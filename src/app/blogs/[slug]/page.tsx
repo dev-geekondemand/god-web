@@ -26,7 +26,12 @@ const slug = params.slug?.toString() || '';
   const blog = useSelector((state: RootState) => state.blog?.blog) as unknown as Blog;
   const allBlogs = useSelector((state: RootState) => state.blog?.blogs) as Blog[];
 
-  const relatedBlogs = allBlogs.filter((item) => item.author === blog?.author && item.title !== blog?.title)?.slice(0, 5);
+  console.log(allBlogs);
+  
+
+  const recentBlogs = allBlogs?.slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5);
+  console.log(recentBlogs);
+  
   
   const azureLoader = ({ src }:{src:string}) => src;
 
@@ -146,11 +151,11 @@ const slug = params.slug?.toString() || '';
                                   <div className='flex md:col-span-4 col-span-12 flex-col gap-5 mt-28 h-fit'>
                                     
                                     <div className='w-full  px-6 py-6 rounded-md'>
-                                      <h3 className="text-2xl font-semibold text-gray-800 mb-4">Related Blogs</h3>
+                                      <h3 className="text-2xl font-semibold text-gray-800 mb-4">Recent Blogs</h3>
 
                                       <div className="flex flex-col gap-4">
-                                        {relatedBlogs?.length > 0 ? (
-                                          relatedBlogs.map((item: Blog,index: number) => (
+                                        {recentBlogs?.length > 0 ? (
+                                          recentBlogs.map((item: Blog,index: number) => (
                                             <Link 
                                               href={`/blogs/${item.slug}`} 
                                               key={index+1}
