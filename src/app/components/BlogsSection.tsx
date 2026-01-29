@@ -34,7 +34,7 @@ const BlogsSection = () => {
     const isLoading = useSelector((state:RootState) => state.blog?.isLoading);
 
   return (
-    <section className='flex justify-center bg-white w-full px-3 py-16'>
+    <section className='flex justify-center bg-white w-full px-3 py-8'>
     <div className='max-w-7xl w-full flex flex-col justify-center items-center rounded-md'>
           <div className='flex flex-col max-w-2xl items-center justify-center w-full mx-auto gap-3'>
             <h1 className="h3 text-center">Insights &  <span className='text-teal-700'>Updates</span></h1>

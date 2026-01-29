@@ -53,7 +53,7 @@ const dispatch = useAppDispatch();
 const azureLoader = ({ src }:{src:string}) => src;
 
   return (
-    <div className='max-w-7xl w-full mx-auto py-20'>
+    <div className='max-w-7xl w-full mx-auto py-0'>
                <div className='flex w-full'>
                 <div className='flex flex-col gap-5 w-full'>
                     <div className='py-5 flex flex-col gap-4'>

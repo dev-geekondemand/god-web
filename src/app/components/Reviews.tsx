@@ -44,7 +44,7 @@ const reviews = [
 
 const Reviews = () => {
   return (
-    <section className='flex justify-center w-full py-12'>
+    <section className='flex justify-center w-full pt-12'>
     <div className='max-w-7xl w-full flex flex-col justify-center items-center rounded-md'>
           <div className='flex flex-col max-w-2xl items-center justify-center w-full mx-auto gap-3'>
             <h1 className="h3 text-center">Voices of Our <span className='colored'>Seekers</span></h1>

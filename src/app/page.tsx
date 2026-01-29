@@ -86,7 +86,7 @@ export default function Home() {
                 </div>}
 
 
-      <section className='py-8 p-3 w-full flex justify-center'>
+      <section className='pt-8 p-3 w-full flex justify-center'>
         <div className='max-w-7xl w-full flex flex-col justify-center items-center py-12 sm:px-10 px-4  bg-amber-800/10 relative rounded-3xl'>
             <div className='flex flex-col text-white max-w-2xl items-center justify-center w-full mx-auto gap-3'>
               <h1 className="text-4xl font-bold text-center text-gray-600">Tech Support in <span className='text-teal-700'>3 Simple Steps</span></h1>
@@ -129,7 +129,7 @@ export default function Home() {
 
       </section>
 
-      <section className=' dark:text-gray-200 pt-20   w-full  mt-10'>
+      <section className=' dark:text-gray-200    w-full  mt-10'>
                           <div className='flex flex-col gap-5 max-w-7xl mb-12 relative justify-center items-center mx-auto'>
                           <h1 className='h2'>Brands Served by our Geeks</h1>
                           

@@ -79,7 +79,7 @@ const mediaSlice = createSlice({
         state.loading = false;
         state.error = action.payload || 'Upload failed';
         state.progress = 0;
-         toast.error((action.payload as { message: string })?.message|| 'Upload failed');
+         toast.error((action.payload as unknown as { message: string } )?.message|| 'Upload failed');
       });
   },
 });

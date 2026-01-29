@@ -152,7 +152,7 @@ const page = () => {
       
     </div>
 
-    <div className='w-full md:pt-20 py-6 md:mt-20 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2'>
+    <div className='w-full md:pt-10 py-6 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2'>
         <div className='flex items-center justify-center relative lg:justify-start p-3'>
           <div className='md:block hidden w-[370px] md:h-[400px] xl:h-[500px] relative bg-gray-900 rounded-lg p-2'>
             <span className='-rotate-90 absolute top-1/2 md:-left-23 xl:-left-19 inline-block text-white text-xl font-semibold'>12+ Years of Experience</span>
@@ -196,8 +196,8 @@ const page = () => {
 
     </div>
 
-            <div className='flex flex-col md:flex-row bg-white w-full max-w-6xl mx-auto gap-20'>
-          <section className='w-full  py-20 flex justify-center items-center'>
+            <div className='flex flex-col md:flex-row mb-8 bg-white w-full max-w-6xl mx-auto gap-20'>
+          <section className='w-full  py-10 flex justify-center border border-gray-500 rounded-md items-center'>
             <div className='max-w-7xl w-full mx-auto flex flex-col gap-10 px-6'>
               <h3 className='h3 text-gray-800 text-center'>Our Mission</h3>
               <ul className='flex flex-col gap-3 text-gray-700 text-sm leading-6 max-w-3xl mx-auto'>
@@ -209,7 +209,7 @@ const page = () => {
           </section>
 
           {/* Our Vision Section */}
-          <section className='w-full flex justify-center items-center'>
+          <section className='w-full flex justify-center border border-gray-500 rounded-md items-center'>
             <div className='max-w-7xl w-full mx-auto flex flex-col gap-6 px-6'>
               <h3 className='h3 text-gray-800 text-center'>Our Vision</h3>
               <p className='text-sm text-gray-600 text-center max-w-4xl mx-auto'>
@@ -228,7 +228,7 @@ const page = () => {
 
 
     {/* Who We Are Section */}
-    <div className='w-full bg-gray-50 py-20'>
+    <div className='w-full bg-gray-50 py-8'>
       <div className='max-w-7xl w-full mx-auto px-6 flex flex-col gap-10'>
         
         {/* Section Heading */}
@@ -317,22 +317,22 @@ const page = () => {
 
 
     
-    <div className='w-full bg-[#f7f7ff] py-20 relative'>
+    <div className='w-full bg-[#f7f7ff] py-10 relative'>
       <div className='w-full max-w-7xl mx-auto flex flex-col justify-center items-center gap-8'>
           <div className='flex flex-col gap-4 items-center justify-center'>
               <h3 className="h2">How It Works</h3>
               <p className="body-2 text-center text-gray-700">Straightforward process designed to make your experience seamless and hassle-free.</p>
           </div>
-          <div className='w-full flex flex-col lg:flex-row justify-center items-center gap-7  p-4'>
+          <div className='w-full flex h-full flex-col xl:flex-row justify-center items-center gap-7  p-4'>
 
-              <div className='bg-white px-4 py-6 rounded-lg flex flex-col items-center gap-4 relative '>
+              <div className='bg-white h-full px-4 py-6 rounded-lg flex flex-col items-center gap-4 relative '>
                 <div className='w-20 h-20 rounded-lg flex items-center justify-center bg-teal-100/70'>
                 <UserSearch width={40} height={40} className='text-teal-500' />
 
                 </div>
                   <div className='flex flex-col md:w-sm items-center gap-2'>
                       <h4 className="h5">1. Search and Browse</h4>
-                      <p className="text-sm text-center px-3 leading-6 text-gray-500">
+                      <p className="text-sm md:h-18 text-center px-3 leading-6 text-gray-500">
                         Customers can browse or search for specific Services or Geeks using categories, filters, or search bars.
                       </p>
 
@@ -343,13 +343,13 @@ const page = () => {
                   </div> */}
               </div>
 
-              <div className='bg-white px-4 py-6 rounded-lg flex flex-col items-center gap-4 relative '>
+              <div className='bg-white h-full px-4 py-6 rounded-lg flex flex-col items-center gap-4 relative '>
                 <div className='w-20 h-20 rounded-lg flex items-center justify-center bg-teal-100/70'>
                 <MousePointer width={40} height={40} className='text-teal-600' />
                 </div>
                   <div className='flex flex-col md:w-sm items-center gap-2'>
                       <h4 className="h5">2. Book Service</h4>
-                      <p className="text-sm text-center leading-6 px-3 text-gray-500">
+                      <p className="text-sm md:h-18 text-center leading-6 px-3 text-gray-500">
                       Register with us in a few simple steps. Hire and work directly with Tech Support Geeks.
                       </p>
 
@@ -361,14 +361,14 @@ const page = () => {
               </div>
 
 
-              <div className='bg-white px-4 py-6 rounded-lg flex flex-col items-center gap-4 relative '>
+              <div className='bg-white h-full px-4 py-6 rounded-lg flex flex-col items-center gap-4 relative '>
                 <div className='w-20 h-20 rounded-lg flex items-center justify-center bg-teal-100/70'>
                 <Sparkle width={40} height={40} className='text-teal-600' />
 
                 </div>
                   <div className='flex flex-col md:w-sm items-center gap-2'>
                       <h4 className="h5">3. Solve Problems</h4>
-                      <p className="text-sm px-3 text-center leading-6 text-gray-500">
+                      <p className="text-sm md:h-18 px-3 text-center leading-6 text-gray-500">
                       Choose the best quotation from expert Geeks and collaborate with them across diverse IT support categories.
                       </p>
 
@@ -386,7 +386,7 @@ const page = () => {
     </div>
 
 
-    <div id='faq' className='w-full sm:p-5 p-3 bg-gray-50/60 py-20 flex flex-col justify-center items-center'>
+    <div id='faq' className='w-full sm:p-5 p-3 bg-gray-50/60 py-10 flex flex-col justify-center items-center'>
       <div className='w-full max-w-7xl mx-auto grid grid-cols-12 gap-6 justify-center items-center'>
           <div className='col-span-12 md:col-span-6 flex flex-col gap-6'>
             <h1 className="h2">Why Choose Geek On Demand?</h1>
@@ -575,8 +575,8 @@ const page = () => {
 
 
 
-    <div className='w-full sm:p-5 p-3 md:pt-20 pt-10 bg-gray-50 flex justify-center py-12'>
-      <div className="max-w-7xl w-full mx-auto gap-6 flex flex-col">
+    <div className='w-full sm:p-5 p-3 md:pt-10 pt-10 bg-gray-50 flex justify-center py-12'>
+      <div className="max-w-7xl w-full mx-auto gap-0 flex flex-col">
             <div className='text-center flex flex-col gap-3'>
               <h3 className='h2 text-gray-800'>Revolutionizing IT Support with AI</h3>
               <h4 className='h4 text-gray-600 font-semibold'>AI + Human Expertise = Better, Faster IT Support</h4>
@@ -590,7 +590,7 @@ const page = () => {
                 opts={{
                     align: "start",
                 }}
-                className="w-full py-6 px-5 "
+                className="w-full  px-5 "
                 >
                 <CarouselContent>
                     {Testimonials.map((t,index) => (
@@ -636,7 +636,7 @@ const page = () => {
 
 
         {/* What's Next Section */}
-      <section className='w-full bg-white py-20 flex justify-center items-center'>
+      <section className='w-full bg-white pt-10 flex justify-center items-center'>
         <div className='max-w-7xl w-full mx-auto flex flex-col gap-10 px-6'>
 
           {/* Heading */}
@@ -650,8 +650,8 @@ const page = () => {
             </p>
           </div>
 
-          <section className='w-full sm:p-5 p-3 flex items-center justify-center  relative z-1 py-20'>
-              <div className='w-full max-w-5xl mx-auto grid grid-cols-12 rounded-lg justify-center items-center md:px-10   px-6 py-10 bg-gray-900 '>
+          <section className='w-full sm:p-5 p-3 flex items-center justify-center  relative z-1 pt-20'>
+              <div className='w-full max-w-5xl mx-auto grid grid-cols-12 rounded-lg justify-center items-center md:px-10   px-6 p-10 bg-gray-900 '>
                 <div className='md:col-span-9 col-span-12 gap-6 flex text-white flex-col items-start justify-center'>
                   
                     <h1 className="h2">Take the Next Step</h1>
