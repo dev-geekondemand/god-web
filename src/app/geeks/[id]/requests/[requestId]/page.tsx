@@ -323,27 +323,40 @@ const SingleRequestPage = () => {
     
                     <div className='w-full bg-white rounded-md py-3 px-4 gap-4 shadow-md flex flex-col'>
                         <div className='w-full border-b border-gray-300 pb-4 flex flex-col gap-2'>
-                            <h3 className="text-2xl font-bold">Service Provider</h3>
+                            <h3 className="text-2xl font-bold">Seeker Details</h3>
                         </div>
     
-                        <div className='w-full flex flex-col gap-1 p-3 justify-center items-center bg-gray-200/60 rounded-lg h-36'>
-                            <div className='w-14 h-14 overflow-hidden rounded-full relative'>
-                                <Image
-                                    
-                                    loader={azureLoader}
-                                    layout="fill"
-                                    objectFit="cover"
-                                    className='object-cover w-full rounded-t-md hover:scale-110 transition transform duration-500' 
-                                    src={request?.geek?.profileImage?.url ? request?.geek?.profileImage?.url : "/assets/images/person.png"} alt='Category Image' />
-                                
-                            </div> 
-                           <div className='flex flex-col items-center justify-center w-full'>
-                           <h3 className="font-bold text-xl">{request?.geek?.fullName?.first + " " + request?.geek?.fullName?.last}</h3>  
-                            <div className='flex gap-1 items-center'>
-                               {request?.geek?.primarySkill?.title}
-                            </div>
-                           </div>
-                        </div>
+                        {/* Profile Section */}
+{request?.seeker?._id ? (
+  <div className="bg-gray-200/60 dark:bg-gray-800 rounded-lg flex flex-col items-center justify-center p-3 h-36 gap-2">
+    
+    {/* Avatar */}
+    <div className="w-20 h-20 rounded-full overflow-hidden">
+      <img
+        src={
+          request?.seeker?.profileImage
+            ? request.seeker.profileImage
+            : "/assets/photos/placeholder_user.jpg"
+        }
+        alt="Seeker profile"
+        className="w-full h-full object-cover"
+      />
+    </div>
+
+    {/* Name */}
+    <div className="flex flex-col items-center justify-center">
+      <p className="font-bold dark:text-gray-100 text-xl text-center">
+        {request?.seeker?.fullName?.first}{" "}
+        {request?.seeker?.fullName?.last}
+      </p>
+    </div>
+  </div>
+) : (
+  <p className="w-full text-center dark:text-white">
+    Seeker does not exist
+  </p>
+)}
+
     
                         <div className='flex flex-col w-full gap-4 py-3 border-b border-gray-400'>
                             <div className='flex justify-between w-full '>
