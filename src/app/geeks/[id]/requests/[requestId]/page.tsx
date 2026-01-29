@@ -51,7 +51,7 @@ const SingleRequestPage = () => {
 <div hidden={!uploadedMedia} onClick={() => setUploadedMedia(false)} className='fixed inset-0 bg-gray-200 opacity-90 z-50 transition-opacity duration-300'></div>
 
                 {uploadedMedia && <div className='fixed flex top-10 h-[70vh] overflow-y-scroll custom-scrollbar bottom-10 right-0 left-0  items-center justify-center  max-w-3xl mx-auto bg-white shadow-lg z-50 transform transition-transform duration-300 '>
-                    <MediaUploader requestId={requestId}  />
+                    <MediaUploader requestId={requestId} isUploadedOpen={uploadedMedia} setIsUploadedOpen={setUploadedMedia}  />
                 </div>}
     
   

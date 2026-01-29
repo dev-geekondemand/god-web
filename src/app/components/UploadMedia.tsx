@@ -12,8 +12,9 @@ import { cancelUpload } from "@/features/media/mediaService";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import toast from "react-hot-toast";
+import { X } from "lucide-react";
 
-const UploadMediaPage = ({ requestId }: { requestId: string }) => {
+const UploadMediaPage = ({ requestId,isUploadedOpen,setIsUploadedOpen }: { requestId: string,isUploadedOpen: boolean,setIsUploadedOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
   const dispatch = useAppDispatch();
   const { loading, progress, success, error } = useSelector(
     (state:RootState) => state.media
@@ -41,7 +42,7 @@ const UploadMediaPage = ({ requestId }: { requestId: string }) => {
       }catch(err){
         setPreviews([]);
         
-        toast.error("Failed to upload media");
+        // toast.error("Failed to upload media");
       }
     },
     [dispatch, requestId]
@@ -63,7 +64,8 @@ const UploadMediaPage = ({ requestId }: { requestId: string }) => {
   });
 
   return (
-    <div className="w-full max-w-xl mx-auto mt-10 p-6 rounded-xl bg-white ">
+    <div className="w-full max-w-xl mx-auto mt-10 p-6 rounded-xl bg-white relative">
+      <button className="text-gray-900 absolute top-2 right-2 cursor-pointer"><X onClick={() => setIsUploadedOpen(false)} className="w-6 h-6" /></button>
       <h2 className="text-xl font-bold mb-4 text-center text-teal-600">
         Upload Media for Request
       </h2>

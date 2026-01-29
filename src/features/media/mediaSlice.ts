@@ -1,6 +1,7 @@
 // features/media/mediaSlice.ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { uploadMedia } from './mediaService';
+import toast from 'react-hot-toast';
 
 interface MediaState {
   loading: boolean;
@@ -35,7 +36,9 @@ export const uploadMediaThunk = createAsyncThunk<
     return data;
   }catch (error) {
     if (error) {
-      return rejectWithValue(((error as { response: { data: unknown } }).response?.data || (error as Error).message).toString());
+      console.log((error as { response: { data: unknown } }).response?.data);
+      
+      return rejectWithValue(((error as { response: { data: { message: string } } }).response?.data?.message || "") as string);
       } else {
         return rejectWithValue('An unknown error occurred');
       }
@@ -70,10 +73,13 @@ const mediaSlice = createSlice({
         state.error = null;
         state.progress = 100;
         state.media = action.payload;
+        toast.success('Media uploaded successfully');
       })
       .addCase(uploadMediaThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Upload failed';
+        state.progress = 0;
+         toast.error((action.payload as { message: string })?.message|| 'Upload failed');
       });
   },
 });
