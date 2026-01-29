@@ -105,14 +105,14 @@ const [openIssueId, setOpenIssueId] = React.useState<string | null>(null);
            
             <div className="flex flex-col justify-center items-start">
               <h3 className="text-lg font-semibold">Service Request for {req?.category?.title}</h3>
-              <HoverCardComponent 
+              {req.geekResponseStatus === "Accepted" ? <HoverCardComponent 
                 linkText={"From: " + req.seeker?.fullName?.first + " " + req.seeker?.fullName?.last}
                 avatarImg={req.seeker.profileImage}
                 title={"Name: " + req?.seeker?.fullName?.first + " " + req?.seeker?.fullName?.last}
                 line1={req.seeker?.authProvider === "google" || req.seeker?.authProvider === "microsoft" ? "Email: " + req?.seeker?.email : "Phone: " + req?.seeker?.phone}
                 line2={"Joined on: " + new Date(req?.seeker?.createdAt).toLocaleString('en-US', { day: 'numeric', month: 'long', year: 'numeric'})}
                 mutedLine={req?.seeker?.address?.line1 ? "Address: " + req?.seeker?.address?.line1 + ", " + req?.seeker?.address?.line2 + ", " + req?.seeker?.address?.line3 : ""}
-              />
+              /> : <p>Accept request to see seeker details.</p>}
               <p className="text-sm flex  gap-2 text-gray-500 mt-1 mb-2">Requested on: {new Date(req.createdAt).toLocaleString('en-US', { day: 'numeric', month: 'long', year: 'numeric' , hour: 'numeric', minute: 'numeric'})} 
                 {/* <span className={`text-sm ${hoursLeft(new Date(req.createdAt)) > 0 ? "text-teal-600" : minutesLeft(new Date(req.createdAt)) > 0 ? "text-yellow-500" : "text-red-500"}`}>{ req.geekResponseStatus === "Pending" && hoursLeft(new Date(req.createdAt)) > 0 ? `(${hoursLeft(new Date(req.createdAt))} hours left)` : minutesLeft(new Date(req.createdAt)) > 0 ? req.geekResponseStatus === "Pending" && `( ${  minutesLeft(new Date(req.createdAt))} minutes left)` : "Expired"}</span> */} </p> 
               <p className="flex text-sm items-center gap-2 mt-1 text-gray-500">Status: <span className={`text-sm ${req.status === "Pending" || req.status === "Matched" ? "text-teal-600" : req.status === "Rejected" || req.status === "Cancelled" ? "text-red-500" : "text-green-500"}`}>{req.status}</span></p>
