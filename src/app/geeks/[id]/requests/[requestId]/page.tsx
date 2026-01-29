@@ -328,7 +328,8 @@ const SingleRequestPage = () => {
     
                         {/* Profile Section */}
 {request?.seeker?._id ? (
-  <div className="bg-gray-200/60 dark:bg-gray-800 rounded-lg flex flex-col items-center justify-center p-3 h-36 gap-2">
+  <div className='w-full flex flex-col gap-3'>
+    <div className="bg-gray-200/60 dark:bg-gray-800 rounded-lg flex flex-col items-center justify-center p-3 h-36 gap-2">
     
     {/* Avatar */}
     <div className="w-20 h-20 rounded-full overflow-hidden">
@@ -351,6 +352,25 @@ const SingleRequestPage = () => {
       </p>
     </div>
   </div>
+
+ 
+    <div className='flex flex-col gap-2 mt-4 pb-4'>
+        <div className="flex items-center justify-between gap-2">
+        <h4 className="text-base text-gray-800 dark:text-gray-100">Email:</h4>
+        {request?.seeker?.email ? <p className="dark:text-gray-100">{request?.seeker?.email}</p> : <p className="dark:text-gray-100">N/A</p>}
+    </div>
+    <div className="flex items-center justify-between gap-2">
+        <h4 className="text-base text-gray-800 dark:text-gray-100">Phone:</h4>
+        {request?.seeker?.phone ? <p className="dark:text-gray-100">{request?.seeker?.phone}</p> : <p className="dark:text-gray-100">N/A</p>}
+    </div>
+    <div className="flex items-center justify-between gap-2">
+        <h4 className="text-base text-gray-800 dark:text-gray-100">Address:</h4>
+        {request?.seeker?.address?.city && request?.seeker?.address?.state ? <p className="dark:text-gray-100">{request?.seeker?.address?.city}, {request?.seeker?.address?.state}</p> : <p className="dark:text-gray-100">N/A</p>}
+    </div>
+    </div>
+  </div>
+
+  
 ) : (
   <p className="w-full text-center dark:text-white">
     Seeker does not exist
@@ -358,29 +378,7 @@ const SingleRequestPage = () => {
 )}
 
     
-                        <div className='flex flex-col w-full gap-4 py-3 border-b border-gray-400'>
-                            <div className='flex justify-between w-full '>
-                                <span className='text-gray-900'>Member Since</span>
-                                <span className='text-gray-600'>{new Date(request?.geek?.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                            </div>
-    
-                            <div className='flex justify-between w-full '>
-                                <span className='text-gray-900'>Email</span>
-                                <span className='text-gray-600'>{request?.geek?.email}</span>
-                            </div>
-    
-                            <div className='flex justify-between w-full '>
-                                <span className='text-gray-900'>Phone</span>
-                                <span className='text-gray-600'>{request?.geek?.mobile}</span>
-                            </div>
-    
-                            <div className='flex justify-between w-full '>
-                                <span className='text-gray-900'>No of Listings</span>
-                                <span className='text-gray-600'>{request?.geek?.requests?.length > 0 ? request?.geek?.requests?.length : 1}</span>
-                            </div>
-    
-    
-                        </div>
+                        
                     </div>  
 
                     {curGeek?._id === request?.geek?._id && request?.status !== "Completed" && request?.status !== "Cancelled" && request?.status !== "Rejected" && (
