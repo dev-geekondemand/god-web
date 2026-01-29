@@ -104,7 +104,7 @@ const [openIssueId, setOpenIssueId] = React.useState<string | null>(null);
             </div>
            
             <div className="flex flex-col justify-center items-start">
-              <h3 className="text-lg font-semibold">Service Request for {req?.category?.title}</h3>
+              <h3 onClick={()=>{handleClick(req)}} className="text-lg font-semibold">Service Request for {req?.category?.title}</h3>
               {req.geekResponseStatus === "Accepted" ? <HoverCardComponent 
                 linkText={"From: " +  req.seeker?.fullName?.first + " " +  (req.seeker?.fullName?.last ?? "")}
                 avatarImg={req.seeker.profileImage}
