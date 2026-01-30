@@ -98,7 +98,7 @@ const Contact = () => {
       
     </div>
 
-    <div className='w-full justify-center flex py-12'>
+    <div className='w-full justify-center flex py-2'>
         <div className='max-w-7xl mx-auto  grid md:grid-cols-3 grid-cols-1 w-full p-3 gap-8 '>
             <div className='bg-white hover:shadow-lg hover:shadow-purple-100 px-6 py-4 flex items-center gap-6 border border-gray-200 rounded-md'>
                 <div className='rounded-full w-20 h-20 bg-gray-50 flex justify-center items-center'>
@@ -106,7 +106,7 @@ const Contact = () => {
                 </div>
                 <div className='flex flex-col gap-1'>
                     <h6 className='text-lg text-black '>Phone</h6>
-                    <p className='body-2 text-gray-600'>(+91) 80089 22112</p>
+                    <a href='tel:(+91) 8374374117' className='body-2 text-gray-600'>(+91) 8374374117</a>
                     {/* <p className='body-2 text-gray-600'>(123) 456-7890</p> */}
                 </div>
             </div>
@@ -118,7 +118,7 @@ const Contact = () => {
                 <div className='flex flex-col gap-1'>
                     <h6 className='text-lg text-black '>Email Address</h6>
                     {/* <p className='body-2 text-gray-600'>abhaypratap@example.com</p> */}
-                    <p className='body-2 text-gray-600'>hello@geekondemand.in</p>
+                    <a href='mailto:hello@geekondemand.in' className='body-2 text-gray-600'>hello@geekondemand.in</a>
                 </div>
             </div>
 
@@ -138,7 +138,7 @@ const Contact = () => {
     </div>
 
 
-    <div className="w-full py-12 px-4 sm:px-6 lg:px-8">
+    <div className="w-full py-2 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl md:gap-12 gap-8 mx-auto grid grid-cols-1 md:grid-cols-2 w-full items-center justify-between">
         {/* Image Section */}
         <div className=" h-[90%] w-full rounded-lg flex relative bg-gray-100 justify-center">

@@ -48,7 +48,7 @@ const Footer = () => {
               url: "/founders-message"
             },
             {
-              text: "Our Community",
+              text: "Blogs",
               url: "/blogs"
             },
             {

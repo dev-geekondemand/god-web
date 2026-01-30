@@ -40,7 +40,7 @@ const TOS = () => {
             </div>
         
         </div>
-    <div className="max-w-6xl mx-auto px-4 py-20">
+    <div className="max-w-6xl mx-auto px-4 py-10">
 
     <div className=" px-4">
       <div className="space-y-6 text-base leading-relaxed text-gray-800">

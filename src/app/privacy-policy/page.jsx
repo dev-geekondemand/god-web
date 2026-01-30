@@ -39,7 +39,7 @@ const PrivacyPolicy = () => {
             </div>
         </div>
 
-    <div className="max-w-6xl mx-auto px-4 py-20">
+    <div className="max-w-6xl mx-auto px-4 py-10">
 
     <section className="space-y-8">
     <p className=" text-gray-600">

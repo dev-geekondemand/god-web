@@ -203,7 +203,7 @@ const FAQs: React.FC = () => {
             </div>
             
         </div>
-        <div className="max-w-6xl w-full gap-12 flex md:flex-row flex-col justify-center items-center md:items-start mx-auto px-4 py-12">
+        <div className="max-w-6xl w-full gap-12 flex md:flex-row flex-col justify-center items-center md:items-start mx-auto px-4 py-6">
 
       <FAQSection title="FAQs for Seekers (Customers)" faqs={seekerFAQs} />
       <FAQSection title="FAQs for Geeks (Service Providers)" faqs={geekFAQs} />

@@ -79,7 +79,7 @@ const slug = params.slug?.toString() || '';
                 </div>
             </div>
 
-            <div className='w-full flex flex-col gap-8 items-center justify-center py-20 px-3 bg-white'>
+            <div className='w-full flex flex-col gap-8 items-center justify-center pt-6 px-3 bg-white'>
                         <div className='max-w-7xl  mx-auto w-full flex flex-col items-center justify-center'>
                             <div className='w-full grid grid-cols-12 gap-8'>
             
@@ -161,7 +161,7 @@ const slug = params.slug?.toString() || '';
                                               key={index+1}
                                               className="flex flex-col gap-3 bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition"
                                             >
-                                              <div className="w-full h-48 rounded overflow-hidden">
+                                              {/* <div className="w-full h-48 rounded overflow-hidden">
                                                 <Image
                                                   src={item.coverImage?.url || "/assets/images/blog.png"}
                                                   width={80}
@@ -169,7 +169,7 @@ const slug = params.slug?.toString() || '';
                                                   className="object-cover w-full h-full"
                                                   alt={item.title}
                                                 />
-                                              </div>
+                                              </div> */}
 
                                               <div className="flex flex-col justify-center gap-4 mt-3">
                                                 <span className="text-xs font-bold text-gray-500">
@@ -188,7 +188,7 @@ const slug = params.slug?.toString() || '';
                                             </Link>
                                           ))
                                         ) : (
-                                          <p className="text-gray-500 text-sm">No related blogs found.</p>
+                                          <p className="text-gray-500 text-sm">No recent blogs found.</p>
                                         )}
                                       </div>
                                     </div>

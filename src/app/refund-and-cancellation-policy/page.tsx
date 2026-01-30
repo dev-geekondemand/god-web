@@ -31,7 +31,7 @@ const RefundCancellationPolicy = () => {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-20">
+      <div className="max-w-6xl mx-auto px-4 py-10">
         <section className="space-y-8">
           <p className="text-gray-600">
             Welcome to GeekOnDemand! GeekOnDemand (“Company”/ “we”/ “our”/ “us”) Website is an online platform that operates towards digitizing the IT service marketplace. This Refund and Cancellation Policy outlines our terms and conditions pertaining to refund and cancellation of payments made to the Company. Please read this policy carefully, together with our Terms of Service Agreement.

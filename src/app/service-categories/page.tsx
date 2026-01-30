@@ -62,7 +62,7 @@ const Categories = () => {
             </div>
         </div>
 
-        <div className='w-full flex justify-center items-center px-3 py-20'>
+        <div className='w-full flex justify-center items-center px-3 py-10'>
             <div className='w-full flex justify-center items-center max-w-7xl mx-auto '>
                 {isLoading ? <GlobalSkeleton cards={9} cols={1} lgCols={3} /> :<div className='w-full grid md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-10 justify-center items-center'>
                     {
