@@ -197,14 +197,13 @@ const page = () => {
     </div>
 
             <div className='flex flex-col md:flex-row mb-8 bg-white w-full max-w-6xl mx-auto gap-20'>
-          <section className='w-full  py-10 flex justify-center border border-gray-500 rounded-md items-center'>
+          <section className='w-full mt-3 py-10 flex justify-center border border-gray-500 rounded-md items-center'>
             <div className='max-w-7xl w-full mx-auto flex flex-col gap-10 px-6'>
               <h3 className='h3 text-gray-800 text-center'>Our Mission</h3>
-              <ul className='flex flex-col gap-3 text-gray-700 text-sm leading-6 max-w-3xl mx-auto'>
-                 <li className='flex items-center gap-2'><Image className='mt-0.5' width={16} height={16} src={"/assets/icons/check-circle.svg"} alt='check image' />To provide on-demand IT services in India that are fast, transparent, and accessible to all.</li>
-                 <li className='flex items-center gap-2'><Image className='mt-0.5' width={16} height={16} src={"/assets/icons/check-circle.svg"} alt='check image' />To empower businesses — from MSMEs to enterprises — with GeekOnDemand IT services they can trust.</li>
-                 <li className='flex items-center gap-2'><Image className='mt-0.5' width={16} height={16} src={"/assets/icons/check-circle.svg"} alt='check image' />To enable IT professionals in India to build successful careers, working commission-free with clients across the globe.</li>
-              </ul>
+              <p className='text-sm text-gray-600 text-center max-w-4xl mx-auto'>To become India’s most trusted, AIpowered IT support platform — bringing
+reliability, transparency, and speed to IT
+services across consumer and business
+segments.</p>
             </div>
           </section>
 
@@ -213,14 +212,13 @@ const page = () => {
             <div className='max-w-7xl w-full mx-auto flex flex-col gap-6 px-6'>
               <h3 className='h3 text-gray-800 text-center'>Our Vision</h3>
               <p className='text-sm text-gray-600 text-center max-w-4xl mx-auto'>
-                GeekOnDemand was founded by technology industry veterans who understand the pain points of traditional outsourcing. 
+                To bridge the gap between the demand for
+skilled, verified IT professionals and the chaotic,
+unstructured nature of today’s tech support
+market by building a dedicated, subscription based marketplace supported by Agentic AI.
               </p>
 
-              <ul className='flex flex-col gap-3 text-gray-700 text-sm leading-6 max-w-3xl mx-auto'>
-                <li className='flex items-center gap-2'><Image className='mt-0.5' width={16} height={16} src={"/assets/icons/check-circle.svg"} alt='check image' />Tech support is available anytime, anywhere.</li>
-                <li className='flex items-center gap-2'><Image className='mt-0.5' width={16} height={16} src={"/assets/icons/check-circle.svg"} alt='check image' />MSMEs and startups can access enterprise-level IT help without high costs.</li>
-                <li className='flex items-center gap-2'><Image className='mt-0.5' width={16} height={16} src={"/assets/icons/check-circle.svg"} alt='check image' /> IT professionals in India get the recognition, exposure, and opportunities they deserve.</li>
-              </ul>
+             
             </div>
           </section>
         </div>
@@ -389,11 +387,11 @@ const page = () => {
     <div id='faq' className='w-full sm:p-5 p-3 bg-gray-50/60 py-10 flex flex-col justify-center items-center'>
       <div className='w-full max-w-7xl mx-auto grid grid-cols-12 gap-6 justify-center items-center'>
           <div className='col-span-12 md:col-span-6 flex flex-col gap-6'>
-            <h1 className="h2">Why Choose Geek On Demand?</h1>
+            <h1 className="h2">Why Choose GeekOnDemand?</h1>
             <p className="body-2 text-gray-600">India’s First Zero-Commission Tech Support Marketplace.</p>
             <Accordion type="single" collapsible className="w-full mt-2 text-base flex flex-col gap-2">
             <AccordionItem value="item-1" className='border-b-0'>
-              <AccordionTrigger className='text-base bg-gray-100 rounded-lg px-3 mb-1'>Verified, Skilled & Trusted Geeks.</AccordionTrigger>
+              <AccordionTrigger className='text-base bg-gray-100 rounded-lg px-3 mb-1'>Verified, Skilled & Trusted Geeks</AccordionTrigger>
               <AccordionContent className='bg-white px-3 text-gray-700'>
              Every Geek goes through background checks, skill evaluation, and continuous performance monitoring — ensuring customers get reliable, high-quality tech support every time.
               </AccordionContent>
@@ -433,7 +431,7 @@ const page = () => {
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-6" className='border-b-0'>
-              <AccordionTrigger className='text-base bg-gray-100 rounded-lg px-3 mb-1'>. Faster Response & Real-Time Tracking</AccordionTrigger>
+              <AccordionTrigger className='text-base bg-gray-100 rounded-lg px-3 mb-1'>Faster Response & Real-Time Tracking</AccordionTrigger>
               <AccordionContent className='bg-white px-3 text-gray-700'>
               From booking to completion:
               <ul className='flex flex-col gap-1 mt-1'>

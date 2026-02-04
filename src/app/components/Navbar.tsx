@@ -2,14 +2,14 @@
 
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation';
-import React, {  useState } from 'react'
+import React, {  useEffect, useState } from 'react'
 import CustomButton from './CustomButton';
 import Link from 'next/link';
 import {  useSelector } from 'react-redux';
-import {  logoutUser, UserState } from '@/features/seeker/seekerSlice';
+import {  loadUser, logoutUser, UserState } from '@/features/seeker/seekerSlice';
 import CustomModel from './CustomModal';
 import {  GeekInitialState, logoutGeek } from '@/features/geek/geekSlice';
-import { LayoutGrid, UserRound } from 'lucide-react';
+import { Bell, LayoutGrid, UserRound } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +22,7 @@ import { RootState } from '@/lib/store';
 import { useAppDispatch } from '@/lib/hooks';
 import { ServiceRequest } from '@/interfaces/ServiceRequest';
 import toast from 'react-hot-toast';
+import { getSeekerRequests } from '@/features/request/requestSlice';
 
 const Navbar = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -31,7 +32,9 @@ const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
 
-
+  useEffect(()=>{
+    dispatch(getSeekerRequests())
+  },[])
 
 
   const { isAuthenticated, user } = useSelector((state:RootState) => state.seeker) as UserState;
@@ -39,13 +42,20 @@ const Navbar = () => {
   const isGeekAuthenticated = geekState?.isAuthenticated;
   const geek = geekState?.geek;
 
+  const seeker = useSelector((state:RootState) => state.seeker) as UserState;
+  const isSeekerAuthenticated = seeker?.isAuthenticated;
+  const seekerUser = seeker?.user;
 
+  const seekerRequests = useSelector((state:RootState) => state.request.requests) as ServiceRequest[];
+  // const unread = seekerRequests.filter((request) => request.geekResponseStatus === 'Accepted' || request.geekResponseStatus === 'Pending').length;
+  const unreadInlast24Hours = seekerRequests.filter((request) => request.status === 'Accepted' || request.status === 'Pending' || request.status === 'Completed' && new Date(request.createdAt).getTime() > Date.now() - 86).length;
+  
 
   const navlinks = [
     { id: 1, name: "Home", link: "/" },
     { id: 5, name: "Blogs", link: "/blogs" },
     { id: 4, name: "Geeks", link: "/geeks" },
-    { id: 3, name: "About", link: "/about" },
+    { id: 3, name: "About Us", link: "/about" },
     { id: 2, name: "Contact Us", link: "/contact" },
   ];
 
@@ -101,9 +111,20 @@ const Navbar = () => {
                 Welcome,&nbsp;
                 <DropdownMenu>
                   <DropdownMenuTrigger className='flex cursor-pointer items-center gap-2 focus:outline-none'>
-                    <div className='flex items-center gap-2'>
+                       
+                      <div className='flex gap-1.5 items-center'>
+                        
                       {user?.fullName?.first || geekState.geek?.fullName?.first}
+
+
                     <UserRound className='w-5 h-5 mb-1 text-gray-800' />
+                      {isAuthenticated &&  !isGeekAuthenticated &&<span>
+                          {unreadInlast24Hours > 0 && (
+                            <span className=' text-white mb-3 bg-red-500 py-0.5 px-1.5 rounded-full'>
+                              {unreadInlast24Hours}
+                            </span>
+                          )}
+                        </span>}
                     </div>
                     {isGeekAuthenticated && geek?.requests && Array.isArray(geek.requests) && (
                       <p onClick={()=>{router.push(`/geeks/${geek?._id}/requests`)}}> 
@@ -120,13 +141,19 @@ const Navbar = () => {
 
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className='w-48 mt-2'>
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                   
+                    <DropdownMenuLabel className='flex items-center gap-2 justify-between mb-4' >My Account  <Link href={`/geeks/${geek?._id}/requests`}><Bell className='w-4 h-4 text-gray-500' /></Link> </DropdownMenuLabel>
+                    
                     <DropdownMenuSeparator />
-                    {isGeekAuthenticated && <DropdownMenuItem><Link  href={`/geeks/dashboard`}>My Profile</Link></DropdownMenuItem>}
+                    {isGeekAuthenticated && <DropdownMenuItem onClick={()=>{router.push(`/geeks/dashboard`)}}>My Profile</DropdownMenuItem>}
                     {isGeekAuthenticated && <DropdownMenuItem onClick={()=>{router.push(`/geeks/${geek?._id}/requests`)}}>Notifications <span>{geek?.requests && geek?.requests?.filter((request:ServiceRequest) => request.geekResponseStatus === "Pending").length > 0 && <span className=' text-white bg-red-500 py-0.5 px-1.5 rounded-full'>{geek?.requests?.filter((request:ServiceRequest) => request.geekResponseStatus === "Pending").length}</span>}</span></DropdownMenuItem>}
-                    {isAuthenticated && <DropdownMenuItem><Link  href={`/seeker/${user?._id}`}>My Profile</Link></DropdownMenuItem>}
+                    {isAuthenticated && <DropdownMenuItem onClick={()=>{router.push(`/seeker/${user?._id}`)}}>My Profile</DropdownMenuItem>}
                     {/* {isGeekAuthenticated && <DropdownMenuItem onClick={()=>{router.push(`/geeks/${geek?._id}/services`)}}>My Services</DropdownMenuItem>} */}
-                    {isAuthenticated && <DropdownMenuItem onClick={()=>{router.push(`/seeker/${user?._id}/services`)}}>My Services</DropdownMenuItem>}
+                    {isAuthenticated && <DropdownMenuItem className='flex justify-between' onClick={()=>{router.push(`/seeker/${user?._id}/services`)}}>My Services {unreadInlast24Hours > 0 && (
+                            <span className=' text-white mb-3 bg-red-500 py-0.5 px-1.5 rounded-full'>
+                              {unreadInlast24Hours}
+                            </span>
+                          )}</DropdownMenuItem>}
                     <DropdownMenuItem onClick={(e) => e.preventDefault()}>
                       <CustomModel
                         text={"Logout"}

@@ -22,7 +22,7 @@ const robotoMono = Roboto_Mono({
 
 
 export const metadata: Metadata = {
-  title: "Geek on Demand",
+  title: "GeekOnDemand",
   description: "Your One-Stop Solution for Professional IT Services",
 };
 

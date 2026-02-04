@@ -52,6 +52,7 @@ const GeekById = () => {
         if(id){
             dispatch(getGeekById(id.toString()));
             dispatch(getBrands());
+            dispatch(getSeekerRequests());
         }else{
             toast.error('Geek not found');
         }
@@ -66,7 +67,7 @@ const GeekById = () => {
     const seekerRequests = useSelector((state: RootState) => state.request?.requests) as ServiceRequest[];
     const brands = useSelector((state: RootState) => state.brand?.brands) as Brand[];
  
-
+        
     const [overView,setOverview] = useState(true);
     const [expertise,setExpertise] = useState(true);
     const [benefits,setBenefits] = useState(false);
@@ -81,7 +82,6 @@ const GeekById = () => {
  const azureLoader = ({ src }:{src:string}) => src;
 
 
-console.log(selectedSkill, categoryId);
 
  const handleClick = async()=>{
     setIsLoading(true);
@@ -157,14 +157,11 @@ console.log(selectedSkill, categoryId);
 
 
  useEffect(()=>{
-    dispatch(getSeekerRequests());
- },[dispatch]);
-console.log(categoryId, selectedSkill);
-
- useEffect(()=>{
     const isRequestedService = (requestState?.requests as ServiceRequest[] | undefined)?.some(
     (request) => request?.geek?._id === geek?._id && request?.geekResponseStatus === 'Accepted'
     );
+
+    // console.log(requestState?.requests, isRequestedService);
 
     
     if (isRequestedService) {
@@ -298,10 +295,10 @@ const getPrimarySkillBrands = (
                         </div>
                     </div>
 
-                    <div className='lg:col-span-3 col-span-1 md:col-span-2 flex flex-col gap-4 p-5'>
-                        <div className='flex flex-col gap-1.5 items-start justify-center'>
+                    <div className='lg:col-span-3 col-span-1 md:col-span-2 flex flex-col flex-wrap gap-4 p-5'>
+                        <div className='flex flex-col flex-wrap gap-1.5 items-start justify-center'>
                             <h6 className='text-gray-700'>Email</h6>
-                            <p className='text-gray-500'>{geek?.email && isRequestedService ? geek?.email : geek?.email ?  "**********" + ".com" : "N/A"  }</p>
+                            <p className='text-gray-500 break-all'>{geek?.email && isRequestedService ? geek?.email : geek?.email ?  "**********" + ".com" : "N/A"  }</p>
                         </div>
 
                         <div className='flex flex-col gap-1.5 items-start justify-center'>

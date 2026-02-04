@@ -381,7 +381,7 @@ const SingleRequestPage = () => {
                         
                     </div>  
 
-                    {curGeek?._id === request?.geek?._id && request?.status !== "Completed" && request?.status !== "Cancelled" && request?.status !== "Rejected" && (
+                    {curGeek?._id === request?.geek?._id && request?.status !== "Completed" && request?.status !== "Matched" && request?.status !== "Cancelled" && request?.status !== "Rejected" && (
                       <div className='w-full bg-white rounded-md py-3 px-4 gap-4 shadow-md flex flex-col'>
                         <button onClick={()=>{setUploadedMedia(true)}} className='w-full cursor-pointer bg-teal-500 text-white text-sm rounded-md px-3 py-2'>Complete Request</button>
                     </div>

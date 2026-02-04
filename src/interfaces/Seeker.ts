@@ -1,4 +1,5 @@
 import { Address } from "./Geek";
+import { ServiceRequest } from "./ServiceRequest";
 
 interface User {
     _id: string;
@@ -16,7 +17,7 @@ interface User {
     profileImage: string;
     profileCompleted: boolean;
     needsReminderToCompleteProfile: boolean;
-    requests: string[];
+    requests: ServiceRequest[];
     createdAt: Date;
     updatedAt: Date;
   }

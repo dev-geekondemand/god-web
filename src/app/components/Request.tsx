@@ -111,7 +111,7 @@ const [openIssueId, setOpenIssueId] = React.useState<string | null>(null);
                 title={"Name: " + req?.seeker?.fullName?.first + " " + (req?.seeker?.fullName?.last ?? "")}
                 line1={req.seeker?.authProvider === "google" || req.seeker?.authProvider === "microsoft" ? "Email: " + req?.seeker?.email : "Phone: " + req?.seeker?.phone}
                 line2={"Joined on: " + new Date(req?.seeker?.createdAt).toLocaleString('en-US', { day: 'numeric', month: 'long', year: 'numeric'})}
-                mutedLine={req?.seeker?.address?.line1 ? "Address: " + req?.seeker?.address?.line1 + ", " + req?.seeker?.address?.line2 + ", " + req?.seeker?.address?.line3 : ""}
+                mutedLine={req?.seeker?.address?.line1 ? "Address: " + (req?.seeker?.address?.line1 + ", " || "" ) + (req?.seeker?.address?.line2  + ", " || "") + (req?.seeker?.address?.line3 || "") : ""}
               /> : <p className="text-sm text-teal-500">Accept request to see seeker details.</p>}
               <p className="text-sm flex  gap-2 text-gray-500 mt-1 mb-2">Requested on: {new Date(req.createdAt).toLocaleString('en-US', { day: 'numeric', month: 'long', year: 'numeric' , hour: 'numeric', minute: 'numeric'})} 
                 {/* <span className={`text-sm ${hoursLeft(new Date(req.createdAt)) > 0 ? "text-teal-600" : minutesLeft(new Date(req.createdAt)) > 0 ? "text-yellow-500" : "text-red-500"}`}>{ req.geekResponseStatus === "Pending" && hoursLeft(new Date(req.createdAt)) > 0 ? `(${hoursLeft(new Date(req.createdAt))} hours left)` : minutesLeft(new Date(req.createdAt)) > 0 ? req.geekResponseStatus === "Pending" && `( ${  minutesLeft(new Date(req.createdAt))} minutes left)` : "Expired"}</span> */} </p> 

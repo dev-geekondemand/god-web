@@ -129,7 +129,7 @@ export default function Home() {
 
       </section>
 
-      <section className=' dark:text-gray-200    w-full  mt-10'>
+      <section className=' dark:text-gray-200    w-full max-w-7xl mx-auto  mt-10'>
                           <div className='flex flex-col gap-5 max-w-7xl mb-12 relative justify-center items-center mx-auto'>
                           <h1 className='h2'>Brands Served by our Geeks</h1>
                           
@@ -157,7 +157,7 @@ export default function Home() {
         </div>
       </div>
 
-      <section className='w-full p-3 bg-amber-800/10 relative'>
+      <section className='w-full p-3 bg-amber-800/10 max-w-7xl mx-auto rounded-md relative'>
         <div className='flex md:w-[90%] md:flex-row flex-col gap-3 justify-between px-4  py-12'>
             <div className='flex flex-col md:px-12 text-white  items-start justify-start w-full gap-2'>
               <h1 className="h2 text-start text-gray-700">Join the Network of  <span className='text-teal-700'>Trusted Geeks </span></h1>

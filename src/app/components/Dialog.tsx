@@ -109,7 +109,7 @@ const DialogComponent = ({
               <Button variant="outline">Cancel</Button>
             </DialogClose>
             <DialogClose asChild>
-              <Button onSubmit={()=>{handleClose();onSubmit()}} type="submit">Save changes</Button>
+              <Button onSubmit={()=>{handleClose();onSubmit()}} type="submit">Save </Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>
