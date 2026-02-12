@@ -40,6 +40,7 @@ function Chat({setOpenChat, isExpanded, setIsExpanded}:{setOpenChat: (value: boo
 	const [fetchedChatHistory, setFetchedChatHistory] = useState(false);
 	const [userIssue,setUserIssue] = useState<UserIssue>();
 	const [error, setError] = useState<string | null>(null);
+	const [sentRequest, setSentRequest] = useState(false);
 
 
 	const ws = useRef<WebSocket | null>(null);
@@ -290,6 +291,7 @@ const dispatch = useAppDispatch();
 				pin: '',
 			},
 		}));
+		setSentRequest(true);
 	};
 
 	const requestState = useSelector((state:RootState)=>state.request) as ServiceState;
@@ -516,7 +518,7 @@ const dispatch = useAppDispatch();
 
 							{!isLoading && isGeekOption && geeks.length > 0 ? (
 								<div className='flex flex-col gap-6 mt-8'>
-									<div className='flex flex-wrap w-full justify-center'>
+									{!sentRequest ?  <div className='grid grid-cols-2 gap-3 w-full justify-center'>
 									{geeks?.map((geek, index) => (
 										<GeekCard
 											// className='m-2'
@@ -525,7 +527,7 @@ const dispatch = useAppDispatch();
 											handleGeekCardClick={() => handleGeekCardClick(geek)}
 										/>
 									))}
-								</div>
+								</div> : <p className='text-center text-green-600 font-semibold'>Your request has been sent to the selected Geek. They will get back to you soon.</p>}
 
 									<Pagination
 									currentPage={page}

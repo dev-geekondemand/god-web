@@ -388,9 +388,9 @@ useEffect(()=>{
                                 <span className='text-gray-600'>{new Date(request?.geek?.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                             </div>
     
-                            <div className='flex justify-between w-full '>
+                            <div className='flex justify-between w-full flex-wrap gap-4'>
                                 <span className='text-gray-900'>Email</span>
-                                <span className='text-gray-600'>{request?.geek?.email || "N/A"}</span>
+                                <span className='text-gray-600 text-wrap'>{request?.geek?.email || "N/A"}</span>
                             </div>
     
                             <div className='flex justify-between w-full '>

@@ -8,7 +8,7 @@ interface GeekCardProps {
 
 const GeekCard: React.FC<GeekCardProps> = ({ geekData, handleGeekCardClick }) => {
 	return (
-		<div className='max-w-xs h-fit shadow-lg border border-teal-500 p-4 m-2 text-wrap rounded-2xl'>
+		<div className='max-w-2xs min-w-[220px] h-fit shadow-lg border border-teal-500 p-4 m-2 text-wrap rounded-2xl'>
 			
 			<div className='flex flex-col gap-1'>
 				<div className='mb-3 flex items-center justify-center'>
