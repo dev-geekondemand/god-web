@@ -66,7 +66,7 @@ const Categories = () => {
                         {/* <Image src={c.Banner} alt='Category Banner' width={60} height={40} /> */}
                         <p className='text-xs text-center font-bold text-gray-800'>{c.title}</p>
                        
-                        <span className='font-normal block text-gray-700 group-hover:hidden text-xs mt-2 transition transform duration-200'>{c.totalGeeks}+ Listings</span>
+                        {/* <span className='font-normal block text-gray-700 group-hover:hidden text-xs mt-2 transition transform duration-200'>{c.totalGeeks}+ Listings</span> */}
                         <Link href={`/categories/${c._id}/brands`} className='hidden mt-2 transition transform duration-200 group-hover:flex text-xs underline text-teal-600'>View All</Link>
 
                       

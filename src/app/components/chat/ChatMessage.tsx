@@ -24,7 +24,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message,profileImage, isExpan
 	const isUser = message.role === 'user';
 
 	const bgColor = isUser
-		? 'bg-gradient-to-br from-violet-400  to-pink-400'
+		? 'bg-teal-500'
 		: 'bg-gradient-to-br from-gray-50 to-gray-200';
 	const textColor = isUser ? 'text-white' : 'text-black';
 	const alignment = isUser ? 'justify-end' : 'justify-start';
