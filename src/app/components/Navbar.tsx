@@ -32,9 +32,7 @@ const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
 
-  useEffect(()=>{
-    dispatch(getSeekerRequests())
-  },[])
+
 
 
   const { isAuthenticated, user } = useSelector((state:RootState) => state.seeker) as UserState;
@@ -50,6 +48,12 @@ const Navbar = () => {
   // const unread = seekerRequests.filter((request) => request.geekResponseStatus === 'Accepted' || request.geekResponseStatus === 'Pending').length;
   const unreadInlast24Hours = seekerRequests.filter((request) => request.status === 'Accepted' || request.status === 'Pending' || request.status === 'Completed' && new Date(request.createdAt).getTime() > Date.now() - 86).length;
   
+
+    useEffect(()=>{
+    if(isAuthenticated && !user){
+      dispatch(getSeekerRequests())
+    }
+  },[])
 
   const navlinks = [
     { id: 1, name: "Home", link: "/" },
