@@ -7,7 +7,7 @@ const Providers = dynamic(() => import('../components/Geeks'), { ssr: false }); 
 const Page = () => {
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <Providers />
+      <Providers /> 
     </Suspense>
   );
 };
