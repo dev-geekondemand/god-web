@@ -233,10 +233,6 @@ const getPrimarySkillBrands = (
 
 
 
-
-
-
-
   return (
     <section className='w-full  flex flex-col items-center justify-center'>
         <div className='w-full relative breadcrumb-bg-2'>
@@ -288,10 +284,10 @@ const getPrimarySkillBrands = (
                         width={150} 
                         height={100} 
                         className="w-[150px] h-[140px] object-cover rounded-md" />
-                        <div className='flex flex-col gap-1.5 items-start justify-start'>
+                        <div className='flex flex-col gap-1.5 items-start justify-center'>
                             <h2 className='text-xl md:text-3xl  font-bold text-black'>{geek.fullName?.first + " " + geek.fullName?.last}</h2>
                             <p className='text-gray-600'>{geek?.primarySkill?.title}.</p>
-                            <p className='text-gray-600 flex gap-2 items-center text-sm'>Member Since <span className='font-semibold'>{new Date(geek.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span></p>
+                            {/* <p className='text-gray-600 flex gap-2 items-center text-sm'>Member Since <span className='font-semibold'>{new Date(geek.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span></p> */}
                         </div>
                     </div>
 

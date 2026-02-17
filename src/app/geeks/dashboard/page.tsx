@@ -361,10 +361,10 @@ const isLoadging = geekState?.isLoading || updating;
                        <div className='flex flex-wrap gap-6 divide-gray-400 divide-x'>
                           
    
-                           <div className='flex flex-col justify-center items-start pr-4 pl-1'>
+                           {/* <div className='flex flex-col justify-center items-start pr-4 pl-1'>
                                <h4 className="p">Active Since</h4>
                                <h5 className="h5">{new Date(geek?.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</h5>
-                           </div>
+                           </div> */}
    
                            
    

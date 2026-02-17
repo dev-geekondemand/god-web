@@ -17,7 +17,7 @@ import GeekSkeletonCard from '../components/GeekSkeletenCard';
 import { fetchUserLocation } from '@/features/locationSlice';
 import { getBrands, getBrandsByCategory } from '@/features/brands/brandsSlice';
 import Brand from '@/interfaces/Brand';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 export interface GeekState {
   geeks: Geek[];
   total: number;
@@ -29,8 +29,12 @@ const LIMIT = 12; // items per page
 
 const Providers = () => {
   const dispatch = useAppDispatch();
+  const searchParams = useSearchParams();
 
-  const [page, setPage] = useState(1);
+  const pageFromUrl = Number(searchParams.get("page")) || 1;
+
+
+  const [page, setPage] = useState(pageFromUrl);
   const [selectedCategory, setSelectedCategory] = useState<Category| null>(null);
   const [brands,setBrands] = useState<Brand[]>([]);  
     const [isOpen, setIsOpen] = useState(false); 
@@ -60,6 +64,7 @@ const Providers = () => {
 
   const handleSubmit = () => {
     setPage(1); 
+    router.push(`?page=1`, { scroll: false });
     setLoading(true);
     dispatch(searchGeeks({ ...filters, page: page, limit: LIMIT }));
   };
@@ -69,6 +74,7 @@ const Providers = () => {
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     setLoading(true);
+    router.push(`?page=${newPage}`, { scroll: false });
     dispatch(searchGeeks({ ...filters, page: newPage, limit: LIMIT }));
   };
 

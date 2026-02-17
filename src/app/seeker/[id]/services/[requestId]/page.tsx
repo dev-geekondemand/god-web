@@ -383,10 +383,10 @@ useEffect(()=>{
                         </div>
     
                         <div className='flex flex-col w-full gap-4 py-3 border-b border-gray-400'>
-                            <div className='flex justify-between w-full '>
+                            {/* <div className='flex justify-between w-full '>
                                 <span className='text-gray-900'>Member Since</span>
                                 <span className='text-gray-600'>{new Date(request?.geek?.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                            </div>
+                            </div> */}
     
                             <div className='flex justify-between w-full flex-wrap gap-4'>
                                 <span className='text-gray-900'>Email</span>

@@ -102,7 +102,7 @@ const exisitingRequests = requests.filter((request) => request.geek?._id !== und
                         avatarImg={req.geek instanceof Object ? req.geek.profileImage?.url : "/assets/images/placeholder_user.jpg"}
                         title={req.geek instanceof Object ? "Name: " + req?.geek?.fullName?.first + " " + req?.geek?.fullName?.last : ""}
                         line1={req?.geek?.mobile && req?.geekResponseStatus === "Accepted" ? "Mobile: " + req?.geek?.mobile : "Mobile: " + "+91**********"}
-                        line2={req.geek instanceof Object ? "Joined on: " + new Date(req?.geek?.createdAt).toLocaleString('en-US', { day: 'numeric', month: 'long', year: 'numeric'}):""}
+                        // line2={req.geek instanceof Object ? "Joined on: " + new Date(req?.geek?.createdAt).toLocaleString('en-US', { day: 'numeric', month: 'long', year: 'numeric'}):""}
                         mutedLine={req.geek instanceof Object ? req?.geek?.address?.city &&  "City: " + req?.geek?.address?.city : "" }
                       />
                       <p className="flex text-sm items-center gap-2 mt-1 text-gray-500">Status: <span className={`text-sm ${req.status === "Pending" || req.status === "Matched" ? "text-teal-600" : req.status === "Rejected" || req.status === "Cancelled" ? "text-red-500" : "text-green-500"}`}>{req.status}</span></p>
