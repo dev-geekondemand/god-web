@@ -289,7 +289,7 @@ const getPrimarySkillBrands = (
                             <p className='text-gray-600'>{geek?.primarySkill?.title}.</p>
                             {/* <p className='text-gray-600 flex gap-2 items-center text-sm'>Member Since <span className='font-semibold'>{new Date(geek.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span></p> */}
                         </div>
-                    </div>
+                    </div> 
 
                     <div className='lg:col-span-3 col-span-1 md:col-span-2 flex flex-col flex-wrap gap-4 p-5'>
                         <div className='flex flex-col flex-wrap gap-1.5 items-start justify-center'>
