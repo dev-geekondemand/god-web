@@ -341,7 +341,7 @@ const isLoadging = geekState?.isLoading || updating;
                
    
                <div className='w-full flex sm:flex-row flex-col justify-between'>
-                    <div className='w-full flex flex-col items-start justify-start md:p-12 p-3'>
+                    <div className='w-full flex flex-col items-start justify-center md:p-12 p-3'>
                    
                        <div className='flex justify-between gap-3 w-full items-end mb-4'>
                            <div className='flex flex-col  gap-1'>

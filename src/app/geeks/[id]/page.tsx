@@ -284,7 +284,7 @@ const getPrimarySkillBrands = (
                         width={150} 
                         height={100} 
                         className="w-[150px] h-[140px] object-cover rounded-md" />
-                        <div className='flex flex-col gap-1.5 items-start justify-center'>
+                        <div className='flex flex-col gap-1.5 items-start justify-start mt-3'>
                             <h2 className='text-xl md:text-3xl  font-bold text-black'>{geek.fullName?.first + " " + geek.fullName?.last}</h2>
                             <p className='text-gray-600'>{geek?.primarySkill?.title}.</p>
                             {/* <p className='text-gray-600 flex gap-2 items-center text-sm'>Member Since <span className='font-semibold'>{new Date(geek.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span></p> */}
