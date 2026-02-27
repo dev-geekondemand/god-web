@@ -84,7 +84,7 @@ const Categories = () => {
                                 <div className='bg-purple-200 rounded-full p-2'>
                                 {c.smallBanner &&<Image loader={azureLoader} src={c.smallBanner?.url} alt='Category Banner' width={30} height={30} />}
                                 </div>
-                                <p className='text-sm text-start font-semibold text-gray-800'>{c.title?.length > 25 ? `${c.title?.slice(0, 25)}...` : c.title }</p>
+                                <p className='text-sm text-start font-semibold text-gray-800'>{c.title?.length > 32 ? `${c.title?.slice(0, 32)}...` : c.title }</p>
                                 </div>
                                 {/* <p className='flex gap-1  text-nowrap text-xs text-gray-700 items-center'>
                                     {c.totalGeeks} Geeks
