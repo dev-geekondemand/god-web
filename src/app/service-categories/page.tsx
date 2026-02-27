@@ -85,9 +85,9 @@ const Categories = () => {
                                 </div>
                                 <p className='text-sm text-start font-semibold text-gray-800'>{c.title?.length > 25 ? `${c.title?.slice(0, 25)}...` : c.title }</p>
                                 </div>
-                                <p className='flex gap-1  text-nowrap text-xs text-gray-700 items-center'>
+                                {/* <p className='flex gap-1  text-nowrap text-xs text-gray-700 items-center'>
                                     {c.totalGeeks} Geeks
-                                </p>
+                                </p> */}
                             </div>
                           
                     </div>
