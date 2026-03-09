@@ -31,7 +31,10 @@ const GeeksByCategories = () => {
   const brandId = useParams().brandId;
   const [loading, setLoading] = useState(false);
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(() => {
+    const pageParam = searchParams.get('page');
+    return pageParam ? parseInt(pageParam, 10) : 1;
+  });
   const [filters, setFilters] = useState({
     city: city ||'',
     state:'',
@@ -53,6 +56,9 @@ const GeeksByCategories = () => {
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     setLoading(true);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', String(newPage));
+    router.replace(`?${params.toString()}`, { scroll: false });
     dispatch(searchGeeks({ page: newPage, limit: LIMIT }));
   };
 
@@ -87,9 +93,12 @@ const router= useRouter();
 
 
   const handleSubmit = () => {
-    setPage(1); 
+    setPage(1);
     setLoading(true);
-    dispatch(searchGeeks({ ...filters, page: page, limit: LIMIT }));
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', '1');
+    router.replace(`?${params.toString()}`, { scroll: false });
+    dispatch(searchGeeks({ ...filters, page: 1, limit: LIMIT }));
   };
 
    
