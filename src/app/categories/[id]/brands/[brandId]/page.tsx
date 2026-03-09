@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 import CustomInput from '@/app/components/CustonInput';
 import GeekSkeletonCard from '@/app/components/GeekSkeletenCard';
 import { fetchUserLocation } from '@/features/locationSlice';
+import Link from 'next/link';
 
 interface GeekState {
   geeks: Geek[];
@@ -106,6 +107,9 @@ const router= useRouter();
           avatar="/assets/logo-big.webp"
         />
       ));
+      setTimeout(() => {
+        router.push('/login/seeker');
+      }, 1000);
     }
   };
 const azureLoader = ({ src }:{src:string}) => src;
@@ -237,7 +241,11 @@ const geeks = geekState?.geeks as Geek[];
                                                 <h2 className="text-xl font-semibold text-gray-700 mb-2">
                                                   We will be adding geeks very soon!
                                                 </h2>
-                                                <button onClick={()=>{setFilters({city: "", state: "", brandId: brandId ?? ""})}} className='bg-teal-600 text-white rounded-lg px-6 py-2.5 cursor-pointer hover:bg-teal-700'>Clear Filters</button>
+                                                <div className='flex gap-4 items-center mt-3'>
+                                                  <button onClick={()=>{setFilters({city: "", state: "", brandId: brandId ?? ""})}} className='bg-teal-600 text-white rounded-lg px-6 py-2.5 cursor-pointer hover:bg-teal-700'>Clear Location</button>
+                                                <Link href={`/geeks`} className='bg-teal-600 text-white rounded-lg px-6 py-2.5 cursor-pointer hover:bg-teal-700'>All Geeks</Link>
+                                              
+                                                </div>
                                               </div>
                                             </div>
                     

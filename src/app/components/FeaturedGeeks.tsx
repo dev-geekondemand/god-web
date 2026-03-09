@@ -61,7 +61,7 @@ const azureLoader = ({ src }:{src:string}) => src;
                         <p className="body-2 text-gray-700 text-center max-w-2xl mx-auto">Meet our most sought-after IT experts, delivering reliable support every day.</p>
         
                     </div>
-                    {isLoading ? <GlobalSkeleton cards={4} cols={1} lgCols={4}  /> :<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-l border-gray-200'>
+                    {isLoading || !geeks ? <GlobalSkeleton cards={4} cols={1} lgCols={4}  /> :<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-l border-gray-200'>
                     {geeks?.map((geek) => (
                         <button onClick={()=>{handleClick(geek?._id)}} className="border-r border-b  border-gray-200  bg-white ml-3  group relative  justify-center cursor-pointer flex flex-col items-start" key={geek._id}>
                             {/* <div className='absolute rounded-md group-hover:block transition transform duration-200 hidden top-5 left-0 blur-[40px] w-full h-[10%] bg-gradient-to-r to-blue-400 via-purple-400 from-pink-400 '></div> */}

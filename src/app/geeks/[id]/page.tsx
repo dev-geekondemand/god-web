@@ -74,99 +74,79 @@ const GeekById = () => {
 
     useEffect(()=>{
         if(geek?.primarySkill){
-            setSkills([geek?.primarySkill,...geek?.secondarySkills]);
+            const allSkills = [geek?.primarySkill,...geek?.secondarySkills];
+            setSkills(allSkills);
+            if(categoryId){
+                const matched = allSkills.find(s => s._id === categoryId);
+                if(matched) setSelectedSkill(matched);
+            }
         }
-    },[geek?.primarySkill, geek?.secondarySkills])
+    },[geek?.primarySkill, geek?.secondarySkills, categoryId])
 
 
  const azureLoader = ({ src }:{src:string}) => src;
 
 
 
- const handleClick = async()=>{
-    setIsLoading(true);
-    if(!selectedMode){
-        setShowDialog(true);
-        setIsLoading(false);
-        return;
-    }
-
-    if(!geek?._id){
+ const handleClick = () => {
+    if (!geek?._id) {
         toast.error('Geek not found');
-        setIsLoading(false);
         return;
     }
-
-    if(loggedInGeek?._id === geek._id){
+    if (loggedInGeek?._id === geek._id) {
         toast.error('You cannot book your own service');
-        setIsLoading(false);
         return;
     }
-
-    if(!loggedInSeeker?._id){
+    if (!loggedInSeeker?._id) {
         toast.error('You are not logged in as a Seeker.');
-        setIsLoading(false);
         return;
     }
+    setShowDialog(true);
+ }
+
+ const handleBookService = async () => {
     const finalCategoryId = selectedSkill?._id || categoryId;
     if (!finalCategoryId) {
-            toast.error('Please select a category from below.');
-            setIsLoading(false);
-            return;
-            }
-
-    if(selectedMode === 'Offline' && !isSeekerAddress){
-        toast.error('Please add your address.');
-        setIsLoading(false);
+        toast.error('Please select a category.');
         return;
     }
-    
+    if (!selectedMode) {
+        toast.error('Please select a mode of service.');
+        return;
+    }
+    if (selectedMode === 'Offline' && !isSeekerAddress) {
+        toast.error('Please add your address first.');
+        return;
+    }
     if (requestState?.requests?.length > 0) {
         const alreadyExists = seekerRequests?.some((request: ServiceRequest) => {
-            return request?.category?._id === selectedSkill?._id && request?.geek?._id === geek?._id && request?.geekResponseStatus === 'Pending';
-        })
-
+            return request?.category?._id === finalCategoryId && request?.geek?._id === geek?._id && request?.geekResponseStatus === 'Pending';
+        });
         if (alreadyExists) {
             toast.error('You already have a pending request for this category.');
-            setIsLoading(false);
             return;
         }
     }
-
-    if(geek?._id && (selectedSkill || categoryId) && selectedMode){
-        setIsLoading(true);
-        await dispatch(createRequest({
-            geek: geek._id,
-            category: selectedSkill?._id as string || categoryId as string,
-            issue: '',
-            mode: selectedMode || "Online",
-            location:{
-                city: '',
-                state: '',
-                line1: ''
-            }
-        }));
-
-        dispatch(getSeekerRequests());
-        
-    }else{
-        console.log(geek, selectedSkill, selectedMode);
-    }
+    setIsLoading(true);
+    await dispatch(createRequest({
+        geek: geek._id,
+        category: finalCategoryId,
+        issue: '',
+        mode: selectedMode,
+        location: { city: '', state: '', line1: '' }
+    }));
+    dispatch(getSeekerRequests());
     setIsLoading(false);
+    setShowDialog(false);
  }
 
 
  useEffect(()=>{
-    const isRequestedService = (requestState?.requests as ServiceRequest[] | undefined)?.some(
+    const requested = (requestState?.requests as ServiceRequest[] | undefined)?.some(
     (request) => request?.geek?._id === geek?._id && request?.geekResponseStatus === 'Accepted'
     );
 
-    // console.log(requestState?.requests, isRequestedService);
-
-    
-    if (isRequestedService) {
-        setIsRequestedService(true);
-    }
+    setIsRequestedService(!!requested);
  },[requestState, geek?._id]);
 
  useEffect(()=>{
@@ -329,20 +309,23 @@ const getPrimarySkillBrands = (
             
                             </div>
                         </div> */}
-                        <button onClick={handleClick} className='w-full cursor-pointer md:w-36 h-10 rounded-md bg-teal-500 text-white font-bold hover:bg-teal-600'>{isLoading ? "Booking..." : "Book Service"}</button>
+                        <button onClick={handleClick} className='w-full cursor-pointer md:w-36 h-10 rounded-md bg-teal-500 text-white font-bold hover:bg-teal-600'>Book Service</button>
 
                         { showDialog && <DialogComponent
-                        modes={geek?.modeOfService=== "All" || geek?.modeOfService=== "None" ? ["Online", "Offline", "Carry In"] : [geek?.modeOfService]}
+                         modes={geek?.modeOfService === "All" || geek?.modeOfService === "None" ? ["Online", "Offline", "Carry In"] : [geek?.modeOfService]}
                          selectedMode={selectedMode}
                          setSelectedMode={setSelectedMode}
                          seekerId={loggedInSeeker?._id}
                          showDialog={showDialog}
                          setShowDialog={setShowDialog}
-                         openBtnText={"Select Mode"}
-                         title={"Select Mode"}
-                         titleDesc={"Select Mode of Service"} 
-                         onSubmit={()=>{setShowDialog(false)}}
+                         title={"Book Service"}
+                         titleDesc={"Select a category and mode to confirm your booking."}
+                         onSubmit={handleBookService}
                          isSeekerAddress={isSeekerAddress}
+                         skills={categoryId ? undefined : skills}
+                         selectedSkill={selectedSkill}
+                         setSelectedSkill={setSelectedSkill}
+                         isLoading={isLoading}
                         />}
                     </div>
 
