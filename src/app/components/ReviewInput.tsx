@@ -8,10 +8,10 @@ import React, { useEffect, useState } from 'react'
 
 
 
-const ReviewInput = ({serviceId}:{serviceId:string}) => {
+const ReviewInput = ({serviceId, onSuccess}:{serviceId:string, onSuccess?: () => void}) => {
 
     console.log(serviceId);
-    
+
 
     const [text, setText] = useState('');
     const [hovered, setHovered] = useState<number | null>(null);
@@ -54,6 +54,7 @@ const ReviewInput = ({serviceId}:{serviceId:string}) => {
             setText('');
             setRating(0);
             setHovered(0);
+            onSuccess?.();
         });
     }
 

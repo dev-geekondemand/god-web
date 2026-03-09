@@ -316,7 +316,9 @@ useEffect(()=>{
                         </div>
 
                         {request?.status === "Completed" && request?.seeker?._id === seeker?._id && <div className={`w-full rounded-sm  flex-col py-3 transition transform duration-300 items-start flex`}>
-                            <ReviewInput serviceId={request?._id} />
+                            {!request?.reviews?.some((r:Review) => r?.postedBy?._id === seeker?._id) && (
+                                <ReviewInput serviceId={request?._id} onSuccess={() => dispatch(getRequestById(requestId))} />
+                            )}
 
                             <div className='w-full h-56 my-4 custom-scrollbar overflow-y-scroll flex flex-col gap-3'>
                                 {
