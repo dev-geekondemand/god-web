@@ -10,7 +10,7 @@ import {
 import Image from 'next/image'
 import { X } from 'lucide-react'
 
-const TOTAL = 5
+const TOTAL = 8
 
 const Reviews = () => {
   const [selected, setSelected] = useState<number | null>(null)
