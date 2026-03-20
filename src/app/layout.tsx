@@ -11,6 +11,7 @@ import { Toaster } from 'react-hot-toast';
 import Navbar from "./components/Navbar";
 import GlobalLoader from "./components/GlobalLoader";
 import Head from "next/head";
+import Script from "next/script";
 
 
 
@@ -39,6 +40,19 @@ export default function RootLayout({
       <body
         className={`${robotoMono.variable} ${robotoMono.variable} antialiased`}
       >
+        <Script
+      src="https://www.googletagmanager.com/gtag/js?id=G-0RR8QZQ3CZ"
+      strategy="afterInteractive"
+    />
+
+    <Script id="google-analytics" strategy="afterInteractive">
+      {`
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-0RR8QZQ3CZ');
+      `}
+    </Script>
         <ReduxProvider>
         <Toaster position="top-right" />
 
