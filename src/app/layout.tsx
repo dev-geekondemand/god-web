@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   title: "GeekOnDemand – On-Demand IT Tech Support & Repair at Home",
   description: "GeekOnDemand is India's first on-demand IT tech support platform. Book verified Geeks for laptop repair, printer, router, software, antivirus & more — anytime, anywhere, at your doorstep.",
   alternates: {
-    canonical: "https://geekondemand.in/",
+    canonical: "https://geekondemand.in/", 
   },
 };
 
