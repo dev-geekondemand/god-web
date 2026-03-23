@@ -162,10 +162,10 @@ const handleSearch = (category: string | null) => {
               <div
                 className="wow fadeInUp"
               >
-                <h1 className=" text-gray-600  md:text-3xl text-2xl leading-12 lg:text-4xl font-bold">
+                <h2 className=" text-gray-600  md:text-3xl text-2xl leading-12 lg:text-4xl font-bold">
                   Service & Repair {" "}
                   <span className="text-teal-700" data-type-text="Carpenders">@Home</span>
-                </h1>
+                </h2>
                 <p className="my-2 ml-2 text-gray-500 md:text-lg tracking-widest  font-mono  sm:text-base text-sm ">IT Tech support - Anytime, Anywhere.</p>
                 <div className="flex items-center gap-8 w-full md:w-[80%] mb-3 py-3 rounded-lg">
                   {/* Location Input */}
@@ -233,7 +233,7 @@ const handleSearch = (category: string | null) => {
 
 
                 <div className="w-full md:w-[80%] h-full flex flex-col gap-3 border p-4 rounded-lg border-gray-600">
-                  <h1 className="text-xl font-medium text-gray-600">What are you looking for?</h1>
+                  <h2 className="text-xl font-medium text-gray-600">What are you looking for?</h2>
                   <div className="md:p-4 flex flex-col w-full md:gap-4 gap-2 justify-start">
                     <div className="flex  w-full">
                      
