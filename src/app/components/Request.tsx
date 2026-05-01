@@ -107,7 +107,7 @@ const [openIssueId, setOpenIssueId] = React.useState<string | null>(null);
               <button onClick={()=>{handleClick(req)}} className="text-lg cursor-pointer font-semibold">Service Request for {req?.category?.title}</button>
               {req.geekResponseStatus === "Accepted" ? <HoverCardComponent 
                 linkText={"From: " +  req.seeker?.fullName?.first + " " +  (req.seeker?.fullName?.last ?? "")}
-                avatarImg={req.seeker.profileImage}
+                avatarImg={req.seeker?.profileImage ? req.seeker.profileImage : "/assets/images/placeholder_user.jpg"}
                 title={"Name: " + req?.seeker?.fullName?.first + " " + (req?.seeker?.fullName?.last ?? "")}
                 line1={req.seeker?.authProvider === "google" || req.seeker?.authProvider === "microsoft" ? "Email: " + req?.seeker?.email : "Phone: " + req?.seeker?.phone}
                 line2={"Joined on: " + new Date(req?.seeker?.createdAt).toLocaleString('en-US', { day: 'numeric', month: 'long', year: 'numeric'})}
