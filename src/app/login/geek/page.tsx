@@ -140,7 +140,7 @@ const LoginGeek = () => {
                   onBlur={formik.handleBlur}
                   type="text"
                   placeholder="6-digit OTP"
-                  className={inputCls}
+                  className={inputCls} 
                 />
                 {formik.touched.otp && formik.errors.otp && (
                   <p className={errorCls}>{formik.errors.otp}</p>
