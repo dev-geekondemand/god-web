@@ -119,7 +119,7 @@ const handleSearch = (category: string | null) => {
 
   
 
-    <section className=" relative p-3 bg-white min-h-auto">
+    <section className=" relative p-3 bg-white min-h-auto my-4">
         {hydrated && showPrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="bg-white w-[90%] max-w-md rounded-2xl p-6 shadow-xl animate-fadeIn">
@@ -155,7 +155,7 @@ const handleSearch = (category: string | null) => {
         </div>
       )}
 
-      <div className="md:py-10">
+      <div className="">
         <div className="max-w-7xl mx-auto ">
           <div className="grid  grid-cols-2 gap-6 items-start">
             <div className="col-span-2 order-2 md:order-1 md:col-span-1">
@@ -166,7 +166,7 @@ const handleSearch = (category: string | null) => {
                   Service & Repair {" "}
                   <span className="text-teal-700" data-type-text="Carpenders">@Home</span>
                 </h2>
-                <p className="my-2 ml-2 text-gray-500 md:text-lg tracking-widest  font-mono  sm:text-base text-sm ">IT Tech support - Anytime, Anywhere.</p>
+                <p className="my-2 ml-2 font-bold  text-teal-800 md:text-lg tracking-widest  font-mono  sm:text-base text-sm ">IT Tech Support – Anytime, Anywhere.</p>
                 <div className="flex items-center gap-8 w-full md:w-[80%] mb-3 py-3 rounded-lg">
                   {/* Location Input */}
                   <div className="relative w-full">
@@ -232,6 +232,21 @@ const handleSearch = (category: string | null) => {
                 </div>
 
 
+                {/* <div className="flex items-center gap-3 mb-4">
+                  <button
+                    onClick={() => router.push('/categories')}
+                    className="flex items-center gap-2 px-6 py-3 bg-teal-700 text-white font-semibold rounded-lg hover:bg-teal-800 transition-colors text-sm shadow-md"
+                  >
+                    Book a Geek
+                  </button>
+                  <button
+                    onClick={() => router.push('/register?type=geek')}
+                    className="flex items-center gap-2 px-6 py-3 border-2 border-teal-700 text-teal-700 font-semibold rounded-lg hover:bg-teal-50 transition-colors text-sm"
+                  >
+                    Become a Geek
+                  </button>
+                </div> */}
+
                 <div className="w-full md:w-[80%] h-full flex flex-col gap-3 border p-4 rounded-lg border-gray-600">
                   <h2 className="text-xl font-medium text-gray-600">What are you looking for?</h2>
                   <div className="md:p-4 flex flex-col w-full md:gap-4 gap-2 justify-start">
@@ -241,8 +256,8 @@ const handleSearch = (category: string | null) => {
                       return  <Link key={i+10} href={`/categories/${cat.id}/brands`} className="flex flex-col w-full">
                       <div className="flex flex-col items-center bg-gray-100 p-3 rounded-lg me-2 md:me-4 mb-1 cursor-pointer hover:bg-teal-700 hover:text-white">
                       <Image 
-                        width={80}
-                        height={80}
+                        width={40}
+                        height={40}
                         decoding="async"
                         src={cat.image}
                         alt="icon"
@@ -261,8 +276,8 @@ const handleSearch = (category: string | null) => {
                       return  <Link key={i+100} href={`/categories/${cat.id}/brands`} className="flex flex-col w-full">
                       <div className="flex flex-col items-center bg-gray-100 p-3 rounded-lg me-2 md:me-4 mb-1 cursor-pointer hover:bg-teal-700 hover:text-white">
                       <Image 
-                        width={80}
-                        height={80}
+                        width={40}
+                        height={40}
                         decoding="async"
                         src={cat.image}
                         alt="icon"
@@ -305,7 +320,7 @@ const handleSearch = (category: string | null) => {
 
                   <div className="flex items-center mr-4 mt-4">
                     <Image
-                      width={41}
+                      width={40}
                       height={40}
                       decoding="async"
                       src="/assets/icons/success-02.svg"
@@ -319,7 +334,7 @@ const handleSearch = (category: string | null) => {
 
                   <div className="flex items-center mr-4 mt-4">
                   <Image
-                      width={41}
+                      width={40}
                       height={40}
                       decoding="async"
                       src="/assets/icons/success-03.svg"
@@ -333,42 +348,49 @@ const handleSearch = (category: string | null) => {
                 </div>
               </div>
             </div>
-            <div className="col-span-2 order-1 md:order-2 sm:h-full xl:h-fit md:col-span-1 grid grid-cols-5 gap-4">
-              <div className="col-span-2">
+            <div className="col-span-2 order-1 md:order-2 md:col-span-1 grid grid-cols-2 gap-2 h-[50vh] md:h-[80vh] max-h-[600px]">
+              {/* Image 1 — full height, left half */}
+              <div className="relative col-span-1 h-full">
                 <Image
                   src={"/assets/New-Img/Banner/image1.png"}
-                  width={400}
-                  height={300}
+                  fill
                   alt="banner image"
-
-                  className="w-full h-full object-cover rounded-lg"
+                  priority
+                  sizes="(max-width: 768px) 40vw, 20vw"
+                  className="object-cover rounded-lg"
                 />
               </div>
-              <div className="col-span-3 grid grid-rows-2 gap-4">
-                <div className="row-span-1 w-full flex justify-center items-start">
+              {/* Right half — top: image 2, bottom: image 3 + 4 */}
+              <div className="col-span-1 grid grid-rows-2 gap-2 h-full">
+                <div className="relative row-span-1">
                   <Image
                     src={"/assets/New-Img/Banner/Image2.png"}
-                    width={200}
-                    height={200}
+                    fill
                     alt="banner image 2"
-                    className="w-full h-full object-cover rounded-lg"
+                    priority
+                    sizes="(max-width: 768px) 40vw, 20vw"
+                    className="object-cover rounded-lg"
                   />
                 </div>
-                <div className="row-span-1 grid grid-cols-2 gap-4 items-start">
-                  <Image
-                    src={"/assets/New-Img/Banner/Image3.png"}
-                    width={300}
-                    height={300}
-                    alt="banner image 3"
-                    className="w-full h-full object-cover rounded-lg"
-                  />
-                  <Image
-                    src={"/assets/New-Img/Banner/Image4.png"}
-                    width={300}
-                    height={300}
-                    alt="banner image 4"
-                    className="w-full h-full object-cover rounded-lg"
-                  />
+                <div className="row-span-1 grid grid-cols-2 gap-2">
+                  <div className="relative">
+                    <Image
+                      src={"/assets/New-Img/Banner/Image3.png"}
+                      fill
+                      alt="banner image 3"
+                      sizes="(max-width: 768px) 20vw, 10vw"
+                      className="object-cover rounded-lg"
+                    />
+                  </div>
+                  <div className="relative">
+                    <Image
+                      src={"/assets/New-Img/Banner/Image4.png"}
+                      fill
+                      alt="banner image 4"
+                      sizes="(max-width: 768px) 20vw, 10vw"
+                      className="object-cover rounded-lg"
+                    />
+                  </div>
                 </div>
               </div>
             </div>

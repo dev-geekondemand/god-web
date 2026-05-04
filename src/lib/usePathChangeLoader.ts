@@ -6,34 +6,18 @@ import { useEffect, useRef, useState } from "react";
 export function usePathChangeLoader(minDuration = 300) {
   const pathname = usePathname();
   const [loading, setLoading] = useState(false);
-
-  const startTimeRef = useRef<number | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isFirstMount = useRef(true);
 
   useEffect(() => {
-    // Route change START
-    startTimeRef.current = Date.now();
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
+    }
+
     setLoading(true);
-
-    return () => {
-      // Route change END
-      const elapsed = Date.now() - (startTimeRef.current ?? 0);
-      const remaining = Math.max(minDuration - elapsed, 0);
-
-      timeoutRef.current = setTimeout(() => {
-        setLoading(false);
-      }, remaining);
-    };
+    const timer = setTimeout(() => setLoading(false), minDuration);
+    return () => clearTimeout(timer);
   }, [pathname, minDuration]);
-
-  // Cleanup
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
 
   return { loading, pathname };
 }

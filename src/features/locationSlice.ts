@@ -2,20 +2,30 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 
 interface LocationState {
   city: string;
+  lat: number | null;
+  lng: number | null;
   loading: boolean;
   error: string | null;
   showPrompt: boolean;
 }
 
 const initialState: LocationState = {
-  city: "",               // default empty
+  city: "",
+  lat: null,
+  lng: null,
   loading: false,
   error: null,
-  showPrompt: true,       // default true, can be updated on client
+  showPrompt: true,
 };
 
 
 // Async thunk to fetch user location
+interface LocationPayload {
+  city: string;
+  lat: number;
+  lng: number;
+}
+
 export const fetchUserLocation = createAsyncThunk(
   "location/fetchUserLocation",
   async (_, { rejectWithValue }) => {
@@ -23,7 +33,7 @@ export const fetchUserLocation = createAsyncThunk(
       return rejectWithValue("Geolocation not supported");
     }
 
-    return new Promise<string>((resolve, reject) => {
+    return new Promise<LocationPayload>((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
@@ -33,14 +43,14 @@ export const fetchUserLocation = createAsyncThunk(
             );
             const data = await res.json();
             const place =
-              data.features.find((f: any) => f.place_type.includes("place")) ||
+              data.features.find((f: { place_type: string[] }) => f.place_type.includes("place")) ||
               data.features[0];
 
             const city = place?.text || "";
             localStorage.setItem("user_city", city);
             sessionStorage.setItem("location_prompt_shown", "true");
 
-            resolve(city);
+            resolve({ city, lat: latitude, lng: longitude });
           } catch (error) {
             reject(error);
           }
@@ -69,8 +79,10 @@ const locationSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchUserLocation.fulfilled, (state, action: PayloadAction<string>) => {
-        state.city = action.payload;
+      .addCase(fetchUserLocation.fulfilled, (state, action: PayloadAction<LocationPayload>) => {
+        state.city = action.payload.city;
+        state.lat = action.payload.lat;
+        state.lng = action.payload.lng;
         state.loading = false;
         state.showPrompt = false;
       })

@@ -10,4 +10,14 @@ const getBlogFromSlug = async (slug: string) => {
     return response.data;
 }
 
-export const blogService = { getAllBlogs, getBlogFromSlug };
+const getTags = async () => {
+    const response = await api.get(`blogs/tags`);
+    return response.data;
+};
+
+const getCategories = async () => {
+    const response = await api.get(`blogs/categories`);
+    return response.data;
+};
+
+export const blogService = { getAllBlogs, getBlogFromSlug, getTags, getCategories };

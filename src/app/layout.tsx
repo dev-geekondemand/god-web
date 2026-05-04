@@ -10,7 +10,6 @@ import AuthInitializer from "./components/AuthInitializer";
 import { Toaster } from 'react-hot-toast';
 import Navbar from "./components/Navbar";
 import GlobalLoader from "./components/GlobalLoader";
-import Head from "next/head";
 import Script from "next/script";
 
 
@@ -18,7 +17,8 @@ import Script from "next/script";
 const robotoMono = Roboto_Mono({
   variable: "--font-roboto-mono",
   subsets: ["latin"],
-  weight: ['400','500','700']
+  weight: ['400','500','700'],
+  display: 'swap',
 });
 
 
@@ -26,7 +26,10 @@ export const metadata: Metadata = {
   title: "GeekOnDemand – On-Demand IT Tech Support & Repair at Home",
   description: "GeekOnDemand is India's first on-demand IT tech support platform. Book verified Geeks for laptop repair, printer, router, software, antivirus & more — anytime, anywhere, at your doorstep.",
   alternates: {
-    canonical: "https://geekondemand.in/", 
+    canonical: "https://geekondemand.in/",
+  },
+  icons: {
+    icon: "/assets/logo-big.webp",
   },
 };
 
@@ -37,11 +40,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Head>
-        <link rel="icon" href="/vercel.svg" />
-      </Head>
       <body
-        className={`${robotoMono.variable} ${robotoMono.variable} antialiased`}
+        className={`${robotoMono.variable} antialiased`}
       >
         <Script
       src="https://www.googletagmanager.com/gtag/js?id=G-0RR8QZQ3CZ"
@@ -57,7 +57,7 @@ export default function RootLayout({
       `}
     </Script>
 
-    <Script id="schema-org" type="application/ld+json" strategy="beforeInteractive">
+    <Script id="schema-org" type="application/ld+json" strategy="afterInteractive">
       {JSON.stringify([
         {
           "@context": "https://schema.org",
@@ -152,6 +152,9 @@ export default function RootLayout({
           <AuthInitializer />
          <CustomCursor />
         <Navbar />
+        {/* <div className="hidden lg:flex sticky top-16 z-40 w-full bg-teal-700 text-white items-center justify-center py-2 text-sm font-semibold tracking-wide shadow-sm">
+          Service &amp; Repair @ Home &nbsp;&bull;&nbsp; IT Tech Support – Anytime, Anywhere
+        </div> */}
         <div className="w-full h-full min-h-screen relative">
           
         {children}

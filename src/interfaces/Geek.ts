@@ -29,12 +29,17 @@ export interface Address {
 
 interface Geek {
 	_id: string;
+	__t?: 'IndividualGeek' | 'CorporateGeek';
 	email: string;
 	mobile: string;
 	fullName: {
 		first: string;
 		last: string;
 	};
+	companyName?: string;
+	GSTIN?: string;
+	CIN?: string;
+	teamSize?: number;
 	idProof: {
 		type: 'Aadhar' | string;
 		isAdhaarVerified: boolean;
@@ -68,6 +73,7 @@ interface Geek {
 	services: Service[];
 	rateCard: RateCard[];
 	requests: ServiceRequest[];
+	subscriptionPlan: 'Startup' | 'Advance' | 'Professional';
 }
 
 export interface GeekData extends Geek {

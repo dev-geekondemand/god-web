@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { createGeek } from '@/features/geek/geekSlice';
+import { createGeek, createCorporateGeek } from '@/features/geek/geekSlice';
 import { getLoginOTP, loadUser, loginWithOTP, registerUser } from '@/features/seeker/seekerSlice';
 import { useAppDispatch } from '@/lib/hooks';
 import { useSelector } from 'react-redux';
@@ -28,6 +28,7 @@ const VerifyOTP = () => {
   const context = searchParams.get('context');
   const refCode = searchParams.get('refCode');
   const brands = searchParams.get('brands');
+  const companyName = searchParams.get('companyName');
 
   console.log(brands);
   
@@ -78,6 +79,20 @@ const VerifyOTP = () => {
             type:"Individual",
             refCode: refCode ?? '',
             brandsServiced: brands ? JSON.parse(brands) : []
+          }));
+        } else if (step === 'register' && selected === 'CorporateGeek') {
+          dispatch(createCorporateGeek({
+            fullName: {
+              first: firstName ?? '',
+              last: lastName ?? '',
+            },
+            mobile: mobile ?? '',
+            otp: +formik.values.otp,
+            primarySkill: category ?? '',
+            yoe: Number(yoe),
+            companyName: companyName ?? '',
+            refCode: refCode ?? '',
+            brandsServiced: brands ? JSON.parse(brands) : [],
           }));
         } else {
           dispatch(loginWithOTP(loginPayload));

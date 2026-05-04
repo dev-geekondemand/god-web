@@ -18,6 +18,7 @@ import { fetchUserLocation } from '@/features/locationSlice';
 import { getBrands, getBrandsByCategory } from '@/features/brands/brandsSlice';
 import Brand from '@/interfaces/Brand';
 import { useRouter, useSearchParams } from 'next/navigation';
+import PageBanner from './PageBanner';
 export interface GeekState {
   geeks: Geek[];
   total: number;
@@ -54,6 +55,8 @@ const Providers = () => {
     chargeType: '',
     minRate: '',
     maxRate: '',
+    lat: '',
+    lng: '',
   });
   const [loading, setLoading] = useState(false);
 
@@ -107,12 +110,18 @@ const Providers = () => {
   };
 
   const curCity = useSelector((state: RootState) => state.location.city);
+  const userLat = useSelector((state: RootState) => state.location.lat);
+  const userLng = useSelector((state: RootState) => state.location.lng);
 
   useEffect(() => {
-    if (curCity) {
-      setFilters({ ...filters, city: curCity });
+    const updates: Record<string, string> = {};
+    if (curCity) updates.city = curCity;
+    if (userLat != null) updates.lat = String(userLat);
+    if (userLng != null) updates.lng = String(userLng);
+    if (Object.keys(updates).length > 0) {
+      setFilters(prev => ({ ...prev, ...updates }));
     }
-  }, [curCity]);
+  }, [curCity, userLat, userLng]);
   
 
   const categories = useSelector((state: RootState) => state.category.categories) as Category[];
@@ -159,12 +168,14 @@ const Providers = () => {
     setFilters({
       skill: '',
       brandId: '',
-      city: '',
+      city: curCity || '',
       state: '',
       mode: '',
       chargeType: '',
       minRate: '',
       maxRate: '',
+      lat: userLat != null ? String(userLat) : '',
+      lng: userLng != null ? String(userLng) : '',
     });
     setSelectedCategory(null);
     setSelectedBrand(null);
@@ -180,13 +191,7 @@ const azureLoader = ({ src }:{src:string}) => src;
 
     <section className='w-full flex flex-col items-center justify-center'>
       
-      <div className='w-full relative breadcrumb-bg-2'>
-        <div className='w-full breadcrumb-bg py-10 text-center bg-[#fbfbfb]'>
-          <div className='xl:max-w-6xl w-full mx-auto'>
-            <h2 className='text-4xl font-bold text-black'>Geeks List</h2>
-          </div>
-        </div>
-      </div>
+      <PageBanner title="Geeks" crumbs={[{ label: 'Geeks' }]} />
 
       <div className="grid w-full py-20 grid-cols-12 gap-4 relative max-w-7xl mx-auto">
         {/* Filters */}

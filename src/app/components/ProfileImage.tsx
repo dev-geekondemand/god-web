@@ -5,19 +5,24 @@ interface ProfileImageProps {
   imageUrl?: string;
   azureLoader: ({ src }: { src: string }) => string;
   setOpenImageUpload: (val: boolean) => void;
+  contained?: boolean;
 }
 
 const ProfileImage: React.FC<ProfileImageProps> = ({
   imageUrl,
   azureLoader,
   setOpenImageUpload,
+  contained = false,
 }) => {
   const [openImageView, setOpenImageView] = useState(false);
 
   return (
     <>
       {/* Profile Image with Hover Options */}
-      <div className="absolute -bottom-8 md:-bottom-16 lg:left-36 left-1/2 transform -translate-x-1/2 bg-white dark:bg-black border-green-500 dark:border-gray-800 border-2  sm:w-32 w-36 h-36 sm:h-32 rounded-full overflow-hidden group shadow-md">
+      <div className={contained
+        ? "relative w-20 h-20 bg-white border-2 border-gray-200 rounded-full overflow-hidden group shadow-sm"
+        : "absolute -bottom-8 md:-bottom-16 lg:left-36 left-1/2 transform -translate-x-1/2 bg-white dark:bg-black border-green-500 dark:border-gray-800 border-2 sm:w-32 w-36 h-36 sm:h-32 rounded-full overflow-hidden group shadow-md"
+      }>
         <Image
           
           loader={azureLoader}

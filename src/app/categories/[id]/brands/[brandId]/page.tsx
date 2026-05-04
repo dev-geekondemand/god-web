@@ -14,6 +14,7 @@ import CustomInput from '@/app/components/CustonInput';
 import GeekSkeletonCard from '@/app/components/GeekSkeletenCard';
 import { fetchUserLocation } from '@/features/locationSlice';
 import Link from 'next/link';
+import PageBanner from '@/app/components/PageBanner';
 
 interface GeekState {
   geeks: Geek[];
@@ -139,13 +140,7 @@ const geeks = geekState?.geeks as Geek[];
 
   return (
     <section className='w-full flex flex-col items-center justify-center'>
-      <div className='w-full relative breadcrumb-bg-2'>
-        <div className='w-full breadcrumb-bg py-10 text-center bg-[#fbfbfb]'>
-          <div className='xl:max-w-6xl w-full mx-auto'>
-            <h2 className='text-4xl font-bold text-black'>Geeks List</h2>
-          </div>
-        </div>
-      </div>
+      <PageBanner title="Geeks List" crumbs={[{ label: 'Geeks' }]} />
 
       <div className="flex flex-col  w-full py-20 gap-4 max-w-7xl mx-auto justify-center items-center">
       

@@ -145,6 +145,42 @@ const verifyMail = async(token:string)=>{
   return response.data;
 }
 
+interface CorporateGeekPayload {
+  mobile: string;
+  otp: number;
+  fullName: { first: string; last: string };
+  companyName: string;
+  primarySkill: string;
+  yoe: number;
+  brandsServiced?: string[];
+  refCode?: string;
+}
+
+const createCorporateGeek = async (data: CorporateGeekPayload) => {
+  const response = await api.post('geek/corporate/register', data, { withCredentials: true });
+  return response.data;
+};
+
+interface AdminCorporateGeekPayload {
+  mobile: string;
+  fullName: { first: string; last: string };
+  companyName: string;
+  primarySkill: string;
+  yoe: number;
+  email?: string;
+  GSTIN?: string;
+  CIN?: string;
+  teamSize?: number;
+  secondarySkills?: string[];
+  brandsServiced?: string[];
+  refCode?: string;
+}
+
+const adminCreateCorporateGeek = async (data: AdminCorporateGeekPayload) => {
+  const response = await api.post('geek/corporate/admin-create', data, { withCredentials: true });
+  return response.data;
+};
+
 const geekService = {
     getGeeks,
     createGeek,
@@ -162,7 +198,9 @@ const geekService = {
     updateRateCard,
     deleteRateCard,
     sendVerificationMail,
-    verifyMail
+    verifyMail,
+    createCorporateGeek,
+    adminCreateCorporateGeek,
 }
 
 export default geekService

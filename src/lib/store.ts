@@ -10,6 +10,8 @@ import mediaSlice from '../features/media/mediaSlice';
 import blogSlice from '../features/blogs/blogSlice';
 import enquirySlice from '../features/enquiry/enquirySlice';
 import locationReducer from '../features/locationSlice.ts';
+import bannersReducer from '../features/banners/bannersSlice';
+import subscriptionReducer from '../features/subscription/subscriptionSlice';
 
 export const makeStore = () =>
   configureStore({
@@ -25,6 +27,8 @@ export const makeStore = () =>
       blog:blogSlice,
       enquiry: enquirySlice,
       location: locationReducer,
+      banners: bannersReducer,
+      subscription: subscriptionReducer,
     },
   });
 

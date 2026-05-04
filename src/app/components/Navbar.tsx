@@ -1,15 +1,15 @@
 "use client";
 
-import Image from 'next/image'
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import React, {  useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 import CustomButton from './CustomButton';
 import Link from 'next/link';
-import {  useSelector } from 'react-redux';
-import {  loadUser, logoutUser, UserState } from '@/features/seeker/seekerSlice';
+import { useSelector } from 'react-redux';
+import { logoutUser, UserState } from '@/features/seeker/seekerSlice';
 import CustomModel from './CustomModal';
-import {  GeekInitialState, logoutGeek } from '@/features/geek/geekSlice';
-import { Bell, LayoutGrid, UserRound } from 'lucide-react';
+import { GeekInitialState, logoutGeek } from '@/features/geek/geekSlice';
+import { Bell, UserRound } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,12 +17,19 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import { RootState } from '@/lib/store';
 import { useAppDispatch } from '@/lib/hooks';
 import { ServiceRequest } from '@/interfaces/ServiceRequest';
 import toast from 'react-hot-toast';
 import { getSeekerRequests } from '@/features/request/requestSlice';
+
+const NotifBadge = ({ count }: { count: number }) =>
+  count > 0 ? (
+    <span className="text-white text-xs font-medium bg-red-500 px-1.5 py-0.5 rounded-full leading-none">
+      {count}
+    </span>
+  ) : null;
 
 const Navbar = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -32,28 +39,31 @@ const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
 
-
-
-
-  const { isAuthenticated, user } = useSelector((state:RootState) => state.seeker) as UserState;
-  const geekState = useSelector((state:RootState) => state.geek) as GeekInitialState;
+  const { isAuthenticated, user } = useSelector((state: RootState) => state.seeker) as UserState;
+  const geekState = useSelector((state: RootState) => state.geek) as GeekInitialState;
   const isGeekAuthenticated = geekState?.isAuthenticated;
   const geek = geekState?.geek;
+  const seekerRequests = useSelector((state: RootState) => state.request.requests) as ServiceRequest[];
 
-  const seeker = useSelector((state:RootState) => state.seeker) as UserState;
-  const isSeekerAuthenticated = seeker?.isAuthenticated;
-  const seekerUser = seeker?.user;
+  // Seeker: requests with activity in the last 24 h
+  // Pending -> no responseAt yet, use createdAt; Accepted -> use responseAt
+  const seekerUnread = seekerRequests.filter((r) => {
+    const relevant = r.geekResponseStatus === 'Pending' || r.geekResponseStatus === 'Accepted';
+    if (!relevant) return false;
+    const ts = r.responseAt ? new Date(r.responseAt).getTime() : new Date(r.createdAt).getTime();
+    return Date.now() - ts < 86400000;
+  }).length;
 
-  const seekerRequests = useSelector((state:RootState) => state.request.requests) as ServiceRequest[];
-  // const unread = seekerRequests.filter((request) => request.geekResponseStatus === 'Accepted' || request.geekResponseStatus === 'Pending').length;
-  const unreadInlast24Hours = seekerRequests.filter((request) => request.status === 'Accepted' || request.status === 'Pending' || request.status === 'Completed' && new Date(request.createdAt).getTime() > Date.now() - 86).length;
-  
+  // Geek: count of pending incoming requests
+  const geekUnread = Array.isArray(geek?.requests)
+    ? (geek.requests as ServiceRequest[]).filter((r) => r.geekResponseStatus === 'Pending').length
+    : 0;
 
-    useEffect(()=>{
-    if(isAuthenticated && !user){
-      dispatch(getSeekerRequests())
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(getSeekerRequests());
     }
-  },[])
+  }, [dispatch, isAuthenticated]);
 
   const navlinks = [
     { id: 1, name: "Home", link: "/" },
@@ -65,104 +75,120 @@ const Navbar = () => {
 
   const handleLogout = () => {
     const userType = localStorage.getItem("userType");
-    if(userType === "seeker") {
+    if (userType === "seeker") {
       dispatch(logoutUser());
-      localStorage.removeItem("userType");
     } else {
       dispatch(logoutGeek());
-      localStorage.removeItem("userType");
     }
+    localStorage.removeItem("userType");
     setOpenModal(false);
     setSidebarOpen(false);
   };
 
+  const isLoggedIn = isAuthenticated || isGeekAuthenticated;
+  const displayName = user?.fullName?.first || geek?.fullName?.first || '';
+
   return (
     <>
-      <div className='sticky top-0 z-50 w-full h-16 bg-white shadow-sm flex px-4 py-2'>
-        <div className='w-full h-full flex justify-between items-center px-3 py-1.5'>
+      <div className="sticky top-0 z-50 w-full h-20 bg-white shadow-sm">
+        <div className="w-full h-full flex justify-between items-center lg:px-32 py-4 max-w-screen-2xl mx-auto">
 
-          {/* Left: Logo & Categories */}
-          <div className='flex h-full items-center lg:justify-center justify-start w-full'>
-            <div className='flex gap-6 items-center justify-center'>
-              <Image src="/assets/logo-big.webp" width={120} height={16} alt='Geek on Demand logo' />
-              <button onClick={() => { router.push("/service-categories") }} className='lg:flex hidden cursor-pointer font-medium text-gray-700 items-center gap-2 bg-gray-100 px-5 border border-gray-200 py-1.5 rounded-md text-sm text-nowrap'>
-                <LayoutGrid className='w-4 h-4 text-gray-500' />
-                
-                Categories
-              </button>
-            </div>
-          </div>
+          {/* Logo */}
+          <Link href="/" className="flex-shrink-0">
+            <Image src="/assets/logo-big.webp" width={140} height={18} alt="Geek on Demand" />
+          </Link>
 
-          {/* Center: Navlinks */}
-          <div className='w-full hidden h-full lg:flex items-center justify-center gap-10 text-sm'>
+          {/* Center: navlinks (desktop) */}
+          <nav className="hidden lg:flex items-center gap-8 text-sm">
             {navlinks.map((navlink) => (
-              <div key={navlink.id} className='text-black text-nowrap'>
-                <a className={`${pathname === navlink.link ? "text-teal-600 font-semibold h-full" : "hover:text-teal-600 hover:underline font-medium underline-offset-8"}`} href={navlink.link}>
-                  {navlink.name}
-                </a>
-              </div>
+              <Link
+                key={navlink.id}
+                href={navlink.link}
+                className={`text-nowrap transition-colors ${
+                  pathname === navlink.link
+                    ? 'text-teal-600 font-semibold'
+                    : 'text-gray-700 font-medium hover:text-teal-600'
+                }`}
+              >
+                {navlink.name}
+              </Link>
             ))}
-          </div>
+          </nav>
 
-          {/* Right: Auth & Join */}
-          <div className='lg:flex hidden w-full items-center justify-center gap-6'>
-            {(!user?.authProvider && !geekState.geek) || (!isAuthenticated && !isGeekAuthenticated) ? (
-              <Link href={"/login"} className='flex items-center justify-center bg-gray-200 px-4 py-2 rounded-lg text-sm text-nowrap'>
+          {/* Right: auth (desktop) */}
+          <div className="hidden lg:flex items-center gap-4">
+            {!isLoggedIn ? (
+              <Link
+                href="/login"
+                className="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
                 Sign In
               </Link>
             ) : (
-              <div className='text-sm flex gap-2 items-center'>
-                Welcome,&nbsp;
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-gray-500">Welcome,</span>
                 <DropdownMenu>
-                  <DropdownMenuTrigger className='flex cursor-pointer items-center gap-2 focus:outline-none'>
-                       
-                      <div className='flex gap-1.5 items-center'>
-                        
-                      {user?.fullName?.first || geekState.geek?.fullName?.first}
-
-
-                    <UserRound className='w-5 h-5 mb-1 text-gray-800' />
-                      {isAuthenticated &&  !isGeekAuthenticated &&<span>
-                          {unreadInlast24Hours > 0 && (
-                            <span className=' text-white mb-3 bg-red-500 py-0.5 px-1.5 rounded-full'>
-                              {unreadInlast24Hours}
-                            </span>
-                          )}
-                        </span>}
-                    </div>
-                    {isGeekAuthenticated && geek?.requests && Array.isArray(geek.requests) && (
-                      <p onClick={()=>{router.push(`/geeks/${geek?._id}/requests`)}}> 
-                        <span>
-                          {(geek.requests as ServiceRequest[]).filter((request:ServiceRequest) => request.geekResponseStatus === "Pending").length > 0 && (
-                            <span className=' text-white bg-red-500 py-0.5 px-1.5 rounded-full'>
-                              {(geek.requests as ServiceRequest[]).filter((request:ServiceRequest) => request.geekResponseStatus === "Pending").length}
-                            </span>
-                          )}
-                        </span>
-                      </p>
-                    )}
-                    {/* {isGeekAuthenticated && <p onClick={()=>{router.push(`/geeks/${geek?._id}/requests`)}}> <span>{geek?.requests && geek?.requests?.filter((request:ServiceRequest) => request.geekResponseStatus === "Pending").length > 0 && <span className=' text-white bg-red-500 py-0.5 px-1.5 rounded-full'>{geek?.requests?.filter((request:ServiceRequest) => request.geekResponseStatus === "Pending").length}</span>}</span></p>} */}
-
+                  <DropdownMenuTrigger className="flex items-center gap-1.5 cursor-pointer focus:outline-none">
+                    <span className="font-medium text-gray-800">{displayName}</span>
+                    <UserRound className="w-5 h-5 text-gray-600" />
+                    {isGeekAuthenticated && <NotifBadge count={geekUnread} />}
+                    {isAuthenticated && !isGeekAuthenticated && <NotifBadge count={seekerUnread} />}
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className='w-48 mt-2'>
-                   
-                    <DropdownMenuLabel className='flex items-center gap-2 justify-between mb-4' >My Account  <Link href={`/geeks/${geek?._id}/requests`}><Bell className='w-4 h-4 text-gray-500' /></Link> </DropdownMenuLabel>
-                    
+
+                  <DropdownMenuContent className="w-52 mt-2">
+                    <DropdownMenuLabel className="flex items-center justify-between">
+                      <span>My Account</span>
+                      {isGeekAuthenticated && (
+                        <Link
+                          href={`/geeks/${geek?._id}/requests`}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Bell className="w-4 h-4 text-gray-500 hover:text-teal-600 transition-colors" />
+                        </Link>
+                      )}
+                    </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    {isGeekAuthenticated && <DropdownMenuItem onClick={()=>{router.push(`/geeks/dashboard`)}}>My Profile</DropdownMenuItem>}
-                    {isGeekAuthenticated && <DropdownMenuItem onClick={()=>{router.push(`/geeks/${geek?._id}/requests`)}}>Notifications <span>{geek?.requests && geek?.requests?.filter((request:ServiceRequest) => request.geekResponseStatus === "Pending").length > 0 && <span className=' text-white bg-red-500 py-0.5 px-1.5 rounded-full'>{geek?.requests?.filter((request:ServiceRequest) => request.geekResponseStatus === "Pending").length}</span>}</span></DropdownMenuItem>}
-                    {isAuthenticated && <DropdownMenuItem onClick={()=>{router.push(`/seeker/${user?._id}`)}}>My Profile</DropdownMenuItem>}
-                    {/* {isGeekAuthenticated && <DropdownMenuItem onClick={()=>{router.push(`/geeks/${geek?._id}/services`)}}>My Services</DropdownMenuItem>} */}
-                    {isAuthenticated && <DropdownMenuItem className='flex justify-between' onClick={()=>{router.push(`/seeker/${user?._id}/services`)}}>My Services {unreadInlast24Hours > 0 && (
-                            <span className=' text-white mb-3 bg-red-500 py-0.5 px-1.5 rounded-full'>
-                              {unreadInlast24Hours}
-                            </span>
-                          )}</DropdownMenuItem>}
+
+                    {isGeekAuthenticated && (
+                      <DropdownMenuItem onClick={() => router.push('/geeks/dashboard')}>
+                        My Profile
+                      </DropdownMenuItem>
+                    )}
+                    {isGeekAuthenticated && (
+                      <DropdownMenuItem onClick={() => router.push('/geeks/subscription')}>
+                        Subscription
+                      </DropdownMenuItem>
+                    )}
+                    {isGeekAuthenticated && (
+                      <DropdownMenuItem
+                        className="flex items-center justify-between"
+                        onClick={() => router.push(`/geeks/${geek?._id}/requests`)}
+                      >
+                        Notifications
+                        <NotifBadge count={geekUnread} />
+                      </DropdownMenuItem>
+                    )}
+                    {isAuthenticated && (
+                      <DropdownMenuItem onClick={() => router.push(`/seeker/${user?._id}`)}>
+                        My Profile
+                      </DropdownMenuItem>
+                    )}
+                    {isAuthenticated && (
+                      <DropdownMenuItem
+                        className="flex items-center justify-between"
+                        onClick={() => router.push(`/seeker/${user?._id}/services`)}
+                      >
+                        My Services
+                        <NotifBadge count={seekerUnread} />
+                      </DropdownMenuItem>
+                    )}
+
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={(e) => e.preventDefault()}>
                       <CustomModel
-                        text={"Logout"}
-                        title={"Are you sure you want to Logout?"}
-                        description='You will be logged out of your account.'
+                        text="Logout"
+                        title="Are you sure you want to Logout?"
+                        description="You will be logged out of your account."
                         onCancel={() => setOpenModal(false)}
                         onOk={handleLogout}
                         openModal={openModal}
@@ -175,61 +201,145 @@ const Navbar = () => {
                 </DropdownMenu>
               </div>
             )}
-            {!isGeekAuthenticated &&<CustomButton handleClick={() => { 
-              if(!isAuthenticated && !isGeekAuthenticated){
-                router.push("/register?type=geek")
-              }else{
-                toast.error("Please logout first to register as a Geek.",{position: 'top-center' });
-              }
-             }} text={"Become a Geek"} type={"submit"} width='text-sm w-fit' />}
+
+            {!isGeekAuthenticated && (
+              <CustomButton
+                handleClick={() => {
+                  if (!isLoggedIn) {
+                    router.push('/register?type=geek');
+                  } else {
+                    toast.error('Please logout first to register as a Geek.', { position: 'top-center' });
+                  }
+                }}
+                text="Get Started"
+                type="submit"
+                width="text-sm w-fit"
+              />
+            )}
           </div>
 
-          {/* Mobile: Hamburger */}
-          <div className='flex lg:hidden'>
-            <button onClick={() => setSidebarOpen(true)}>
-              <Image src={"/assets/icons/hamburger-menu.svg"} width={24} height={14} alt='menu' />
-            </button>
-          </div>
+          {/* Mobile: hamburger */}
+          <button className="flex lg:hidden p-1" onClick={() => setSidebarOpen(true)}>
+            <Image src="/assets/icons/hamburger-menu.svg" width={24} height={14} alt="menu" />
+          </button>
         </div>
       </div>
 
-      {/* Overlay */}
+      {/* Sidebar overlay */}
       {sidebarOpen && (
-        <div onClick={() => setSidebarOpen(false)} className="fixed inset-0 bg-white opacity-50 z-50 transition-opacity duration-300"></div>
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
+        />
       )}
 
-      {/* Sidebar (Right slide-in) */}
-      <div className={`fixed top-0 right-0 h-full w-1/2 bg-white shadow-lg z-50 transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        <div className='p-4 flex justify-between items-center border-b'>
-          <Image src="/assets/logo-big.webp" width={100} height={16} alt='Logo' />
-          <button onClick={() => setSidebarOpen(false)}>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      {/* Mobile sidebar */}
+      <div
+        className={`fixed top-0 right-0 h-full w-72 max-w-[80vw] bg-white shadow-xl z-50 transform transition-transform duration-300 ${
+          sidebarOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="p-4 flex justify-between items-center border-b">
+          <Link href="/" onClick={() => setSidebarOpen(false)}>
+            <Image src="/assets/logo-big.webp" width={110} height={16} alt="Logo" />
+          </Link>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="p-1 rounded-md text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors"
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
-        <div className='flex flex-col gap-4 p-4 text-sm'>
-          {navlinks.map(nav => (
-            <Link href={nav.link} key={nav.id} onClick={() => setSidebarOpen(false)} className={`text-black ${pathname === nav.link ? 'font-semibold text-blue-600' : ''}`}>
-              {nav.name}
-            </Link>
-          ))}
-          {(!user?.authProvider && !geekState.geek) || (!isAuthenticated && !isGeekAuthenticated) ? (
-            <Link href="/login" onClick={() => setSidebarOpen(false)} className="bg-gray-100 px-4 py-2 rounded-lg text-center">Sign In</Link>
-          ) : (
-            <>
-              <p className='mt-4 font-semibold'>Welcome, {user?.fullName?.first || geekState.geek?.fullName?.first}</p>
-              {isGeekAuthenticated && (
-                <Link href="/geeks/dashboard" onClick={() => setSidebarOpen(false)}>My Profile</Link>
-              )}
-              {isAuthenticated && <Link  href={`/seeker/${user?._id}`}>My Profile</Link>}
-                    {/* {isGeekAuthenticated && <DropdownMenuItem onClick={()=>{router.push(`/geeks/${geek?._id}/services`)}}>My Services</DropdownMenuItem>} */}
-              {isAuthenticated && <button className='w-fit' onClick={()=>{router.push(`/seeker/${user?._id}/services`)}}>My Services</button>}
 
+        <div className="flex flex-col p-4 gap-1 text-sm overflow-y-auto h-[calc(100%-65px)]">
+          {/* Nav links */}
+          <div className="flex flex-col gap-0.5">
+            {navlinks.map((nav) => (
+              <Link
+                key={nav.id}
+                href={nav.link}
+                onClick={() => setSidebarOpen(false)}
+                className={`px-3 py-2.5 rounded-lg transition-colors ${
+                  pathname === nav.link
+                    ? 'text-teal-600 font-semibold bg-teal-50'
+                    : 'text-gray-700 font-medium hover:bg-gray-50'
+                }`}
+              >
+                {nav.name}
+              </Link>
+            ))}
+          </div>
+
+          <div className="border-t mt-3 pt-3 flex flex-col gap-0.5">
+            {!isLoggedIn ? (
+              <Link
+                href="/login"
+                onClick={() => setSidebarOpen(false)}
+                className="bg-gray-100 hover:bg-gray-200 px-4 py-2.5 rounded-lg text-center font-medium transition-colors"
+              >
+                Sign In
+              </Link>
+            ) : (
+              <>
+                <p className="px-3 py-1.5 text-xs text-gray-400 uppercase tracking-wide font-semibold">
+                  {displayName}
+                </p>
+
+                {isGeekAuthenticated && (
+                  <Link
+                    href="/geeks/dashboard"
+                    onClick={() => setSidebarOpen(false)}
+                    className="px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    My Profile
+                  </Link>
+                )}
+                {isGeekAuthenticated && (
+                  <Link
+                    href="/geeks/subscription"
+                    onClick={() => setSidebarOpen(false)}
+                    className="px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Subscription
+                  </Link>
+                )}
+                {isGeekAuthenticated && (
+                  <Link
+                    href={`/geeks/${geek?._id}/requests`}
+                    onClick={() => setSidebarOpen(false)}
+                    className="px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center justify-between transition-colors"
+                  >
+                    Notifications
+                    <NotifBadge count={geekUnread} />
+                  </Link>
+                )}
+                {isAuthenticated && (
+                  <Link
+                    href={`/seeker/${user?._id}`}
+                    onClick={() => setSidebarOpen(false)}
+                    className="px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    My Profile
+                  </Link>
+                )}
+                {isAuthenticated && (
+                  <Link
+                    href={`/seeker/${user?._id}/services`}
+                    onClick={() => setSidebarOpen(false)}
+                    className="px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center justify-between transition-colors"
+                  >
+                    My Services
+                    <NotifBadge count={seekerUnread} />
+                  </Link>
+                )}
+
+                <div className="mt-1 px-1">
                   <CustomModel
-                    text={"Logout"}
-                    title={"Are you sure you want to Logout?"}
-                    description='You will be logged out of your account.'
+                    text="Logout"
+                    title="Are you sure you want to Logout?"
+                    description="You will be logged out of your account."
                     onCancel={() => setOpenModal(false)}
                     onOk={handleLogout}
                     openModal={openModal}
@@ -237,15 +347,28 @@ const Navbar = () => {
                     toggleModal={() => setOpenModal(!openModal)}
                     isOpen={openModal}
                   />
-            </>
-          )}
-          {!isGeekAuthenticated &&<CustomButton handleClick={() => { 
-              if(!isAuthenticated && !isGeekAuthenticated){
-                router.push("/register?type=geek")
-              }else{
-                toast.error("Please logout first to register as a Geek.",{position: 'top-center' });
-              }
-             }} text={"Become a Geek"} type={"submit"} width='text-sm w-fit' />}
+                </div>
+              </>
+            )}
+
+            {!isGeekAuthenticated && (
+              <div className="mt-2">
+                <CustomButton
+                  handleClick={() => {
+                    if (!isLoggedIn) {
+                      router.push('/register?type=geek');
+                    } else {
+                      toast.error('Please logout first to register as a Geek.', { position: 'top-center' });
+                    }
+                    setSidebarOpen(false);
+                  }}
+                  text="Get Started"
+                  type="submit"
+                  width="text-sm w-full"
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </>

@@ -61,6 +61,30 @@ export const createGeek = createAsyncThunk('geek/create', async (geek:RegisterGe
   }
 })
 
+interface CreateCorporateGeekData {
+    mobile: string;
+    otp: number;
+    fullName: { first: string; last: string };
+    companyName: string;
+    primarySkill: string;
+    yoe: number;
+    brandsServiced?: string[];
+    refCode?: string;
+}
+
+export const createCorporateGeek = createAsyncThunk('geek/createCorporate', async (data: CreateCorporateGeekData, thunkAPI) => {
+    try {
+        const response = await geekService.createCorporateGeek(data);
+        return response;
+    } catch (error) {
+        if (error) {
+            return thunkAPI.rejectWithValue((error as { response: { data: unknown } }).response?.data || (error as Error).message);
+        } else {
+            return thunkAPI.rejectWithValue('An unknown error occurred');
+        }
+    }
+})
+
 export const loginGeek = createAsyncThunk('geek/login', async (geek:{phone: string,otp: number},thunkAPI) => {
     try{
         const response = await geekService.loginGeek(geek);
@@ -396,6 +420,24 @@ const geekSlice = createSlice({
             state.isSuccess = false;
             state.message = action.error.message;
            state.message = (action.payload as { message: string })?.message;
+            toast.error((action.payload as { message: string })?.message || 'Registration failed.');
+        }).addCase(createCorporateGeek.pending, (state) => {
+            state.isLoading = true;
+            state.isSuccess = false;
+            state.isError = false;
+        }).addCase(createCorporateGeek.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.isError = false;
+            state.geek = action.payload?.geek ?? action.payload;
+            state.isAuthenticated = true;
+            toast.success('Registration successful.');
+            window.location.href = '/';
+        }).addCase(createCorporateGeek.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.isSuccess = false;
+            state.message = (action.payload as { message: string })?.message;
             toast.error((action.payload as { message: string })?.message || 'Registration failed.');
         }).addCase(loginGeek.pending, (state) => {
             state.isLoading = true;

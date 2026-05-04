@@ -7,18 +7,30 @@ import { useAppDispatch } from "@/lib/hooks";
 import { RootState } from "@/lib/store";
 import { getBrands } from "@/features/brands/brandsSlice";
 import { getCategories } from "@/features/category/categorySlice";
-import CustomSelect from "@/app/components/CustomSelect";
 import CustomInput from "@/app/components/CustonInput";
-// import { Progress } from "@/components/ui/progress";
 import Geek from "@/interfaces/Geek";
 import { Category } from "@/interfaces/Category";
-import { BadgeCheck, Cross, OctagonX, Pencil, Plus, Trash2, X } from "lucide-react";
+import {
+  BadgeCheck,
+  OctagonX,
+  Pencil,
+  Plus,
+  Trash2,
+  X,
+  MapPin,
+  CreditCard,
+} from "lucide-react";
 import toast from "react-hot-toast";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Multiselect } from "react-widgets";
 import "react-widgets/styles.css";
-import { deleteRateCard, sendVerificationMail, updateGeekProfile, verificationStatus } from "@/features/geek/geekSlice";
+import {
+  deleteRateCard,
+  sendVerificationMail,
+  updateGeekProfile,
+  verificationStatus,
+} from "@/features/geek/geekSlice";
 import AadhaarVerificationForm from "@/app/components/adhaarForm";
 import AddressForm from "@/app/components/AddressForm";
 import ProfileImageUpload from "@/app/components/ImageUpload";
@@ -27,14 +39,10 @@ import RateCardSection from "@/app/components/RateCard";
 import Brand from "@/interfaces/Brand";
 import GlobalSkeleton from "@/app/components/Sekeletn";
 
-
-
 interface SkillWithBrands {
   categoryId: string;
   brands: Brand[];
 }
-
-
 
 const Languages = [
   "English","Hindi", "Bengali", "Telugu", "Marathi", "Tamil", "Urdu",
@@ -43,29 +51,75 @@ const Languages = [
   "Konkani", "Sindhi", "Dogri", "Manipuri"
 ];
 
+// ── Shared modal shell ─────────────────────────────────────────────────────────
+const Modal = ({
+  open,
+  onClose,
+  title,
+  subtitle,
+  maxWidth = "max-w-lg",
+  children,
+}: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  subtitle?: string;
+  maxWidth?: string;
+  children: React.ReactNode;
+}) => {
+  if (!open) return null;
+  return (
+    <>
+      <div onClick={onClose} className="fixed inset-0 bg-black/30 z-50" />
+      <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+        <div
+          className={`bg-white rounded-xl shadow-xl w-full ${maxWidth} max-h-[90vh] flex flex-col`}
+          onClick={e => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="flex items-start justify-between px-5 py-4 border-b border-gray-100 shrink-0">
+            <div>
+              <h2 className="text-base font-semibold text-gray-900">{title}</h2>
+              {subtitle && <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>}
+            </div>
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-700 cursor-pointer mt-0.5">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          {/* Body — scrollable */}
+          <div className="overflow-y-auto custom-scrollbar flex-1">
+            {children}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
 const Dashboard = () => {
   const dispatch = useAppDispatch();
-  const [open, setOpen] = useState(false);
+
+  // modal open states
+  const [openProfile, setOpenProfile] = useState(false);
+  const [openSkills, setOpenSkills] = useState(false);
   const [openAdhaarForm, setOpenAdhaarForm] = useState(false);
   const [openAddressForm, setOpenAddressForm] = useState(false);
   const [openImageUpload, setOpenImageUpload] = useState(false);
   const [openRateCard, setOpenRateCard] = useState(false);
-  const [updating, setUpdating] = useState(false);
-const [isMailSent, setIsMailSent] = useState(false);
-const [filteredBrands, setFilteredBrands] = useState<Brand[]>([]);
+
+  // loading states
+  const [updatingProfile, setUpdatingProfile] = useState(false);
+  const [updatingSkills, setUpdatingSkills] = useState(false);
+
+  const [isMailSent, setIsMailSent] = useState(false);
+  const [isSecondaryOpen, setIsSecondaryOpen] = useState(false);
+  const [tempSkill, setTempSkill] = useState<SkillWithBrands>({ categoryId: "", brands: [] });
+
   const geekState = useSelector((state: RootState) => state.geek);
   const geek: Geek = useSelector((state: RootState) => state.geek?.geek as Geek);
   const geekId = geek?._id;
   const brands = useSelector((state: RootState) => state.brand?.brands) as Brand[];
   const categories = useSelector((state: RootState) => state.category?.categories) as Category[];
-  const selectedCategory = geek?.primarySkill || null;
-const [isSecondaryOpen, setIsSecondaryOpen] = useState(false);
-const [tempSkill, setTempSkill] = useState<SkillWithBrands>({
-  categoryId: "",
-  brands: [],
-});
-
-  
 
   useEffect(() => {
     dispatch(getBrands());
@@ -73,21 +127,15 @@ const [tempSkill, setTempSkill] = useState<SkillWithBrands>({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ── Helpers ──────────────────────────────────────────────────────────────────
+  const getCategoryById = (cats: Category[], id?: string) => cats.find(c => c._id === id);
+  const getBrandsByCategoryId = (b: Brand[], categoryId?: string) =>
+    b.filter(br => br.category?._id === categoryId);
+  const isSecondaryCategoryAdded = (skills: SkillWithBrands[], categoryId: string) =>
+    skills.some(s => s.categoryId === categoryId);
 
-
-const getCategoryById = (categories: Category[], id?: string) =>
-  categories.find(c => c._id === id);
-
-const getBrandsByCategoryId = (brands: Brand[], categoryId?: string) =>
-  brands.filter(b => b.category?._id === categoryId);
-
-const isSecondaryCategoryAdded = (
-  skills: SkillWithBrands[],
-  categoryId: string
-) => skills.some(s => s.categoryId === categoryId);
-
-
-  const formik = useFormik({
+  // ── Profile formik (personal info only) ──────────────────────────────────────
+  const profileFormik = useFormik({
     enableReinitialize: true,
     initialValues: {
       firstName: geek?.fullName?.first || "",
@@ -96,864 +144,684 @@ const isSecondaryCategoryAdded = (
       mobile: geek?.mobile || "",
       yoe: geek?.yoe,
       modeOfService: geek?.modeOfService || "",
-      primarySkill: {
-      categoryId: geek?.primarySkill?._id || "",
-      brands: geek?.brandsServiced?.filter(
-        (b: Brand) => b?.category?._id === geek?.primarySkill?._id
-      ) || [],
-    },
-    secondarySkills: (geek?.secondarySkills || []).map((cat: Category) => ({
-      categoryId: cat._id,
-      brands: geek?.brandsServiced?.filter(
-        (b: Brand) => b?.category?._id === cat._id
-      ) || [],
-    })),
-      brandsServiced: geek?.brandsServiced || [],
       languagePreferences: geek?.languagePreferences || [],
     },
     validationSchema: Yup.object({
       firstName: Yup.string().required("First name is required"),
       lastName: Yup.string().required("Last name is required"),
       email: Yup.string().email("Invalid email").required("Email is required"),
-      yoe: Yup.number().min(0, "Experience must be positive").required("Experience is required"),
+      yoe: Yup.number().min(0, "Must be positive").required("Experience is required"),
       modeOfService: Yup.string().required("Mode of service is required"),
-      primarySkill: Yup.object({
-      categoryId: Yup.string().required("Primary skill is required"),
-      brands: Yup.array().min(1, "Select at least one brand"),
-    }),
-    secondarySkills: Yup.array().of(
-      Yup.object({
-        categoryId: Yup.string().required(),
-        brands: Yup.array().min(1, "Select at least one brand"),
-      })
-    ),
-      brandsServiced: Yup.array(),
       languagePreferences: Yup.array().min(1, "At least one language is required"),
     }),
     onSubmit: async (values) => {
-        
-        try {
-            setUpdating(true);
-                const allBrands = [
-                ...values.primarySkill.brands,
-                ...values.secondarySkills.flatMap(s => s.brands),
-            ];
-
-            const payload = {
-                primarySkill: values.primarySkill.categoryId,
-                secondarySkills: values.secondarySkills.map(s => s.categoryId),
-                brandsServiced: Array.from(
-                new Map(allBrands.map(b => [b._id, b])).values()
-                ).map(b => b._id),
-            };
-
-            const updatedDetails = {
-            fullName: {
-                first: values.firstName,
-                last: values.lastName,
-            },
+      try {
+        setUpdatingProfile(true);
+        await dispatch(updateGeekProfile({
+          id: geekId,
+          data: {
+            fullName: { first: values.firstName, last: values.lastName },
             email: values.email,
             mobile: values.mobile,
             yoe: values.yoe,
             modeOfService: values.modeOfService,
-            ...payload,
             languagePreferences: values.languagePreferences,
-            };
-            await dispatch(updateGeekProfile({ id: geekId, data: updatedDetails })).unwrap();
-        } catch (error: Error | unknown) {
-           if(error instanceof Error){
-            toast.error(error.message);
-           }else{
-            console.error('Unknown error:', error);
-           }
-        }finally{
-            setUpdating(false);
-        }
-    }
+          },
+        })).unwrap();
+      } catch (error: Error | unknown) {
+        if (error instanceof Error) toast.error(error.message);
+        else console.error("Unknown error:", error);
+      } finally {
+        setUpdatingProfile(false);
+      }
+    },
   });
 
+  // ── Skills formik (primary + secondary skills & brands) ───────────────────────
+  const skillsFormik = useFormik({
+    enableReinitialize: true,
+    initialValues: {
+      primarySkill: {
+        categoryId: geek?.primarySkill?._id || "",
+        brands: geek?.brandsServiced?.filter((b: Brand) => b?.category?._id === geek?.primarySkill?._id) || [],
+      },
+      secondarySkills: (geek?.secondarySkills || []).map((cat: Category) => ({
+        categoryId: cat._id,
+        brands: geek?.brandsServiced?.filter((b: Brand) => b?.category?._id === cat._id) || [],
+      })),
+    },
+    validationSchema: Yup.object({
+      primarySkill: Yup.object({
+        categoryId: Yup.string().required("Primary skill is required"),
+        brands: Yup.array().min(1, "Select at least one brand"),
+      }),
+      secondarySkills: Yup.array().of(
+        Yup.object({
+          categoryId: Yup.string().required(),
+          brands: Yup.array().min(1, "Select at least one brand"),
+        })
+      ),
+    }),
+    onSubmit: async (values) => {
+      try {
+        setUpdatingSkills(true);
+        const allBrands = [
+          ...values.primarySkill.brands,
+          ...values.secondarySkills.flatMap(s => s.brands),
+        ];
+        await dispatch(updateGeekProfile({
+          id: geekId,
+          data: {
+            primarySkill: values.primarySkill.categoryId,
+            secondarySkills: values.secondarySkills.map(s => s.categoryId),
+            brandsServiced: Array.from(new Map(allBrands.map(b => [b._id, b])).values()).map(b => b._id),
+          },
+        })).unwrap();
+      } catch (error: Error | unknown) {
+        if (error instanceof Error) toast.error(error.message);
+        else console.error("Unknown error:", error);
+      } finally {
+        setUpdatingSkills(false);
+      }
+    },
+  });
+
+  // Reset primary brands when category changes
+  useEffect(() => {
+    skillsFormik.setFieldValue("primarySkill.brands", []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [skillsFormik.values.primarySkill.categoryId]);
+
+  // Hydrate skills formik when geek data / brands / categories load
+  useEffect(() => {
+    if (!geek || brands.length === 0 || categories.length === 0) return;
+    const primaryCategoryId = geek.primarySkill?._id;
+    const primaryBrands = brands.filter(
+      b => b.category?._id === primaryCategoryId && geek.brandsServiced?.some(gb => gb._id === b._id)
+    );
+    const secondarySkills: SkillWithBrands[] = geek.secondarySkills?.map(cat => ({
+      categoryId: cat._id,
+      brands: brands.filter(b => b.category?._id === cat._id && geek.brandsServiced?.some(gb => gb._id === b._id)),
+    })) || [];
+    skillsFormik.setValues({
+      primarySkill: { categoryId: primaryCategoryId, brands: primaryBrands },
+      secondarySkills,
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [geek, brands, categories]);
+
+  // ── Side effects ──────────────────────────────────────────────────────────────
   const handleEmailVerify = () => {
     setIsMailSent(true);
-     dispatch(sendVerificationMail(geek?._id || ""))
-  }
+    dispatch(sendVerificationMail(geek?._id || ""));
+  };
 
   useEffect(() => {
-      if(geekState?.isMailSent === true && geekState?.isSuccess){
-        setIsMailSent(true);
-          toast.dismiss();
-          toast.success('Verification mail sent successfully',{
-              id: 'mailSent',
-              position: 'top-center',
-              style: {
-                  background: '#333',
-                  color: '#fff',
-              }
-          });
-        setIsMailSent(true);
-      }else{
-        setIsMailSent(false);
-      }
-  },[geekState?.isMailSent, geekState?.isSuccess]);
-  
-
-
-  useEffect(()=>{
-    if(geekState?.isProfileUpdated === true && updating === false && geekState?.isSuccess){
-         toast.dismiss();
-         toast.success('Profile updated successfully');
-         setOpen(false);
-         window.location.reload();
+    if (geekState?.isMailSent === true && geekState?.isSuccess) {
+      setIsMailSent(true);
+      toast.dismiss();
+      toast.success("Verification mail sent", {
+        id: "mailSent", position: "top-center", style: { background: "#333", color: "#fff" },
+      });
+    } else {
+      setIsMailSent(false);
     }
-  },[geekState?.isProfileUpdated, geekState?.isSuccess, updating])
-  
+  }, [geekState?.isMailSent, geekState?.isSuccess]);
 
   useEffect(() => {
-      if(geek?._id){
-            if(geek?.idProof?.isAdhaarVerified===false && geek?.idProof?.status && geek?.idProof?.status === 'Requested'){
-            dispatch(verificationStatus(geek?.idProof?.requestId));
-        }else if(geek?.idProof?.isAdhaarVerified ===false && geek?.idProof?.status && geek?.idProof?.status === 'Completed'){
-            toast.success('Aadhaar verification was completed successfully');
-        }else{
-          
-        }
+    if (geekState?.isProfileUpdated === true && geekState?.isSuccess) {
+      if (updatingProfile === false) {
+        setOpenProfile(false);
+        toast.dismiss();
+        toast.success("Profile updated");
+        window.location.reload();
       }
-  },[geek?.idProof?.isAdhaarVerified, geek?.idProof?.status, geek?.idProof?.requestId, dispatch, geek?._id]);
+      if (updatingSkills === false) {
+        setOpenSkills(false);
+        toast.dismiss();
+        toast.success("Skills updated");
+        window.location.reload();
+      }
+    }
+  }, [geekState?.isProfileUpdated, geekState?.isSuccess, updatingProfile, updatingSkills]);
 
-  
+  useEffect(() => {
+    if (geek?._id && geek?.idProof?.isAdhaarVerified === false && geek?.idProof?.status === "Requested") {
+      dispatch(verificationStatus(geek?.idProof?.requestId));
+    }
+  }, [geek?.idProof?.isAdhaarVerified, geek?.idProof?.status, geek?.idProof?.requestId, dispatch, geek?._id]);
 
-
-  const azureLoader = ({ src }:{src:string}) => src;
-useEffect(() => {
-    const selectedSkillIds = [
-        formik.values.primarySkill?.categoryId,
-        ...formik.values.secondarySkills.map((skill) => skill.categoryId ),
-    ].filter(Boolean);
-
-    const brandsFilteredByCategory = brands?.filter((brand: Brand) =>
-        selectedSkillIds.includes(brand?.category?._id)
-    );
-    setFilteredBrands(brandsFilteredByCategory);
-}, [formik.values.primarySkill, formik.values.secondarySkills, brands]);
-
-
-
-const handleDeleteRateCard = async (rateId:string) => {
+  const handleDeleteRateCard = async (rateId: string) => {
     await dispatch(deleteRateCard({ id: geek._id, rateCardId: rateId })).unwrap();
-    
-}
+  };
 
-useEffect(()=>{
-  if(geekState?.isRateCardDeleted === true && geekState?.isSuccess){
-    toast.dismiss();
-    toast.success('Rate card deleted successfully');
-    window.location.reload();
-  }
-},[geekState?.isRateCardDeleted, geekState?.isSuccess])
+  useEffect(() => {
+    if (geekState?.isRateCardDeleted === true && geekState?.isSuccess) {
+      toast.dismiss();
+      toast.success("Rate card deleted");
+      window.location.reload();
+    }
+  }, [geekState?.isRateCardDeleted, geekState?.isSuccess]);
 
-useEffect(() => {
-  formik.setFieldValue("primarySkill.brands", []);
-// eslint-disable-next-line react-hooks/exhaustive-deps
-}, [formik.values.primarySkill.categoryId]);
+  const azureLoader = ({ src }: { src: string }) => src;
 
+  // ── Display helpers ───────────────────────────────────────────────────────────
+  const getSecondarySkillsWithBrands = (secondarySkills: Category[] = [], brandsServiced: Brand[] = []) =>
+    secondarySkills.map(skill => ({
+      category: skill,
+      brands: brandsServiced.filter(b => b.category?._id === skill._id),
+    }));
 
+  const getPrimarySkillBrands = (primarySkill: Category, brandsServiced: Brand[] = []) =>
+    brandsServiced.filter(b => b.category?._id === primarySkill._id);
 
-useEffect(() => {
-  if (!geek || brands.length === 0 || categories.length === 0) return;
+  const isLoading = geekState?.isLoading;
+  const modeLabels = ["Online", "Offline", "Carry In"];
+  const isModeActive = (mode: string) => geek?.modeOfService === "All" || geek?.modeOfService === mode;
 
-  const primaryCategoryId = geek.primarySkill?._id;
-
-  const primaryBrands = brands.filter(
-    b =>
-      b.category?._id === primaryCategoryId &&
-      geek.brandsServiced?.some(gb => gb._id === b._id)
+  const Card = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
+    <div className={`bg-white border border-gray-200 rounded-xl p-5 ${className}`}>{children}</div>
   );
 
-  const secondarySkills: SkillWithBrands[] =
-    geek.secondarySkills?.map(cat => ({
-      categoryId: cat._id,
-      brands: brands.filter(
-        b =>
-          b.category?._id === cat._id &&
-          geek.brandsServiced?.some(gb => gb._id === b._id)
-      ),
-    })) || [];
+  const SectionTitle = ({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) => (
+    <div className="flex items-center justify-between mb-4">
+      <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">{children}</h2>
+      {action}
+    </div>
+  );
 
-  formik.setValues({
-    ...formik.values,
-    primarySkill: {
-      categoryId: primaryCategoryId,
-      brands: primaryBrands,
-    },
-    secondarySkills,
-  });
-}, [geek, brands, categories]);
+  // ── Render ────────────────────────────────────────────────────────────────────
+  return (
+    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+      {isLoading ? (
+        <div className="max-w-5xl mx-auto">
+          <GlobalSkeleton cards={4} cols={4} lgCols={4} />
+        </div>
+      ) : (
+        <div className="max-w-5xl mx-auto flex flex-col gap-5">
 
+          {/* Profile Header */}
+          <Card className="p-0 overflow-hidden">
+            <div className="h-2 bg-teal-500 w-full" />
+            <div className="p-5 flex flex-col sm:flex-row gap-4">
+              <ProfileImage
+                imageUrl={geek?.profileImage?.url}
+                azureLoader={azureLoader}
+                setOpenImageUpload={setOpenImageUpload}
+                contained
+              />
+              <div className="flex-1 flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h1 className="text-xl font-bold text-gray-900">
+                      {geek?.fullName?.first} {geek?.fullName?.last}
+                    </h1>
+                    {geek?.idProof?.isAdhaarVerified ? (
+                      <span className="inline-flex items-center gap-1 text-xs text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full font-medium">
+                        <BadgeCheck className="w-3 h-3" /> Verified
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => setOpenAdhaarForm(true)}
+                        className="inline-flex items-center gap-1 text-xs text-orange-700 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded-full font-medium cursor-pointer hover:bg-orange-100"
+                      >
+                        <OctagonX className="w-3 h-3" /> Verify ID
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-500 mt-0.5">{geek?.primarySkill?.title || "No primary skill set"}</p>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
+                    <div className="flex items-center gap-1 text-sm text-gray-600">
+                      <span>{geek?.email || "Email not provided"}</span>
+                      {geek?.isEmailVerified ? (
+                        <span className="text-xs text-green-600">(verified)</span>
+                      ) : (
+                        <button disabled={isMailSent} onClick={handleEmailVerify}
+                          className="text-xs text-teal-600 hover:underline disabled:opacity-50 cursor-pointer"
+                        >
+                          {isMailSent ? "Sent" : geek?.email?.length > 0 ? "Verify" : ""}
+                        </button>
+                      )}
+                    </div>
+                    {geek?.mobile && <span className="text-sm text-gray-600">{geek.mobile}</span>}
+                    {geek?.yoe != null && <span className="text-sm text-gray-600">{geek.yoe} yrs exp</span>}
+                  </div>
+                </div>
+                <button
+                  onClick={() => setOpenProfile(true)}
+                  className="self-start flex items-center gap-1.5 text-sm text-teal-600 hover:text-teal-700 border border-teal-200 hover:bg-teal-50 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                >
+                  <Pencil className="w-3.5 h-3.5" /> Edit
+                </button>
+              </div>
+            </div>
+          </Card>
 
-const getSecondarySkillsWithBrands = (
-  secondarySkills: Category[] = [],
-  brands: Brand[] = []
-) => {
-  return secondarySkills.map(skill => ({
-    category: skill,
-    brands: brands.filter(
-      b => b.category?._id === skill._id
-    ),
-  }));
+          {/* Main content grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+            {/* Left — Skills + Rate Cards */}
+            <div className="lg:col-span-2 flex flex-col gap-5">
+
+              {/* Skills */}
+              <Card>
+                <SectionTitle action={
+                  <button onClick={() => setOpenSkills(true)} className="text-xs text-teal-600 hover:underline cursor-pointer flex items-center gap-1">
+                    <Pencil className="w-3 h-3" /> Edit Skills
+                  </button>
+                }>
+                  Skills
+                </SectionTitle>
+
+                {geek?.primarySkill ? (
+                  <div className="mb-4">
+                    <p className="text-xs text-gray-400 font-medium mb-1.5">Primary</p>
+                    <div className="border border-gray-200 rounded-lg p-3">
+                      <p className="text-sm font-semibold text-gray-800 mb-2">{geek.primarySkill.title}</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {getPrimarySkillBrands(geek.primarySkill, geek.brandsServiced).map(brand => (
+                          <span key={brand._id} className="text-xs bg-teal-50 text-teal-700 border border-teal-100 px-2 py-0.5 rounded">
+                            {brand.name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-400 mb-3">No primary skill added</p>
+                )}
+
+                {getSecondarySkillsWithBrands(geek?.secondarySkills, geek?.brandsServiced).length > 0 && (
+                  <div>
+                    <p className="text-xs text-gray-400 font-medium mb-1.5">Secondary</p>
+                    <div className="flex flex-col gap-2">
+                      {getSecondarySkillsWithBrands(geek.secondarySkills, geek.brandsServiced).map(({ category, brands: skillBrands }) => (
+                        <div key={category._id} className="border border-gray-200 rounded-lg p-3">
+                          <p className="text-sm font-semibold text-gray-700 mb-2">{category.title}</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {skillBrands.length > 0 ? skillBrands.map(brand => (
+                              <span key={brand._id} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+                                {brand.name}
+                              </span>
+                            )) : <span className="text-xs text-gray-400">No brands</span>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </Card>
+
+              {/* Rate Cards */}
+              <Card>
+                <SectionTitle action={
+                  <button onClick={() => setOpenRateCard(true)} className="text-xs text-teal-600 hover:underline cursor-pointer flex items-center gap-1">
+                    {geek?.rateCard?.length > 0 ? <><Pencil className="w-3 h-3" /> Edit</> : <><Plus className="w-3 h-3" /> Add</>}
+                  </button>
+                }>
+                  Rate Cards
+                </SectionTitle>
+
+                {geek?.rateCard?.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {geek.rateCard.map(card => (
+                      <div key={card._id} className="border border-gray-200 rounded-lg p-3 flex items-center justify-between group">
+                        <div>
+                          <p className="text-sm font-semibold text-gray-800">{card.skill?.title}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">{card.chargeType}</p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm font-bold text-gray-800">₹{card.rate}</span>
+                          <button onClick={() => handleDeleteRateCard(card._id)}
+                            className="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-8 text-gray-400">
+                    <CreditCard className="w-7 h-7 mb-2 opacity-30" />
+                    <p className="text-sm">No rate cards yet</p>
+                  </div>
+                )}
+              </Card>
+            </div>
+
+            {/* Right sidebar */}
+            <div className="flex flex-col gap-5">
+              <Card>
+                <SectionTitle>Service Mode</SectionTitle>
+                <div className="flex flex-col gap-1.5">
+                  {modeLabels.map(mode => (
+                    <div key={mode} className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm border ${
+                      isModeActive(mode)
+                        ? "border-teal-200 bg-teal-50 text-teal-700 font-medium"
+                        : "border-gray-100 bg-gray-50 text-gray-400"
+                    }`}>
+                      {mode}
+                      {isModeActive(mode) && <BadgeCheck className="w-3.5 h-3.5 text-teal-500" />}
+                    </div>
+                  ))}
+                </div>
+              </Card>
+
+              <Card>
+                <SectionTitle action={
+                  <button onClick={() => setOpenAddressForm(true)} className="text-xs text-teal-600 hover:underline cursor-pointer flex items-center gap-1">
+                    <Pencil className="w-3 h-3" /> Edit
+                  </button>
+                }>
+                  Address
+                </SectionTitle>
+                {geek?.address?.city ? (
+                  <div className="flex gap-2">
+                    <MapPin className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                    <address className="not-italic text-sm text-gray-600 leading-relaxed">
+                      {[geek.address.line1, geek.address.line2, geek.address.city, geek.address.state, geek.address.pin]
+                        .filter(Boolean).join(", ")}
+                    </address>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-400">No address added</p>
+                )}
+              </Card>
+
+              {geek?.languagePreferences?.length > 0 && (
+                <Card>
+                  <SectionTitle>Languages</SectionTitle>
+                  <div className="flex flex-wrap gap-1.5">
+                    {geek.languagePreferences.map((lang: string) => (
+                      <span key={lang} className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded border border-gray-200">
+                        {lang}
+                      </span>
+                    ))}
+                  </div>
+                </Card>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modals ── */}
+
+      {/* Address */}
+      <Modal open={openAddressForm} onClose={() => setOpenAddressForm(false)} title="Edit Address" subtitle="Update your service location">
+        <AddressForm />
+      </Modal>
+
+      {/* Aadhaar */}
+      <Modal open={openAdhaarForm} onClose={() => setOpenAdhaarForm(false)} title="Verify Aadhaar" maxWidth="max-w-md">
+        <AadhaarVerificationForm status={geek?.idProof?.status} />
+      </Modal>
+
+      {/* Image upload */}
+      <Modal open={openImageUpload} onClose={() => setOpenImageUpload(false)} title="Update Photo" maxWidth="max-w-sm">
+        <ProfileImageUpload imageUrl={geek?.profileImage?.url} geekId={geek?._id} />
+      </Modal>
+
+      {/* Rate card */}
+      {geek && (
+        <Modal open={openRateCard} onClose={() => setOpenRateCard(false)} title="Rate Cards" subtitle="Set your pricing per skill">
+          <RateCardSection geek={geek} />
+        </Modal>
+      )}
+
+      {/* ── Edit Profile modal (personal info only) ── */}
+      <Modal
+        open={openProfile}
+        onClose={() => setOpenProfile(false)}
+        title="Edit Profile"
+        subtitle="Name, contact details, experience and service mode"
+      >
+        <form onSubmit={profileFormik.handleSubmit} className="px-5 py-5 flex flex-col gap-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <CustomInput readOnly={false} disabled={false} title="First Name" labelFor="firstName"
+                value={profileFormik.values.firstName} name="firstName" required
+                onChange={profileFormik.handleChange} placeholder="First name" type="text" labelBg="bg-white" />
+              {profileFormik.touched.firstName && profileFormik.errors.firstName && (
+                <p className="text-xs text-red-500 mt-1">{profileFormik.errors.firstName}</p>
+              )}
+            </div>
+            <div>
+              <CustomInput readOnly={false} disabled={false} title="Last Name" labelFor="lastName"
+                value={profileFormik.values.lastName} name="lastName" required
+                onChange={profileFormik.handleChange} placeholder="Last name" type="text" labelBg="bg-white" />
+              {profileFormik.touched.lastName && profileFormik.errors.lastName && (
+                <p className="text-xs text-red-500 mt-1">{profileFormik.errors.lastName}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <CustomInput readOnly={false} disabled={false} title="Email" labelFor="email"
+                value={profileFormik.values.email} name="email" required
+                onChange={profileFormik.handleChange} placeholder="" type="email" labelBg="bg-white" />
+              {profileFormik.touched.email && profileFormik.errors.email && (
+                <p className="text-xs text-red-500 mt-1">{profileFormik.errors.email}</p>
+              )}
+            </div>
+            <div>
+              <CustomInput title="Mobile" labelFor="mobile" value={profileFormik.values.mobile}
+                name="mobile" required onChange={profileFormik.handleChange}
+                placeholder="" type="text" readOnly disabled labelBg="bg-white" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <CustomInput readOnly={false} disabled={false} title="Experience (Years)" labelFor="yoe"
+                value={profileFormik.values?.yoe} name="yoe" required
+                onChange={profileFormik.handleChange} placeholder="" type="number" labelBg="bg-white" />
+              {profileFormik.touched.yoe && profileFormik.errors.yoe && (
+                <p className="text-xs text-red-500 mt-1">{profileFormik.errors.yoe}</p>
+              )}
+            </div>
+            <div>
+              <label className="text-sm text-gray-500 block mb-1">Mode of Service</label>
+              <select id="modeOfService" name="modeOfService" value={profileFormik.values.modeOfService}
+                onChange={profileFormik.handleChange} onBlur={profileFormik.handleBlur}
+                className="w-full bg-white border text-gray-600 text-sm border-gray-300 px-3 py-2.5 rounded-lg outline-none focus:border-teal-400"
+              >
+                <option value="">Select mode</option>
+                <option value="Online">Online</option>
+                <option value="Offline">Offline</option>
+                <option value="Carry In">Carry In</option>
+                <option value="All">All</option>
+                <option value="None">None</option>
+              </select>
+              {profileFormik.touched.modeOfService && profileFormik.errors.modeOfService && (
+                <p className="text-xs text-red-500 mt-1">{profileFormik.errors.modeOfService}</p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <label className="text-sm text-gray-500 block mb-1">Language Preferences</label>
+            <Multiselect data={Languages} value={profileFormik.values.languagePreferences}
+              onChange={value => profileFormik.setFieldValue("languagePreferences", value)}
+              placeholder="Select languages" />
+            {profileFormik.touched.languagePreferences && profileFormik.errors.languagePreferences && (
+              <p className="text-xs text-red-500 mt-1">{profileFormik.errors.languagePreferences}</p>
+            )}
+          </div>
+
+          <button disabled={updatingProfile} type="submit"
+            className="w-full bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg transition-colors cursor-pointer"
+          >
+            {updatingProfile ? "Saving..." : "Save Changes"}
+          </button>
+        </form>
+      </Modal>
+
+      {/* ── Edit Skills modal ── */}
+      <Modal
+        open={openSkills}
+        onClose={() => { setOpenSkills(false); setIsSecondaryOpen(false); setTempSkill({ categoryId: "", brands: [] }); }}
+        title="Edit Skills"
+        subtitle="Primary skill, secondary skills and brands serviced"
+      >
+        <form onSubmit={skillsFormik.handleSubmit} className="px-5 py-5 flex flex-col gap-6">
+
+          {/* Primary skill */}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-gray-700">Primary Skill</p>
+              <span className="text-xs text-gray-400">Your main area of expertise</span>
+            </div>
+            <div className="border border-gray-200 rounded-lg p-4 flex flex-col gap-3">
+              <div>
+                <label className="text-xs text-gray-500 block mb-1">Skill category</label>
+                <select
+                  value={skillsFormik.values.primarySkill?.categoryId}
+                  onChange={e => skillsFormik.setFieldValue("primarySkill", { categoryId: e.target.value, brands: [] })}
+                  className="w-full bg-white border text-gray-700 text-sm border-gray-300 px-3 py-2 rounded-lg outline-none focus:border-teal-400"
+                >
+                  <option value="">Select category</option>
+                  {categories.map(c => <option key={c._id} value={c._id}>{c.title}</option>)}
+                </select>
+                {skillsFormik.touched.primarySkill?.categoryId && skillsFormik.errors.primarySkill?.categoryId && (
+                  <p className="text-xs text-red-500 mt-1">{skillsFormik.errors.primarySkill.categoryId}</p>
+                )}
+              </div>
+              {skillsFormik.values.primarySkill?.categoryId && (
+                <div>
+                  <label className="text-xs text-gray-500 block mb-1">Brands you service</label>
+                  <Multiselect
+                    data={getBrandsByCategoryId(brands, skillsFormik.values.primarySkill?.categoryId)}
+                    dataKey="_id" textField="name"
+                    value={skillsFormik.values.primarySkill?.brands}
+                    onChange={value => skillsFormik.setFieldValue("primarySkill.brands", value)}
+                    placeholder="Select brands..."
+                  />
+                  {skillsFormik.touched.primarySkill?.brands && skillsFormik.errors.primarySkill?.brands && (
+                    <p className="text-xs text-red-500 mt-1">{skillsFormik.errors.primarySkill.brands as string}</p>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Secondary skills */}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-gray-700">Secondary Skills</p>
+              <span className="text-xs text-gray-400">Optional additional skills</span>
+            </div>
+
+            {/* Existing secondary skills */}
+            {skillsFormik.values.secondarySkills.length > 0 && (
+              <div className="flex flex-col gap-2">
+                {skillsFormik.values.secondarySkills.map((skill, index) => {
+                  const category = getCategoryById(categories, skill.categoryId);
+                  return (
+                    <div key={skill.categoryId} className="border border-gray-200 rounded-lg p-4 flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium text-gray-700">{category?.title}</p>
+                        <button type="button"
+                          onClick={() => skillsFormik.setFieldValue(
+                            "secondarySkills",
+                            skillsFormik.values.secondarySkills.filter(s => s.categoryId !== skill.categoryId)
+                          )}
+                          className="text-xs text-red-400 hover:text-red-600 cursor-pointer"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <label className="text-xs text-gray-500">Brands you service</label>
+                      <Multiselect
+                        data={getBrandsByCategoryId(brands, skill.categoryId)}
+                        dataKey="_id" textField="name"
+                        value={skill.brands}
+                        onChange={value => skillsFormik.setFieldValue(`secondarySkills.${index}.brands`, value)}
+                        placeholder="Select brands..."
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Add new secondary skill */}
+            {isSecondaryOpen ? (
+              <div className="border border-dashed border-gray-300 rounded-lg p-4 flex flex-col gap-3 bg-gray-50">
+                <p className="text-xs font-medium text-gray-500">New secondary skill</p>
+                <div>
+                  <label className="text-xs text-gray-500 block mb-1">Skill category</label>
+                  <select
+                    value={tempSkill.categoryId}
+                    onChange={e => setTempSkill({ categoryId: e.target.value, brands: [] })}
+                    className="w-full bg-white border text-gray-700 text-sm border-gray-300 px-3 py-2 rounded-lg outline-none"
+                  >
+                    <option value="">Select category</option>
+                    {categories
+                      .filter(c => c._id !== skillsFormik.values.primarySkill.categoryId)
+                      .map(c => (
+                        <option key={c._id} value={c._id}
+                          disabled={isSecondaryCategoryAdded(skillsFormik.values.secondarySkills, c._id)}
+                        >
+                          {c.title}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                {tempSkill.categoryId && (
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">Brands you service</label>
+                    <Multiselect
+                      data={getBrandsByCategoryId(brands, tempSkill.categoryId)}
+                      dataKey="_id" textField="name"
+                      value={tempSkill.brands}
+                      onChange={value => setTempSkill(prev => ({ ...prev, brands: value }))}
+                      placeholder="Select brands..."
+                    />
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <button type="button"
+                    disabled={!tempSkill.categoryId || tempSkill.brands.length === 0}
+                    onClick={() => {
+                      skillsFormik.setFieldValue("secondarySkills", [...skillsFormik.values.secondarySkills, tempSkill]);
+                      setTempSkill({ categoryId: "", brands: [] });
+                      setIsSecondaryOpen(false);
+                    }}
+                    className="bg-teal-600 text-white text-sm px-4 py-1.5 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-teal-700 transition-colors cursor-pointer"
+                  >
+                    Add
+                  </button>
+                  <button type="button"
+                    onClick={() => { setIsSecondaryOpen(false); setTempSkill({ categoryId: "", brands: [] }); }}
+                    className="border border-gray-300 text-gray-600 text-sm px-4 py-1.5 rounded-lg hover:bg-gray-50 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button type="button"
+                disabled={!skillsFormik.values.primarySkill.categoryId}
+                onClick={() => setIsSecondaryOpen(true)}
+                className="flex items-center gap-1.5 text-sm text-teal-600 font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:text-teal-700 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" /> Add secondary skill
+              </button>
+            )}
+          </div>
+
+          <button disabled={updatingSkills} type="submit"
+            className="w-full bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg transition-colors cursor-pointer"
+          >
+            {updatingSkills ? "Saving..." : "Save Skills"}
+          </button>
+        </form>
+      </Modal>
+    </div>
+  );
 };
 
-
-
-const getPrimarySkillBrands = (
-  primarySkill: Category,
-  brands: Brand[] = []
-) => (  brands.filter(b => b.category?._id === primarySkill._id));
-
-
-
-
-const isLoadging = geekState?.isLoading || updating;
-
-
-  return (
-       <div className='w-full h-full flex flex-col bg-gray-100 md:p-24 p-4'>
-           
-           {isLoadging ? <div className="w-full h-full bg-white max-w-6xl mx-auto">
-            <GlobalSkeleton cards={4} cols={4} lgCols={4} /> 
-           </div>: <div className='w-full h-full max-w-5xl mx-auto bg-white text-black dark:bg-black dark:text-white flex flex-col items-center justify-center pb-12'>
-               <div className='w-full sm:h-30 h-56 relative mb-8 p-2'>
-                   {/* <Image width={500} height={500} className='object-cover w-full h-72 rounded-xl' src="/assets/profile.jpg" alt="" /> */}
-   
-                   {/* <div className="absolute -bottom-8 md:-bottom-16 lg:left-30 left-1/2 transform -translate-x-1/2 bg-white dark:bg-black border-green-500 dark:border-gray-800 border-2 w-16 h-16 sm:w-32 sm:h-32 rounded-full overflow-hidden group shadow-md"> */}
-                        <ProfileImage
-                            imageUrl={geek?.profileImage?.url}
-                            azureLoader={azureLoader}
-                            setOpenImageUpload={setOpenImageUpload}
-                        />
-
-                    {/* </div> */}
-
-
-                   <div className='absolute right-10 top-10'>
-                        <button onClick={() => setOpen(true)} className='text-sm text-teal-600 hover:underline hover:text-teal-600 flex gap-1 items-center'><Pencil className=' text-sm ' /> <span className='mt-1.5'>Edit Profile</span></button>
-                   </div>
-               </div>
-
-               
-   
-               <div className='w-full flex sm:flex-row flex-col justify-between'>
-                    <div className='w-full flex flex-col items-start justify-center md:p-12 p-3'>
-                   
-                       <div className='flex justify-between gap-3 w-full items-end mb-4'>
-                           <div className='flex flex-col  gap-1'>
-                               <h3 className="h2">{geek?.fullName?.first} {geek?.fullName?.last}</h3>
-                               <div className='flex flex-wrap divide-x divide-gray-600  items-center gap-4'>
-                                    <div className=' text-start pr-8 py-2 relative'>{geek?.email || 'Email Not Provided'}
-                                        {geek?.isEmailVerified ? <span className="absolute text-green-500 text-xs top-0 right-2">Verified</span>
-                                        : <button disabled={isMailSent} onClick={handleEmailVerify} className={`absolute cursor-pointer text-teal-600 text-xs top-0 right-2 ${isMailSent ? 'cursor-not-allowed' : 'border-teal-200'}`}>{isMailSent ? 'Sent' : geek?.email?.length > 0 ? "Verify" : ""}</button>    
-                                    }
-                                         </div>
-                                    <h4 className=' text-start'>{geek?.mobile || 'Mobile Not Provided'} </h4>
-                               </div>
-                           </div>
-   
-                        
-                       </div>
-                       <div className='flex flex-wrap gap-6 divide-gray-400 divide-x'>
-                          
-   
-                           {/* <div className='flex flex-col justify-center items-start pr-4 pl-1'>
-                               <h4 className="p">Active Since</h4>
-                               <h5 className="h5">{new Date(geek?.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</h5>
-                           </div> */}
-   
-                           
-   
-                           <div className='flex flex-col justify-center items-start pr-4 pl-1'>
-                               <h4 className="p">Last Updated</h4>
-                               <h5 className="h5">{new Date(geek?.updatedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</h5>
-                           </div>
-
-                           <div className='flex flex-col justify-center items-start pr-4 pl-1'>
-                               <h4 className="p">Experience</h4>
-                               <h5 className="h5">{geek?.yoe} Years</h5>
-                           </div>
-
-                            
-                        </div>
-                       
-               </div>
-
-                        <div className='md:w-1/2 w-full flex justify-center px-4 my-2 items-center'>
-                            {geek?.idProof?.isAdhaarVerified && geek?.idProof?.idNumber ? <div className='flex flex-col gap-2 justify-center items-center'>
-                                <h4 className="p flex items-center gap-2"><BadgeCheck className='text-teal-600' /> Adhaar Verified</h4>
-                                
-                            </div> : <div className='flex sm:flex-col flex-row flex-wrap gap-2 justify-center items-center'>
-                                <h4 className="p text-sm flex items-center gap-2"><OctagonX className='text-red-500' /> Adhaar Not Verified</h4>
-                                <button onClick={() => setOpenAdhaarForm(true)} className='hover:text-teal-600 cursor-pointer text-teal-600 text-sm'>Click to Verify Adhaar.</button>
-                            </div>}
-                        </div>
-
-               </div>
-
-               <section className='w-full flex gap-2 flex-col items-start justify-start md:px-12 p-3'>
-
-
-                   <div className="w-full flex flex-col gap-3">
-                        <h3 className="h6">Primary Skill:</h3>
-
-                        {geek?.primarySkill ? (
-                            <div className="flex flex-col gap-4">
-                            <div className="border border-gray-200 rounded-md p-3">
-                                <p className="font-medium text-sm text-gray-800 mb-2">
-                                {geek?.primarySkill?.title}
-                                </p>
-                                {getPrimarySkillBrands(geek?.primarySkill, geek?.brandsServiced)?.length > 0 && (
-                            <div className="flex gap-4 flex-wrap">
-                            {getPrimarySkillBrands(geek?.primarySkill, geek?.brandsServiced).map((brand) => (
-                                <span
-                                        key={brand._id}
-                                        className="text-xs text-nowrap bg-gray-100 px-2 py-1 rounded-md"
-                                        >
-                                        {brand.name}
-                                        </span>
-                            ))}
-                            </div>
-                        )}
-                            </div>
-                            </div>
-                        ) : (
-                            <p className="text-sm text-gray-500">No primary skill added</p>
-                        )}
-
-                        
-                        
-                    </div>
-
-                
-
-                   <div className="w-full flex flex-col gap-3">
-                        <h3 className="h6">Secondary Skills:</h3>
-
-                        {getSecondarySkillsWithBrands(
-                            geek?.secondarySkills,
-                            geek?.brandsServiced
-                        ).length === 0 ? (
-                            <p className="text-sm text-gray-500">No secondary skills added</p>
-                        ) : (
-                            <div className="flex flex-col gap-4">
-                            {getSecondarySkillsWithBrands(
-                                geek?.secondarySkills,
-                                geek?.brandsServiced
-                            ).map(({ category, brands }) => (
-                                <div
-                                key={category._id}
-                                className="border border-gray-200 rounded-md p-3"
-                                >
-                                <p className="font-medium text-sm text-gray-800">
-                                    {category.title}
-                                </p>
-
-                                {brands.length > 0 ? (
-                                    <div className="flex flex-wrap gap-2 mt-2">
-                                    {brands.map(brand => (
-                                        <span
-                                        key={brand._id}
-                                        className="text-xs bg-gray-100 px-2 py-1 rounded-md"
-                                        >
-                                        {brand.name}
-                                        </span>
-                                    ))}
-                                    </div>
-                                ) : (
-                                    <p className="text-xs text-gray-500 mt-1">
-                                    No brands selected
-                                    </p>
-                                )}
-                                </div>
-                            ))}
-                            </div>
-                        )}
-                        </div>
-
-
-                   <div className='w-full flex flex-wrap gap-3 items-center'>
-                       <h3 className='h6 text-nowrap'>Mode of Service:</h3>
-                       <div className=' flex md:gap-3 gap-1 items-center flex-wrap'>
-                            <div className={`${geek?.modeOfService === "All" || geek?.modeOfService === "Online" ? "border-2 border-green-500" : "border border-black"}  bg-gray-50 px-2 py-1 rounded-md text-xs font-bold`}>Online</div>
-                            <div className={`${geek?.modeOfService === "All" || geek?.modeOfService === "Offline" ? "border-2 border-green-500" : "border border-black"} bg-gray-50  px-2 py-1 rounded-md text-xs font-bold`}>Offline</div>
-                            <div className={`${geek?.modeOfService === "All" || geek?.modeOfService === "Carry In" ? "border-2 border-green-500" : "border border-black"} bg-gray-50  px-2 py-1 rounded-md text-xs font-bold`}>Carry In</div>
-                            <div className={`${geek?.modeOfService === "None" ? "border-2 border-green-500" : "border border-black"} bg-gray-50  px-2 py-1 rounded-md text-xs font-bold`}>None</div>
-                       </div>
-                   </div>
-
-
-                    {/* <div className='w-full flex flex-wrap font-normal gap-3 items-center'>
-                       <h3 className='h6 text-nowrap font-semibold'>Brands Serviced:</h3>
-                       
-                           {
-                               geek?.brandsServiced?.map((brand: Brand,i:number) => (
-                                   <p key={brand._id} className=' text-sm'>{i< geek?.brandsServiced?.length-1 ? `${brand.name}, ` : brand.name}</p>
-                               ))
-                            }
-                      
-                   </div>  */}
-
-                   <div className='w-full flex flex-wrap gap-3 items-center'>
-                       <h3 className='h6 text-nowrap'>Address:</h3>
-                       <address className='text-sm'>{geek?.address?.line1} {geek?.address?.line2} {geek?.address?.city}, {geek?.address?.state}, {geek?.address?.pin}</address>
-                       <button onClick={()=>{setOpenAddressForm(true)}} className="text-pink font-medium text-sm underline text-teal-600 cursor-pointer">Edit Address</button>
-                    </div> 
-
-                    {geek?.languagePreferences?.length > 0 && <div className='w-full flex gap-3 items-start'>
-                       <h3 className='h6 text-nowrap'>Languages:</h3>
-                       <div className='w-full flex flex-wrap gap-3 items-center mt-1.5'>
-                           {
-                               geek?.languagePreferences?.map((language: string,i:number) => (
-                                   <p key={language} className=' font-medium text-sm'>{ `${i<geek?.languagePreferences?.length-1 ? `${language}, ` : language}` }</p>
-                               ))
-                            }
-                       </div>
-                   </div> }     
-
-                   {geek?.rateCard?.length > 0 ? <div className='w-full flex flex-wrap gap-3 items-center'>
-                       <h3 className='h6 text-nowrap'>Rate Card:</h3>
-                       <button onClick={()=>{setOpenRateCard(true)}} className="text-pink font-medium text-sm underline text-teal-600 cursor-pointer">Edit</button>
-                        <div className="flex flex-wrap gap-4 mt-4">
-                                {geek?.rateCard?.map((card) => (
-                                    <div
-                                    key={card._id}
-                                    className="border relative rounded-2xl flex flex-col gap-1 p-4 shadow-sm bg-white"
-                                    >
-                                     <Trash2 onClick={() => handleDeleteRateCard(card._id)} className="absolute bottom-1 right-3 cursor-pointer text-gray-700 hover:text-red-500 w-4 h-4" />
-                                    <div className="font-medium text-base">{card.skill?.title}</div>
-                                    <div className="text-xs text-gray-600">
-                                        Charge Type: <span className="font-normal">{card.chargeType}</span>
-                                    </div>
-                                    <div className="text-xs text-gray-600">
-                                        Rate: <span className="font-normal">₹{card.rate}</span>
-                                    </div>
-                                    </div>
-                                ))}
-                                </div>
-                   </div>: <button onClick={()=>{setOpenRateCard(true)}} className='text-base cursor-pointer flex gap-1 text-teal-600'>
-                            <Plus className='text-teal-600' /> Rate Card
-                   </button> }
-
-
-                   {geek?.qualifications?.length > 0 ? <div className='w-full flex gap-3 items-center'>
-                       <h3 className='h6 text-nowrap'>Qualifications:</h3>
-                       <div className='w-full flex gap-3 items-center'>
-                           {/* {
-                               geek?.qualifications?.map((qual: any,i:number) => (
-                                   <p key={qual._id} className=' font-medium text-sm'>{i<4 ?  `${i<geek?.qualifications?.length-1 ? `${qual.title}, ` : qual.title}` : `...`}</p>
-                               ))
-                            } */}
-                       </div>
-                   </div>: <div className='text-base flex gap-1 text-teal-600'>
-                            {/* <Plus className='text-teal-600' /> Qualifications */}
-                   </div> }
-
-                   {geek?.availability?.length > 0 ? <div className='w-full flex gap-3 items-center'>
-                       <h3 className='h6 text-nowrap'>Availibility:</h3>
-                       <div className='w-full flex gap-3 items-center'>
-                           {/* {
-                               geek?.availility?.map((avail: any,i:number) => (
-                                   <p key={avail._id} className=' font-medium text-sm'>{i<4 ?  `${i<geek?.availility?.length-1 ? `${avail.title}, ` : avail.title}` : `...`}</p>
-                               ))   
-                            } */}
-                       </div>
-                   </div>: <div className='text-base flex gap-1 text-teal-600'>
-                            {/* <Plus className='text-teal-600' /> Availibility */}
-                   </div> }
-                    
-                
-                    
-
-               </section>
-
-
-               <div hidden={!openAddressForm} onClick={() => setOpenAddressForm(false)} className='fixed inset-0 bg-gray-200 opacity-90 z-50 transition-opacity duration-300'></div>
-
-                {openAddressForm && <div className='fixed flex top-10 h-[70vh] overflow-y-scroll custom-scrollbar bottom-10 right-0 left-0  items-center justify-center  max-w-3xl mx-auto bg-white shadow-lg z-50 transform transition-transform duration-300 '>
-                    <AddressForm  />
-                </div>}
-
-
-                <div hidden={!openAdhaarForm} onClick={() => setOpenAdhaarForm(false)} className='fixed inset-0 bg-gray-200 opacity-90 z-50 transition-opacity duration-300'></div>
-
-                {openAdhaarForm && <div className='fixed top-10 h-[50vh] overflow-y-scroll custom-scrollbar bottom-10 right-0 left-0 flex items-center justify-center  max-w-3xl mx-auto bg-white shadow-lg z-50 transform transition-transform duration-300 '>
-                    <AadhaarVerificationForm status={geek?.idProof?.status} />
-                </div>}
-
-
-                <div hidden={!openImageUpload} onClick={() => setOpenImageUpload(false)} className='fixed inset-0 bg-gray-200 opacity-90 z-50 transition-opacity duration-300'></div>
-
-                {openImageUpload && <div className='fixed top-10 h-[50vh] overflow-y-scroll custom-scrollbar bottom-10 right-0 left-0 flex items-center justify-center  max-w-3xl mx-auto bg-white shadow-lg z-50 transform transition-transform duration-300 '>
-                   <button onClick={() => setOpenImageUpload(false)} className="absolute cursor-pointer top-2 right-5 text-2xl">X</button>
-                    <ProfileImageUpload imageUrl={geek?.profileImage?.url} geekId={geek?._id} />
-                </div>}
-
-
-
-                <div hidden={!openRateCard} onClick={() => setOpenRateCard(false)} className='fixed inset-0 bg-gray-200 opacity-90 z-50 transition-opacity duration-300'></div>
-
-
-                {geek && openRateCard && <div className='fixed top-10 h-[80vh] overflow-y-scroll custom-scrollbar bottom-10 right-0 left-0 flex items-center justify-center  max-w-3xl mx-auto bg-white shadow-lg z-50 transform transition-transform duration-300 '>
-                   <button onClick={() => setOpenRateCard(false)} className="absolute cursor-pointer top-2 right-5 text-2xl">X</button>
-                    {geek && <RateCardSection geek={geek} />}
-                </div>}
-
-
-
-
-
-
-
-           
-            <div hidden={!open}  className='fixed  inset-0 bg-gray-200 opacity-90 z-50 transition-opacity duration-300'></div>
-               {open && <section className='w-full p-4 '>
-                        
-                    <div className={`fixed  top-10 h-[90vh] overflow-y-scroll custom-scrollbar bottom-10 right-0 left-0   max-w-3xl mx-auto bg-white shadow-lg z-50 transform transition-transform duration-300 `}>
-                    
-                   <div className='px-10 relative py-20 flex flex-col gap-5'>
-                    <div className="absolute top-4 right-4 cursor-pointer"><X onClick={() => setOpen(false)} /></div>
-                        <div className='flex flex-col justify-center items-center mb-8'>
-                            <h4 className='h2'>Edit Profile</h4>
-                            <div className='w-36 h-1 bg-teal-500'></div>
-                        </div>
-
-                        <form onSubmit={formik.handleSubmit} >
-                                          <div className=' items-center justify-around md:gap-12 gap-4 px-3 py-2'>
-                        <div className='md:col-span-3 col-span-5 md:col-start-3 '>
-                            <div className='flex  md:gap-16 gap-4 justify-evenly w-full'>
-                            <div className='w-full max-w-xs'>
-                                <CustomInput
-                                    readOnly={false}
-                                    disabled={false}
-                                    title="First Name"
-                                    labelFor="firstName"
-                                    value={formik.values.firstName}
-                                    name="firstName"
-                                    required={true}
-                                    onChange={formik.handleChange}
-                                    placeholder="Enter first name"  
-                                    type="text"
-                                    labelBg="bg-white"
-                                    />
-                                {formik.touched.firstName && formik.errors.firstName && (
-                                <p className="text-sm text-red-500">{formik.errors.firstName}</p>
-                                )}
-
-                            </div>
-                            <div className='w-full max-w-xs'>
-                                <CustomInput
-                                    readOnly={false}
-                                    disabled={false}
-                                    title="Last Name"
-                                    labelFor="lastName"
-                                    value={formik.values.lastName}
-                                    name="lastName"
-                                    required={true}
-                                    onChange={formik.handleChange}
-                                    placeholder="Enter first name"  
-                                    type="text"
-                                    labelBg="bg-white"
-                                    />
-                                {formik.touched.lastName && formik.errors.lastName && (
-                                <p className="text-sm text-red-500">{formik.errors.lastName}</p>
-                                )}
-                            </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className='flex w-full items-center md:gap-12 gap-4 px-3 py-2'>
-    
-                        <div className='w-full  flex'>
-                            <div className='flex  w-full gap-4 md:gap-8 lg:gap-12 justify-between'>
-                            <div className='w-full flex flex-col gap-1'>
-                                <CustomInput
-                                    readOnly={false}
-                                    disabled={false}
-                                    title="Email"
-                                    labelFor="email"
-                                    value={formik.values.email}
-                                    name="email"
-                                    required={true}
-                                    onChange={formik.handleChange}
-                                    placeholder=""  
-                                    type="email"
-                                    labelBg="bg-white"
-                                    />
-                                {formik.touched.email && formik.errors.email && (
-                                <p className="text-sm text-red-500">{formik.errors.email}</p>
-                                )}
-                            </div>
-                            <div className='w-full flex flex-col gap-1'>
-                                <CustomInput
-                                    title="Mobile"
-                                    labelFor="mobile"
-                                    value={formik.values.mobile}
-                                    name="mobile"
-                                    required={true}
-                                    onChange={formik.handleChange}
-                                    placeholder="Enter mobile number"  
-                                    type="text"
-                                    readOnly={true}
-                                    disabled={true}
-                                    labelBg="bg-white"
-                                    />
-                                {formik.touched.mobile && formik.errors.mobile && (
-                                <p className="text-sm text-red-500">{formik.errors.mobile}</p>
-                                )}
-                            </div>
-                            </div>
-                        </div>
-                    </div>
-    
-
-                       
-
-                   
-
-                    <div className='flex w-full my-3 items-center  md:gap-6 lg:gap-8 gap-4 px-3 py-2 pb-2 '>
-                            <div className='w-full flex flex-col gap-1 max-w-xl'>
-                                <CustomInput
-                                    readOnly={false}
-                                    disabled={false}
-                                    title="Experience (Years)"
-                                    labelFor="yoe"
-                                    value={formik.values?.yoe}
-                                    name="yoe"
-                                    required={true}
-                                    onChange={formik.handleChange}
-                                    placeholder=""  
-                                    type="number"
-                                    labelBg="bg-white"
-                                    />
-                                {formik.touched.yoe && formik.errors.yoe && (
-                                <p className="text-sm text-red-500">{formik.errors.yoe}</p>
-                                )}
-                            </div>
-
-                            <div className="w-full flex flex-col gap-1">
-                                <label className="text-sm text-gray-500" htmlFor="modeOfService">Mode of Service</label>
-                                <select
-                                    id="modeOfService"
-                                    name="modeOfService"
-                                    value={formik.values.modeOfService}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    className="w-full bg-white border text-gray-500 text-sm border-gray-300 flex items-center justify-between px-3 outline-none py-2 rounded-md"
-                                >
-                                    <option value="">Mode of Service</option>
-                                    <option value="Online">Online</option>
-                                    <option value="Offline">Offline</option>
-                                    <option value="Carry In">Carry In</option>
-                                    <option value="All">All</option>
-                                    <option value="None">None</option>
-                                </select>
-
-                                {formik.touched.modeOfService && formik.errors.modeOfService && (
-                                    <p className="text-sm text-red-500">{formik.errors.modeOfService}</p>
-                                )}
-                                </div>
-
-
-                          
-
-                           
-                           
-                    </div>
-
-                    <div className='w-full flex flex-col gap-2'>
-                            <label className="text-sm text-gray-500" htmlFor="languagePreferences">Language Preferences:</label>
-                                <Multiselect
-                                    data={Languages}
-                                    value={formik.values.languagePreferences}
-                                    onChange={(value) => formik.setFieldValue("languagePreferences", value)}
-                                    placeholder="Select Language Preferences"
-                                    />
-                                    {formik.touched.languagePreferences && formik.errors.languagePreferences && (
-                                    <p className="text-sm text-red-500">{formik.errors.languagePreferences}</p>
-                                    )}
-
-                            </div>
-
-
-
-
-                        <div className='w-full flex flex-col gap-2 my-4'>
-                            <label className="text-sm text-gray-500" htmlFor="primarySkill">Primary Skill:</label>
-                            <select
-                            value={formik.values.primarySkill?.categoryId}
-                            onChange={(e) => {
-                                formik.setFieldValue("primarySkill", {
-                                categoryId: e.target.value,
-                                brands: [],
-                                });
-                            }}
-                            className="w-full bg-white border text-gray-500 text-sm border-gray-300 flex items-center justify-between px-3 outline-none py-2 rounded-md"
-                            >
-                            <option value="">Select Primary Skill</option>
-                            {categories.map(c => (
-                                <option key={c._id} value={c._id}>{c.title}</option>
-                            ))}
-                            </select>
-
-                           <div className="flex flex-col gap-1 my-2">
-                            <label className="text-sm text-gray-500" htmlFor="">Brands for Primary Skill:</label>
-                             <Multiselect
-                            data={getBrandsByCategoryId(
-                                brands,
-                                formik.values.primarySkill?.categoryId
-                            )}
-                            dataKey="_id"
-                            textField="name"
-                            value={formik.values.primarySkill?.brands}
-                            onChange={(value) =>
-                                formik.setFieldValue("primarySkill.brands", value)
-                            }
-                            
-                            />
-                           </div>
-
-                            
-                        </div>
-
-
-                            
-
-
-
-                        <div className="flex flex-col gap-3 border border-gray-300 rounded-md p-2">
-                            <label className="text-sm text-gray-500" htmlFor="secondarySkills">Secondary Skills:</label>
-                            {formik.values.secondarySkills.map((skill, index) => {
-                                const category = getCategoryById(categories, skill.categoryId);
-
-                                return (
-                                    <div key={skill.categoryId} className=" p-4 rounded-md shadow-md">
-                                    <p className="font-medium text-gray-600 mb-3">{`Secondary Skill ${index + 1}:  ${category?.title}`}</p>
-
-                                    <Multiselect
-                                        data={getBrandsByCategoryId(brands, skill.categoryId)}
-                                        dataKey="_id"
-                                        textField="name"
-                                        value={skill.brands}
-                                        onChange={(value) =>
-                                        formik.setFieldValue(
-                                            `secondarySkills.${index}.brands`,
-                                            value
-                                        )
-                                        }
-                                    />
-
-                                    <button
-                                        type="button"
-                                        className="text-white text-sm mt-2 bg-red-500 py-1.5 px-3 rounded-md"
-                                        onClick={() =>
-                                        formik.setFieldValue(
-                                            "secondarySkills",
-                                            formik.values.secondarySkills.filter(
-                                            s => s.categoryId !== skill.categoryId
-                                            )
-                                        )
-                                        }
-                                    >
-                                        Remove
-                                    </button>
-                                    </div>
-                                );
-                                })}
-
-
-{isSecondaryOpen &&  (
-
-                           <div>
-                             <select
-                                value={tempSkill.categoryId}
-                                onChange={(e) =>
-                                    setTempSkill({ categoryId: e.target.value, brands: [] })
-                                }
-                                className="w-full my-4 bg-white border text-gray-500 text-sm border-gray-300 flex items-center justify-between px-3 outline-none py-2 rounded-md"
-                                >
-                                <option value="">Select Skill</option>
-                                {categories
-                                    .filter(c => c._id !== formik.values.primarySkill.categoryId)
-                                    .map(c => (
-                                    <option
-                                        key={c._id}
-                                        value={c._id}
-                                        disabled={isSecondaryCategoryAdded(
-                                        formik.values.secondarySkills,
-                                        c._id
-                                        )}
-                                    >
-                                        {c.title}
-                                    </option>
-                                    ))}
-                                </select>
-                                
-                                <div className="flex flex-col gap-1 my-2">
-                                    <label className="my-1 text-gray-500 text-sm" htmlFor="">Select Brands for Secondary Skill</label>
-                                <Multiselect
-                                data={getBrandsByCategoryId(brands, tempSkill.categoryId)}
-                                dataKey="_id"
-                                textField="name"
-                                value={tempSkill.brands}
-                                onChange={(value) =>
-                                    setTempSkill(prev => ({ ...prev, brands: value }))
-                                }
-                                />
-                                </div>
-
-                                <button
-                                disabled={!tempSkill.categoryId || tempSkill.brands.length === 0}
-                                onClick={() => {
-                                    formik.setFieldValue("secondarySkills", [
-                                    ...formik.values.secondarySkills,
-                                    tempSkill,
-                                    ]);
-                                    setTempSkill({ categoryId: "", brands: [] });
-                                    setIsSecondaryOpen(false);
-                                }}
-                                className="flex my-3 items-center gap-2 text-white px-5 py-2 rounded-md cursor-pointer bg-teal-600 text-sm font-medium mt-3 disabled:opacity-40 disabled:cursor-not-allowed"
-                                >
-                                Add Skill
-                                </button>
-                           </div>
-
-                    )
-                    
-                    
-                    }
-
-                                <button
-                                    type="button"
-                                    disabled={
-                                        !formik.values.primarySkill.categoryId  || isSecondaryOpen
-
-                                    }
-                                    onClick={() => setIsSecondaryOpen(true)}
-                                    className="flex my-3 items-center gap-2 text-teal-600 text-sm font-medium mt-3 disabled:opacity-40 disabled:cursor-not-allowed"
-                                    >
-                                    <Plus className="w-4 h-4" />
-                                    Add Secondary Skill
-                                    </button>
-                        </div>
-
-
-                    
-
-                            <button disabled={updating} type="submit" className={`bg-primary ${updating && "opacity-50"} cursor-pointer text-white py-2 px-4 rounded-md w-full mt-4`}>{updating ? "Updating..." : "Update Profile"}</button>
-                        </form>
-                   </div>
-                </div>
-               </section>}
-   
-           </div>}
-       </div>
-  )
-}
-
-export default Dashboard
+export default Dashboard;
