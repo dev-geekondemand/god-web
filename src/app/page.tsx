@@ -66,11 +66,12 @@ export default function Home() {
         )}
 
         {/* Tech Support in 3 Simple Steps */}
-        <section className='pt-8 p-3 w-full flex flex-col lg:flex-row justify-center gap-8 items-start'>
-          <div className='hidden lg:block lg:w-1/4'>
-            <InnerBannerAd placement="home" medium_rectangle />
+        <section className='pt-8 max-w-7xl mx-auto grid grid-cols-12 p-3 w-full  justify-center gap-8 items-start'>
+          <div className='col-span-4 h-full hidden lg:flex justify-center items-center'>
+            <InnerBannerAd placement="home" medium_rectangle  />
+
           </div>
-          <div className='max-w-5xl w-full flex flex-col justify-center items-center py-12 sm:px-10 px-4 bg-amber-800/10 relative rounded-3xl'>
+          <div className='max-w-5xl h-full col-span-12 lg:col-span-8 w-full flex flex-col justify-center items-center py-12 sm:px-10 px-4 bg-amber-800/10 relative rounded-3xl'>
             
             <div className='flex flex-col text-white max-w-2xl items-center justify-center w-full mx-auto gap-3'>
               <h1 className="text-4xl font-bold text-center text-gray-600">
@@ -96,24 +97,24 @@ export default function Home() {
               </div>
 
               <div className='flex w-full text-black gap-3 justify-center items-center bg-white rounded-2xl py-6'>
-                <div className='flex flex-col items-center justify-center text-center'>
+                <div className='flex flex-col items-center justify-center text-center w-full'>
                  <div className='h-[50%] w-full flex items-center justify-center'>
-                    <Image src={"/assets/images/book.jpeg"} className='mb-4 w-[80%] rounded-lg' alt='Work-01' width={200} height={70} />
+                    <Image src={"/assets/images/book.jpeg"} className='mb-4 w-[80%] rounded-lg' alt='Work-02' width={200} height={70} />
                   </div>
                   <h4 className="text-xs font-bold">2. Getting Booked & Job done.</h4>
-                  <p className='text-xs max-w-[250px] font-medium'>
+                  <p className='text-xs max-w-[220px] font-medium'>
                     Once you find a Geek that best fits your needs, get booked and get your job done.
                   </p>
                 </div>
               </div>
 
               <div className='flex w-full text-center text-black gap-3 justify-center items-center bg-white rounded-2xl py-6'>
-                <div className='flex flex-col items-center justify-center text-center'>
+                <div className='flex flex-col items-center justify-center text-center w-full'>
                   <div className='h-[50%] w-full flex items-center justify-center'>
-                    <Image src={"/assets/images/rate.jpeg"} className='mb-4 w-[80%] rounded-lg' alt='Work-01' width={200} height={70} />
+                    <Image src={"/assets/images/rate.jpeg"} className='mb-4 w-[80%] rounded-lg' alt='Work-03' width={200} height={70} />
                   </div>
                   <h4 className="text-xs font-bold">3. Rate and Review the service.</h4>
-                  <p className='text-xs max-w-[250px] font-medium'>
+                  <p className='text-xs max-w-[220px] font-medium'>
                     After your job is complete, you can rate and review the Geeks according to your experience so that others can know about them.
                   </p>
                 </div>
@@ -151,7 +152,7 @@ export default function Home() {
           )}
         </section>
 
-        <div className='max-w-6xl mx-auto'>
+        <div className='max-w-6xl mx-auto my-5'>
           <InnerBannerAd placement="home" wide_banner />
         </div>
         
@@ -167,7 +168,7 @@ export default function Home() {
         </div>
 
         {/* Inner banner ad – second slot */}
-          <div className='w-full max-w-[86rem] mx-auto'>
+          <div className='w-full max-w-[86rem]  mx-auto'>
         <InnerBannerAd placement="home" wide_banner />
 
           </div>
