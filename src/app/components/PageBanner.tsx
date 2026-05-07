@@ -41,7 +41,7 @@ function ChevronIcon() {
 export default function PageBanner({ title, crumbs }: PageBannerProps) {
   return (
     <div className="w-full relative breadcrumb-bg-2">
-      <div className="w-full breadcrumb-bg relative flex justify-center items-center py-10 text-center bg-teal-600">
+      <div className="w-full breadcrumb-bg relative flex justify-center items-center py-10 text-center ">
         <div className="xl:max-w-6xl w-full h-full lg:max-w-5xl md:max-w-3xl sm:max-w-xl mx-auto">
           <div className="w-full flex flex-col gap-3 items-center justify-center">
             <h2 className="text-4xl font-bold text-black">{title}</h2>

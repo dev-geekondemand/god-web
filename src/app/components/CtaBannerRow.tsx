@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import InnerBannerAd from "./InnerBannerAd";
 
 const CtaBannerRow = () => {
   return (
@@ -14,11 +15,11 @@ const CtaBannerRow = () => {
           className="col-span-1 flex flex-col items-center gap-3 w-full "
         >
           <Image
-            src="/assets/New-Img/Banner/image2.png"
+            src="/assets/images/book_geek.png"
             alt="Book a Geek"
             width={500}
             height={400}
-            className="w-full min-h-[400px] object-cover rounded-lg"
+            className="w-full min-h-[250px] md:min-h-[400px] object-cover rounded-lg"
           />
           <button className="text-sm bg-teal-700 rounded-xl text-white py-2 px-6  hover:bg-teal-800">
             Book a Geek
@@ -27,34 +28,23 @@ const CtaBannerRow = () => {
 
         {/* Left CTA – Book a Geek */}
         <Link
-          href="/categories"
+          href="/register?type=geek"
           className="col-span-1 flex flex-col items-center gap-3 w-full "
         >
           <Image
-            src="/assets/New-Img/Banner/image2.png"
+            src="/assets/images/become_geek.png"
             alt="Book a Geek"
             width={500}
             height={400}
-            className="w-full min-h-[400px] object-cover rounded-lg"
+            className="w-full min-h-[250px] md:min-h-[400px] object-cover rounded-lg"
           />
           <button className="text-sm bg-teal-700 rounded-xl text-white py-2 px-8  hover:bg-teal-800">
             Become a Geek
           </button>
         </Link>
 
-        {/* Right CTA – Become a Geek */}
-        <Link
-          href="/register?type=geek"
-          className="overflow-hidden  w-full h-[500px]"
-        >
-          <Image
-            src="/assets/New-Img/Banner/Image2.png"
-            alt="Become a Geek"
-            width={500}
-            height={400}
-            className="w-full h-full object-cover"
-          />
-        </Link>
+        <InnerBannerAd placement="home" medium_rectangle />
+        
 
       </div>
     </section>

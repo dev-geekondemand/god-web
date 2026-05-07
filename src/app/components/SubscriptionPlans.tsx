@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch } from "@/lib/hooks";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
@@ -10,8 +10,11 @@ import {
   switchPlan,
   getMySubscription,
   clearPendingCheckout,
+  resetSuccess,
 } from "@/features/subscription/subscriptionSlice";
 import { loadGeek } from "@/features/geek/geekSlice";
+import { useRouter } from "next/navigation";
+import PageBanner from "@/app/components/PageBanner";
 import toast from "react-hot-toast";
 
 // ─── Razorpay types ───────────────────────────────────────────────────────────
@@ -116,14 +119,22 @@ export default function SubscriptionPlans() {
   const pendingCheckout = useSelector((state: RootState) => state.subscription.pendingCheckout);
   const isLoading = useSelector((state: RootState) => state.subscription.isLoading);
 
+  const isGeekAuthenticated = useSelector((state: RootState) => state.geek.isAuthenticated);
+  const isSuccess = useSelector((state: RootState) => state.subscription.isSuccess);
+  const router = useRouter();
+
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   const currentPlan = (geek?.subscriptionPlan as string) || "Startup";
 
   useEffect(() => {
+    if (!isGeekAuthenticated) {
+      router.push("/login/geek");
+      return;
+    }
     dispatch(getMySubscription());
-  }, [dispatch]);
+  }, [dispatch, isGeekAuthenticated, router]);
 
   // When a pending checkout arrives (from switchPlan upgrade or createSubscriptionOrder), open Razorpay
   useEffect(() => {
@@ -145,7 +156,7 @@ export default function SubscriptionPlans() {
       subscription_id: checkout.subscriptionId,
       name: "Geek on Demand",
       description: `${checkout.plan} Plan — Monthly Subscription`,
-      image: "/assets/logo-big.webp",
+      image: `${window.location.origin}/assets/logo-big.webp`,
       handler: async (response: RazorpayPaymentResponse) => {
         try {
           await dispatch(verifySubscriptionPayment(response)).unwrap();
@@ -273,7 +284,80 @@ export default function SubscriptionPlans() {
     return null;
   }
 
+  // ─── Success screen ───────────────────────────────────────────────────────────
+  if (isSuccess) {
+    const planName = subscription?.plan ?? '';
+    const periodEnd = subscription?.currentPeriodEnd
+      ? new Date(subscription.currentPeriodEnd).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+      : null;
+    const AMOUNTS: Record<string, number> = { Advance: 499, Professional: 999 };
+
+    return (
+      <div className="w-full flex flex-col items-center bg-gray-50 min-h-screen">
+        <PageBanner title="Subscription Plans" crumbs={[{ label: "Subscription Plans" }]} />
+        <div className="flex flex-col items-center justify-center flex-1 px-4 py-20">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 max-w-md w-full text-center">
+            {/* Checkmark */}
+            <div className="w-16 h-16 rounded-full bg-teal-50 flex items-center justify-center mx-auto mb-6">
+              <svg className="w-8 h-8 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Subscription Activated!</h2>
+            <p className="text-gray-500 text-sm mb-6">
+              Welcome to the <span className="font-semibold text-teal-600">{planName}</span> plan.
+              Your profile now gets priority placement in search results.
+            </p>
+
+            {/* Plan summary card */}
+            <div className="bg-teal-50 border border-teal-100 rounded-xl p-4 mb-6 text-left space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Plan</span>
+                <span className="font-semibold text-gray-800">{planName}</span>
+              </div>
+              {AMOUNTS[planName] && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Amount charged</span>
+                  <span className="font-semibold text-gray-800">₹{AMOUNTS[planName]} / month</span>
+                </div>
+              )}
+              {periodEnd && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Next renewal</span>
+                  <span className="font-semibold text-gray-800">{periodEnd}</span>
+                </div>
+              )}
+            </div>
+
+            <p className="text-xs text-gray-400 mb-8">
+              A confirmation SMS has been sent to your registered mobile number.
+              Razorpay will email your payment receipt separately.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => { dispatch(resetSuccess()); router.push('/geeks/dashboard'); }}
+                className="flex-1 py-2.5 px-4 bg-teal-600 text-white text-sm font-medium rounded-lg hover:bg-teal-700 transition"
+              >
+                Go to Dashboard
+              </button>
+              <button
+                onClick={() => dispatch(resetSuccess())}
+                className="flex-1 py-2.5 px-4 border border-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition"
+              >
+                View Plans
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
+    <div className="w-full flex flex-col items-center bg-gray-50 min-h-screen">
+    <PageBanner title="Subscription Plans" crumbs={[{ label: "Subscription Plans" }]} />
     <div className="w-full max-w-5xl mx-auto px-4 py-10">
       <div className="text-center mb-10">
         <h1 className="text-3xl font-bold text-gray-900">Choose Your Plan</h1>
@@ -383,6 +467,7 @@ export default function SubscriptionPlans() {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }

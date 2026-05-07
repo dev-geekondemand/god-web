@@ -29,7 +29,7 @@ export interface Address {
 
 interface Geek {
 	_id: string;
-	__t?: 'IndividualGeek' | 'CorporateGeek';
+	__t?: 'Individual' | 'Corporate';
 	email: string;
 	mobile: string;
 	fullName: {

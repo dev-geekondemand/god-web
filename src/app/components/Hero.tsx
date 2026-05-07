@@ -167,7 +167,7 @@ const handleSearch = (category: string | null) => {
                   <span className="text-teal-700" data-type-text="Carpenders">@Home</span>
                 </h2>
                 <p className="my-2 ml-2 font-bold  text-teal-800 md:text-lg tracking-widest  font-mono  sm:text-base text-sm ">IT Tech Support – Anytime, Anywhere.</p>
-                <div className="flex items-center gap-8 w-full md:w-[80%] mb-3 py-3 rounded-lg">
+                <div className="flex items-center gap-2 sm:gap-4 md:gap-8 w-full md:w-[80%] mb-3 py-3 rounded-lg">
                   {/* Location Input */}
                   <div className="relative w-full">
                     <input

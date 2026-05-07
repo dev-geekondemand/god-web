@@ -199,7 +199,7 @@ const Register = () => {
           <form onSubmit={formik.handleSubmit} className='w-full flex flex-col gap-4'>
 
             {/* Type toggle */}
-            <div className="flex gap-6 items-center w-full">
+            {/* <div className="flex gap-6 items-center w-full">
               <label className="flex items-center cursor-pointer gap-2">
                 <input
                   type="radio"
@@ -222,7 +222,7 @@ const Register = () => {
                 />
                 <span className="text-sm text-gray-600">Seeker</span>
               </label>
-            </div>
+            </div> */}
 
             {/* Referral code */}
             <div>
@@ -349,7 +349,7 @@ const Register = () => {
               </>
             )}
 
-            <button type='submit' disabled={formik.isSubmitting} className='btn-primary w-full'>
+            <button type='submit' disabled={formik.isSubmitting} className='text-white cursor-pointer bg-teal-500 hover:bg-teal-700 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-6 py-2 w-full'>
               <span>Sign Up</span>
             </button>
           </form>

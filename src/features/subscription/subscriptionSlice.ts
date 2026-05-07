@@ -86,6 +86,9 @@ const subscriptionSlice = createSlice({
     clearPendingCheckout(state) {
       state.pendingCheckout = null;
     },
+    resetSuccess(state) {
+      state.isSuccess = false;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -119,8 +122,17 @@ const subscriptionSlice = createSlice({
         if (state.subscription) {
           state.subscription.plan = action.payload.plan;
           state.subscription.status = 'active';
+          if (action.payload.currentPeriodEnd) {
+            state.subscription.currentPeriodEnd = action.payload.currentPeriodEnd;
+          }
+        } else {
+          state.subscription = {
+            _id: '',
+            plan: action.payload.plan,
+            status: 'active',
+            currentPeriodEnd: action.payload.currentPeriodEnd,
+          };
         }
-        toast.success(`Plan activated successfully!`);
       })
       .addCase(verifySubscriptionPayment.rejected, (state, action) => {
         state.isLoading = false;
@@ -158,5 +170,5 @@ const subscriptionSlice = createSlice({
   },
 });
 
-export const { clearPendingCheckout } = subscriptionSlice.actions;
+export const { clearPendingCheckout, resetSuccess } = subscriptionSlice.actions;
 export default subscriptionSlice.reducer;

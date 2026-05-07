@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "@/lib/hooks";
 import { RootState } from "@/lib/store";
@@ -120,6 +121,8 @@ const Dashboard = () => {
   const geekId = geek?._id;
   const brands = useSelector((state: RootState) => state.brand?.brands) as Brand[];
   const categories = useSelector((state: RootState) => state.category?.categories) as Category[];
+
+  const isCorporate = geek?.__t === "Corporate" || geek?.companyName;
 
   useEffect(() => {
     dispatch(getBrands());
@@ -330,6 +333,8 @@ const Dashboard = () => {
     </div>
   );
 
+
+
   // ── Render ────────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
@@ -342,7 +347,7 @@ const Dashboard = () => {
 
           {/* Profile Header */}
           <Card className="p-0 overflow-hidden">
-            <div className="h-2 bg-teal-500 w-full" />
+            <div className={`h-2 w-full ${isCorporate ? "bg-indigo-500" : "bg-teal-500 "}`} />
             <div className="p-5 flex flex-col sm:flex-row gap-4">
               <ProfileImage
                 imageUrl={geek?.profileImage?.url}
@@ -351,45 +356,83 @@ const Dashboard = () => {
                 contained
               />
               <div className="flex-1 flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h1 className="text-xl font-bold text-gray-900">
-                      {geek?.fullName?.first} {geek?.fullName?.last}
-                    </h1>
-                    {geek?.idProof?.isAdhaarVerified ? (
-                      <span className="inline-flex items-center gap-1 text-xs text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full font-medium">
-                        <BadgeCheck className="w-3 h-3" /> Verified
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => setOpenAdhaarForm(true)}
-                        className="inline-flex items-center gap-1 text-xs text-orange-700 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded-full font-medium cursor-pointer hover:bg-orange-100"
-                      >
-                        <OctagonX className="w-3 h-3" /> Verify ID
-                      </button>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-500 mt-0.5">{geek?.primarySkill?.title || "No primary skill set"}</p>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
-                    <div className="flex items-center gap-1 text-sm text-gray-600">
-                      <span>{geek?.email || "Email not provided"}</span>
-                      {geek?.isEmailVerified ? (
-                        <span className="text-xs text-green-600">(verified)</span>
-                      ) : (
-                        <button disabled={isMailSent} onClick={handleEmailVerify}
-                          className="text-xs text-teal-600 hover:underline disabled:opacity-50 cursor-pointer"
-                        >
-                          {isMailSent ? "Sent" : geek?.email?.length > 0 ? "Verify" : ""}
-                        </button>
-                      )}
-                    </div>
-                    {geek?.mobile && <span className="text-sm text-gray-600">{geek.mobile}</span>}
-                    {geek?.yoe != null && <span className="text-sm text-gray-600">{geek.yoe} yrs exp</span>}
-                  </div>
-                </div>
+                 <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                {isCorporate && (
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H3m8-10h.01M12 17h.01M9 17h.01" />
+                    </svg>
+                    Corporate
+                  </span>
+                )}
+                {/* {planLabel !== 'Startup' && (
+                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${planColorClass}`}>
+                    {planLabel}
+                  </span>
+                )} */}
+                {/* {isVerified && (
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200">
+                    ID Verified
+                  </span>
+                )} */}
+              </div>
+
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
+                {geek?.fullName?.first} {geek?.fullName?.last}
+              </h1>
+
+              {isCorporate && geek?.companyName && (
+                <p className="text-base font-medium text-indigo-600 mt-0.5 flex items-center gap-1.5">
+                  <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H3m8-10h.01M12 17h.01M9 17h.01" />
+                  </svg>
+                  {geek.companyName}
+                </p>
+              )}
+
+              <p className="text-gray-500 mt-1">{geek?.primarySkill?.title}</p>
+
+              {/* Stats row */}
+              <div className="flex flex-wrap gap-4 mt-4 text-sm text-gray-600">
+                {geek?.address?.city && (
+                  <span className="flex items-center gap-1">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    {geek.address.city}, {geek.address.state}
+                  </span>
+                )}
+                {geek?.yoe != null && (
+                  <span className="flex items-center gap-1">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {geek.yoe} yr{geek.yoe !== 1 ? 's' : ''} experience
+                  </span>
+                )}
+                {geek?.modeOfService && (
+                  <span className="flex items-center gap-1">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    {geek.modeOfService}
+                  </span>
+                )}
+                {isCorporate && geek?.teamSize && (
+                  <span className="flex items-center gap-1">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Team of {geek.teamSize}
+                  </span>
+                )}
+              </div>
+            </div>
                 <button
                   onClick={() => setOpenProfile(true)}
-                  className="self-start flex items-center gap-1.5 text-sm text-teal-600 hover:text-teal-700 border border-teal-200 hover:bg-teal-50 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                  className={`self-start flex items-center gap-1.5 text-sm ${isCorporate ? "text-indigo-600" : "text-teal-600"} hover:text-${isCorporate ? "indigo" : "teal"}-700 border border-${isCorporate ? "indigo" : "teal"}-200 hover:bg-${isCorporate ? "indigo" : "teal"}-50 px-3 py-1.5 rounded-lg transition-colors cursor-pointer`}
                 >
                   <Pencil className="w-3.5 h-3.5" /> Edit
                 </button>
@@ -406,7 +449,7 @@ const Dashboard = () => {
               {/* Skills */}
               <Card>
                 <SectionTitle action={
-                  <button onClick={() => setOpenSkills(true)} className="text-xs text-teal-600 hover:underline cursor-pointer flex items-center gap-1">
+                  <button onClick={() => setOpenSkills(true)} className={`text-xs ${isCorporate ? "text-indigo-600" : "text-teal-600"} hover:underline cursor-pointer flex items-center gap-1`}>
                     <Pencil className="w-3 h-3" /> Edit Skills
                   </button>
                 }>
@@ -420,7 +463,7 @@ const Dashboard = () => {
                       <p className="text-sm font-semibold text-gray-800 mb-2">{geek.primarySkill.title}</p>
                       <div className="flex flex-wrap gap-1.5">
                         {getPrimarySkillBrands(geek.primarySkill, geek.brandsServiced).map(brand => (
-                          <span key={brand._id} className="text-xs bg-teal-50 text-teal-700 border border-teal-100 px-2 py-0.5 rounded">
+                          <span key={brand._id} className={`text-xs ${isCorporate ? "bg-indigo-50 text-indigo-700 border border-indigo-100" : "bg-teal-50 text-teal-700 border border-teal-100"} px-2 py-0.5 rounded`}>
                             {brand.name}
                           </span>
                         ))}
@@ -455,7 +498,7 @@ const Dashboard = () => {
               {/* Rate Cards */}
               <Card>
                 <SectionTitle action={
-                  <button onClick={() => setOpenRateCard(true)} className="text-xs text-teal-600 hover:underline cursor-pointer flex items-center gap-1">
+                  <button onClick={() => setOpenRateCard(true)} className={`text-xs ${isCorporate ? "text-indigo-600" : "text-teal-600"} hover:underline cursor-pointer flex items-center gap-1`}>
                     {geek?.rateCard?.length > 0 ? <><Pencil className="w-3 h-3" /> Edit</> : <><Plus className="w-3 h-3" /> Add</>}
                   </button>
                 }>
@@ -498,11 +541,11 @@ const Dashboard = () => {
                   {modeLabels.map(mode => (
                     <div key={mode} className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm border ${
                       isModeActive(mode)
-                        ? "border-teal-200 bg-teal-50 text-teal-700 font-medium"
-                        : "border-gray-100 bg-gray-50 text-gray-400"
+                        ? `${isCorporate ? "border-indigo-200 bg-indigo-50 text-indigo-700" : "border-teal-200 bg-teal-50 text-teal-700"} font-medium`
+                        : `${isCorporate ? "border-indigo-100 bg-indigo-50 text-indigo-400" : "border-gray-100 bg-gray-50 text-gray-400"}`
                     }`}>
                       {mode}
-                      {isModeActive(mode) && <BadgeCheck className="w-3.5 h-3.5 text-teal-500" />}
+                      {isModeActive(mode) && <BadgeCheck className={`w-3.5 h-3.5 ${isCorporate ? "text-indigo-600" : "text-teal-600"}`} />}
                     </div>
                   ))}
                 </div>
@@ -510,7 +553,7 @@ const Dashboard = () => {
 
               <Card>
                 <SectionTitle action={
-                  <button onClick={() => setOpenAddressForm(true)} className="text-xs text-teal-600 hover:underline cursor-pointer flex items-center gap-1">
+                  <button onClick={() => setOpenAddressForm(true)} className={`text-xs ${isCorporate ? "text-indigo-600" : "text-teal-600"} hover:underline cursor-pointer flex items-center gap-1`}>
                     <Pencil className="w-3 h-3" /> Edit
                   </button>
                 }>
@@ -541,6 +584,38 @@ const Dashboard = () => {
                   </div>
                 </Card>
               )}
+
+              {/* Subscription */}
+              <Card>
+                <SectionTitle>Subscription</SectionTitle>
+                {(() => {
+                  const plan = geek?.subscriptionPlan || "Startup";
+                  const colorClass =
+                    plan === "Professional"
+                      ? "bg-amber-50 border-amber-200 text-amber-700"
+                      : plan === "Advance"
+                      ? "bg-teal-50 border-teal-200 text-teal-700"
+                      : "bg-gray-50 border-gray-200 text-gray-500";
+                  return (
+                    <div className="flex flex-col gap-3">
+                      <div className={`flex items-center justify-between px-3 py-2 rounded-lg border text-sm font-medium ${colorClass}`}>
+                        <span>{plan}</span>
+                        <span className="text-xs font-normal">{plan === "Startup" ? "Free" : "Active"}</span>
+                      </div>
+                      <Link
+                        href="/geeks/subscription"
+                        className={`text-xs text-center py-1.5 px-3 rounded-lg border transition ${
+                          isCorporate
+                            ? "border-indigo-200 text-indigo-600 hover:bg-indigo-50"
+                            : "border-teal-200 text-teal-600 hover:bg-teal-50"
+                        }`}
+                      >
+                        {plan === "Startup" ? "Upgrade Plan" : "Manage Subscription"}
+                      </Link>
+                    </div>
+                  );
+                })()}
+              </Card>
             </div>
           </div>
         </div>

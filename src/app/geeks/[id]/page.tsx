@@ -70,7 +70,7 @@ const GeekById = () => {
   const seekerRequests = useSelector((state: RootState) => state.request?.requests) as ServiceRequest[]
   const brands = useSelector((state: RootState) => state.brand?.brands) as Brand[]
 
-  const isCorporate = !!(geek?.__t === 'CorporateGeek' || geek?.companyName)
+  const isCorporate = !!(geek?.__t === 'Corporate' || geek?.companyName) 
 
   useEffect(() => {
     if (geek?.primarySkill) {

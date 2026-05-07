@@ -8,76 +8,92 @@ import { RootState } from "@/lib/store";
 import { useAppDispatch } from "@/lib/hooks";
 import { getInnerAds, Ad } from "@/features/banners/bannersSlice";
 
-// Standard ad sizes used across the site
 export const AD_SIZES: Record<string, { width: number; height: number; label: string }> = {
-  leaderboard:      { width: 728,  height: 90,  label: "Leaderboard (728×90)" },
-  large_leaderboard:{ width: 970,  height: 90,  label: "Large Leaderboard (970×90)" },
-  wide_banner:      { width: 1200, height: 250, label: "Wide Banner (1200×250)" },
-  medium_rectangle: { width: 300,  height: 250, label: "Medium Rectangle (300×250)" },
-  half_page:        { width: 300,  height: 600, label: "Half Page (300×600)" },
-  mobile_banner:    { width: 320,  height: 50,  label: "Mobile Banner (320×50)" },
+  wide_banner:      { width: 2000, height: 400,  label: "Wide Banner (2000×400)" },
+  medium_rectangle: { width: 900,  height: 1200, label: "Medium Rectangle (900×1200)" },
 };
+
+const SIZE_TOLERANCE = 100;
 
 const PLACEHOLDER_SRC = "/assets/god-banner.png";
 
 interface Props {
-  placement: string;   // e.g. "home", "category", "profile", "blog"
-  index?: number;      // which ad slot to show (0 = first, 1 = second, …)
+  placement: string;
+  wide_banner?: boolean;
+  medium_rectangle?: boolean;
   className?: string;
+  stretch?: boolean;
 }
 
-const InnerBannerAd = ({ placement, index = 0, className = "" }: Props) => {
-  const dispatch = useAppDispatch();
-  const innerAds = useSelector((state: RootState) => state.banners?.innerAds) as Ad[];
+type SizeKey = keyof typeof AD_SIZES;
 
-  const placementAds = innerAds?.filter((a) => a.placement === placement);
+const azLoader = ({ src }: { src: string }) => src;
 
-  useEffect(() => {
-    // Only fetch when we don't yet have enough ads for this placement
-    if (placementAds.length <= index) {
-      dispatch(getInnerAds(placement));
-    }
-  }, [dispatch, placement, index]);
+function matchesSize(ad: Ad, sizeKey: SizeKey) {
+  const { width, height } = AD_SIZES[sizeKey];
+  return (
+    ad.width  !== undefined && Math.abs(ad.width  - width)  <= SIZE_TOLERANCE &&
+    ad.height !== undefined && Math.abs(ad.height - height) <= SIZE_TOLERANCE
+  );
+}
 
-  const ad = placementAds?.[0];
-  console.log(innerAds);
-  
+function AdSlot({ ad, sizeKey, className, stretch }: { ad: Ad; sizeKey: SizeKey; className: string; stretch?: boolean }) {
+  const { width: w, height: h } = AD_SIZES[sizeKey];
+  const imgUrl = ad.image?.url || PLACEHOLDER_SRC;
+  const link = ad.link;
 
-  const imgUrl   = ad?.image?.url || PLACEHOLDER_SRC;
-  const link     = ad?.link;
-  const w        = ad?.width  || 1200;
-  const h        = ad?.height || 250;
-  const azLoader = ({ src }: { src: string }) => src;
-
-  const banner = (
+  const banner = stretch ? (
+    <div className={`relative w-full h-full overflow-hidden bg-gray-100 ${className}`}>
+      <Image loader={azLoader} src={imgUrl} alt="Advertisement" fill className="object-cover" />
+    </div>
+  ) : (
     <div
-      className={`relative w-full overflow-hidden   bg-gray-100 ${className}`}
+      className={`relative w-full overflow-hidden bg-gray-100 ${className}`}
       style={{ aspectRatio: `${w}/${h}` }}
     >
-      <Image
-        loader={ad ? azLoader : undefined}
-        src={imgUrl}
-        alt="Advertisement"
-        width={1200}
-        height={250}
-        
-        className="object-contain w-full h-full"
-        // sizes="(max-width: 768px) 100vw, 1200px" 
-      />
+      <Image loader={azLoader} src={imgUrl} alt="Advertisement" width={w} height={h} className="object-cover w-full h-full" />
     </div>
   );
 
   return (
-    <section className="w-full px-3 py-4 flex justify-center">
-      <div className={`${index === 0 ? "max-w-5xl" : "max-w-7xl"} w-full ${className}`}>
-        {link ? (
-          <Link href={link} target="_blank" rel="noopener noreferrer">
-            {banner}
-          </Link>
-        ) : (
-          banner
-        )}
-      </div>
+    <div className={`w-full ${stretch ? "h-full" : ""}`}>
+      {link ? (
+        <Link href={link} target="_blank" rel="noopener noreferrer" className={stretch ? "block h-full" : ""}>
+          {banner}
+        </Link>
+      ) : (
+        banner
+      )}
+    </div>
+  );
+}
+
+const InnerBannerAd = ({ placement, wide_banner, medium_rectangle, className = "", stretch }: Props) => {
+  const dispatch = useAppDispatch();
+  const innerAds = useSelector((state: RootState) => state.banners?.innerAds) as Ad[];
+
+  const placementAds = innerAds?.filter((a) => a.placement === placement) ?? [];
+
+  useEffect(() => {
+    dispatch(getInnerAds(placement));
+  }, [dispatch, placement]);
+
+  const enabledSizes: SizeKey[] = [
+    ...(wide_banner      ? ["wide_banner"      as SizeKey] : []),
+    ...(medium_rectangle ? ["medium_rectangle" as SizeKey] : []),
+  ];
+
+  if (enabledSizes.length === 0) return null;
+
+  return (
+    <section className={`w-full flex flex-col items-center gap-4 ${stretch ? "h-full" : ""}`}>
+      {enabledSizes.map((sizeKey) =>
+        placementAds
+          .filter((ad) => matchesSize(ad, sizeKey))
+          .map((ad) => (
+            <AdSlot key={ad._id} ad={ad} sizeKey={sizeKey} className={className} stretch={stretch} />
+          ))
+      )}
     </section>
   );
 };
