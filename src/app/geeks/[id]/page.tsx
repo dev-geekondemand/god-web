@@ -468,14 +468,24 @@ const GeekById = () => {
                 )}
                 {isCorporate && geek?.GSTIN && (
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-xs text-gray-400 uppercase tracking-wide">GSTIN</span>
-                    <span className="text-gray-700 font-mono text-xs">{geek.GSTIN}</span>
+                    <span className="text-xs text-gray-400 uppercase tracking-wide flex items-center gap-1">
+                      GSTIN
+                      <span className="text-green-500 text-xs font-semibold">✓ Verified</span>
+                    </span>
+                    <span className="text-gray-700 font-mono text-xs tracking-wider">
+                      {geek.GSTIN.slice(0, 2)}{"·".repeat(9)}{geek.GSTIN.slice(-4)}
+                    </span>
                   </div>
                 )}
                 {isCorporate && geek?.CIN && (
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-xs text-gray-400 uppercase tracking-wide">CIN</span>
-                    <span className="text-gray-700 font-mono text-xs">{geek.CIN}</span>
+                    <span className="text-xs text-gray-400 uppercase tracking-wide flex items-center gap-1">
+                      CIN
+                      <span className="text-green-500 text-xs font-semibold">✓ Verified</span>
+                    </span>
+                    <span className="text-gray-700 font-mono text-xs tracking-wider">
+                      {geek.CIN.slice(0, 3)}{"·".repeat(12)}{geek.CIN.slice(-6)}
+                    </span>
                   </div>
                 )}
               </div>

@@ -13,6 +13,7 @@ import Geek from "@/interfaces/Geek";
 import { Category } from "@/interfaces/Category";
 import {
   BadgeCheck,
+  Building2,
   OctagonX,
   Pencil,
   Plus,
@@ -32,6 +33,30 @@ import {
   updateGeekProfile,
   verificationStatus,
 } from "@/features/geek/geekSlice";
+
+// ── GST/CIN helpers ───────────────────────────────────────────────────────────
+const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+const CIN_REGEX = /^[LU][0-9]{5}[A-Z]{2}[0-9]{4}(PLC|PTC|NPL|OPC|GOI|FLC|FTC|FRN)[0-9]{6}$/;
+type VerifyStatus = "idle" | "loading" | "verified" | "mismatch" | "api_error";
+
+function normalizeCompanyName(name: string): string {
+  return name.toLowerCase()
+    .replace(/private\s+limited/gi, "pvt ltd").replace(/pvt\.?\s*ltd\.?/gi, "pvt ltd")
+    .replace(/public\s+limited/gi, "ltd").replace(/\blimited\b/gi, "ltd")
+    .replace(/\band\b/gi, "&").replace(/[^a-z0-9\s&]/g, "").replace(/\s+/g, " ").trim();
+}
+function namesMatch(a: string, b: string) {
+  const na = normalizeCompanyName(a), nb = normalizeCompanyName(b);
+  return na === nb || na.includes(nb) || nb.includes(na);
+}
+
+function VerifyBadge({ status, message }: { status: VerifyStatus; message: string }) {
+  if (status === "idle") return null;
+  if (status === "loading") return <span className="mt-1 flex items-center gap-1 text-xs text-gray-500"><svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Verifying…</span>;
+  if (status === "verified") return <span className="mt-1 flex items-center gap-1 text-xs text-green-600">✓ {message}</span>;
+  if (status === "mismatch") return <span className="mt-1 flex items-center gap-1 text-xs text-red-500">✗ {message}</span>;
+  return <span className="mt-1 flex items-center gap-1 text-xs text-amber-600">⚠ {message}</span>;
+}
 import AadhaarVerificationForm from "@/app/components/adhaarForm";
 import AddressForm from "@/app/components/AddressForm";
 import ProfileImageUpload from "@/app/components/ImageUpload";
@@ -107,10 +132,18 @@ const Dashboard = () => {
   const [openAddressForm, setOpenAddressForm] = useState(false);
   const [openImageUpload, setOpenImageUpload] = useState(false);
   const [openRateCard, setOpenRateCard] = useState(false);
+  const [openCompanyDetails, setOpenCompanyDetails] = useState(false);
 
   // loading states
   const [updatingProfile, setUpdatingProfile] = useState(false);
   const [updatingSkills, setUpdatingSkills] = useState(false);
+  const [updatingCompany, setUpdatingCompany] = useState(false);
+
+  // GSTIN / CIN verify states (for company modal)
+  const [gstinStatus, setGstinStatus] = useState<VerifyStatus>("idle");
+  const [gstinMsg, setGstinMsg] = useState("");
+  const [cinStatus, setCinStatus] = useState<VerifyStatus>("idle");
+  const [cinMsg, setCinMsg] = useState("");
 
   const [isMailSent, setIsMailSent] = useState(false);
   const [isSecondaryOpen, setIsSecondaryOpen] = useState(false);
@@ -228,6 +261,98 @@ const Dashboard = () => {
       }
     },
   });
+
+  // ── Company Details formik (GSTIN + CIN, corporate only) ────────────────────
+  const companyFormik = useFormik({
+    enableReinitialize: true,
+    initialValues: {
+      GSTIN: geek?.GSTIN || "",
+      CIN: geek?.CIN || "",
+    },
+    validationSchema: Yup.object({
+      GSTIN: Yup.string().matches(GSTIN_REGEX, "Invalid GSTIN format (e.g. 27AABCU9603R1ZX)"),
+      CIN: Yup.string().matches(CIN_REGEX, "Invalid CIN format (e.g. L17110MH1973PLC019786)"),
+    }),
+    onSubmit: async (values) => {
+      if (gstinStatus === "mismatch" || cinStatus === "mismatch") {
+        toast.error("Company name mismatch — correct before saving.");
+        return;
+      }
+      try {
+        setUpdatingCompany(true);
+        await dispatch(updateGeekProfile({
+          id: geekId,
+          data: { GSTIN: values.GSTIN || undefined, CIN: values.CIN || undefined },
+        })).unwrap();
+        setOpenCompanyDetails(false);
+      } catch (error: Error | unknown) {
+        if (error instanceof Error) toast.error(error.message);
+      } finally {
+        setUpdatingCompany(false);
+      }
+    },
+  });
+
+  // Reset verify + captcha state when fields change in company modal
+  const [gstinCaptchaD, setGstinCaptchaD] = useState<{ image: string; sessionId: string } | null>(null);
+  const [gstinCaptchaInputD, setGstinCaptchaInputD] = useState("");
+  useEffect(() => { setGstinStatus("idle"); setGstinMsg(""); setGstinCaptchaD(null); setGstinCaptchaInputD(""); }, [companyFormik.values.GSTIN]);
+  useEffect(() => { setCinStatus("idle"); setCinMsg(""); }, [companyFormik.values.CIN]);
+
+  // Step 1 — load captcha for the GST portal
+  async function fetchGstinCaptchaD() {
+    const gstin = companyFormik.values.GSTIN.trim().toUpperCase();
+    if (!GSTIN_REGEX.test(gstin)) { toast.error("Enter a valid GSTIN first."); return; }
+    setGstinStatus("loading");
+    try {
+      const check = await fetch(`/api/verify-gstin?gstin=${gstin}`);
+      const checkData = await check.json();
+      if (check.status === 400) { setGstinStatus("mismatch"); setGstinMsg(checkData.error || "Invalid GSTIN"); return; }
+    } catch { setGstinStatus("api_error"); setGstinMsg("Could not validate GSTIN format"); return; }
+    try {
+      const res = await fetch("/api/gstin-captcha");
+      const data = await res.json();
+      if (!res.ok || data.error) { setGstinStatus("api_error"); setGstinMsg(data.error || "Failed to load captcha"); return; }
+      setGstinCaptchaD({ image: data.image, sessionId: data.sessionId });
+      setGstinCaptchaInputD(""); setGstinStatus("idle"); setGstinMsg("");
+    } catch { setGstinStatus("api_error"); setGstinMsg("Failed to load captcha"); }
+  }
+
+  // Step 2 — submit captcha and verify company name
+  async function verifyGstinDashboard() {
+    if (!gstinCaptchaD || !gstinCaptchaInputD.trim()) { toast.error("Enter the captcha text first."); return; }
+    const companyName = geek?.companyName || "";
+    setGstinStatus("loading");
+    try {
+      const res = await fetch("/api/verify-gstin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ gstin: companyFormik.values.GSTIN.trim().toUpperCase(), sessionId: gstinCaptchaD.sessionId, captcha: gstinCaptchaInputD.trim() }),
+      });
+      const data = await res.json();
+      setGstinCaptchaD(null);
+      if (res.status === 400) { setGstinStatus("mismatch"); setGstinMsg(data.error || "GSTIN verification failed"); return; }
+      if (res.status === 404) { setGstinStatus("api_error"); setGstinMsg(data.error || "GSTIN not found in GST records"); return; }
+      if (!res.ok) { setGstinStatus("api_error"); setGstinMsg(data.error || "GST portal unreachable — try again"); return; }
+      const portalName: string = data.legalName || data.tradeName || "";
+      if (!portalName) { setGstinStatus("api_error"); setGstinMsg("Could not retrieve company name"); return; }
+      if (namesMatch(portalName, companyName)) { setGstinStatus("verified"); setGstinMsg(`Verified: ${portalName}`); }
+      else { setGstinStatus("mismatch"); setGstinMsg(`Mismatch — portal shows: "${portalName}"`); }
+    } catch { setGstinStatus("api_error"); setGstinMsg("Verification request failed"); setGstinCaptchaD(null); }
+  }
+
+  // CIN — structural validation only (MCA has no public API)
+  async function verifyCinDashboard() {
+    const cin = companyFormik.values.CIN.trim().toUpperCase();
+    if (!CIN_REGEX.test(cin)) { toast.error("Enter a valid CIN first."); return; }
+    setCinStatus("loading"); setCinMsg("");
+    try {
+      const res = await fetch(`/api/verify-cin?cin=${cin}`);
+      const data = await res.json();
+      if (res.status === 400) { setCinStatus("mismatch"); setCinMsg(data.error || "CIN verification failed"); return; }
+      setCinStatus("verified"); setCinMsg(data.message || "CIN structure verified (state code & year valid)");
+    } catch { setCinStatus("api_error"); setCinMsg("Verification request failed"); }
+  }
 
   // Reset primary brands when category changes
   useEffect(() => {
@@ -572,6 +697,44 @@ const Dashboard = () => {
                 )}
               </Card>
 
+              {isCorporate && (
+                <Card>
+                  <SectionTitle action={
+                    <button onClick={() => setOpenCompanyDetails(true)} className="text-xs text-indigo-600 hover:underline cursor-pointer flex items-center gap-1">
+                      <Pencil className="w-3 h-3" /> Edit
+                    </button>
+                  }>
+                    Company Credentials
+                  </SectionTitle>
+                  <div className="flex flex-col gap-3 text-sm">
+                    <div>
+                      <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">GSTIN</p>
+                      {geek?.GSTIN ? (
+                        <p className="font-mono text-xs text-gray-700 flex items-center gap-1.5">
+                          <Building2 className="w-3 h-3 text-indigo-400 shrink-0" />
+                          {geek.GSTIN.slice(0, 2)}{"·".repeat(9)}{geek.GSTIN.slice(-4)}
+                          <span className="text-green-500 text-xs">✓</span>
+                        </p>
+                      ) : (
+                        <p className="text-xs text-gray-400 italic">Not added</p>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">CIN</p>
+                      {geek?.CIN ? (
+                        <p className="font-mono text-xs text-gray-700 flex items-center gap-1.5">
+                          <Building2 className="w-3 h-3 text-indigo-400 shrink-0" />
+                          {geek.CIN.slice(0, 3)}{"·".repeat(12)}{geek.CIN.slice(-6)}
+                          <span className="text-green-500 text-xs">✓</span>
+                        </p>
+                      ) : (
+                        <p className="text-xs text-gray-400 italic">Not added</p>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              )}
+
               {geek?.languagePreferences?.length > 0 && (
                 <Card>
                   <SectionTitle>Languages</SectionTitle>
@@ -733,6 +896,108 @@ const Dashboard = () => {
           </button>
         </form>
       </Modal>
+
+      {/* ── Company Details modal (GSTIN + CIN) ── */}
+      {isCorporate && (
+        <Modal
+          open={openCompanyDetails}
+          onClose={() => setOpenCompanyDetails(false)}
+          title="Company Credentials"
+          subtitle="GSTIN and CIN — verify against your company name"
+          maxWidth="max-w-lg"
+        >
+          <form onSubmit={companyFormik.handleSubmit} className="px-5 py-5 flex flex-col gap-5">
+            <p className="text-xs text-gray-500 bg-indigo-50 border border-indigo-100 rounded-lg px-3 py-2">
+              Company name on file: <span className="font-semibold text-indigo-700">{geek?.companyName}</span>
+            </p>
+
+            {/* GSTIN */}
+            <div>
+              <label className="text-sm text-gray-600 block mb-1.5">
+                GSTIN <span className="text-xs text-gray-400">(GST Identification Number)</span>
+              </label>
+              <div className="flex gap-2">
+                <input
+                  name="GSTIN"
+                  value={companyFormik.values.GSTIN}
+                  onChange={e => companyFormik.setFieldValue("GSTIN", e.target.value.toUpperCase())}
+                  onBlur={companyFormik.handleBlur}
+                  placeholder="27AABCU9603R1ZX"
+                  maxLength={15}
+                  className="flex-1 px-3 py-2 text-sm font-mono tracking-wider bg-gray-50 border border-gray-300 rounded-lg outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                />
+                <button
+                  type="button"
+                  onClick={gstinCaptchaD ? verifyGstinDashboard : fetchGstinCaptchaD}
+                  disabled={gstinStatus === "loading" || !GSTIN_REGEX.test(companyFormik.values.GSTIN)}
+                  className="px-3 py-2 text-xs font-semibold rounded-lg border border-indigo-500 text-indigo-700 hover:bg-indigo-50 disabled:opacity-40 disabled:cursor-not-allowed transition whitespace-nowrap"
+                >
+                  {gstinStatus === "loading" ? "…" : gstinCaptchaD ? "Verify" : "Get Captcha"}
+                </button>
+              </div>
+
+              {/* Captcha UI — step 2 */}
+              {gstinCaptchaD && gstinStatus !== "verified" && gstinStatus !== "mismatch" && (
+                <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-lg flex flex-col gap-2">
+                  <div className="flex items-center gap-3">
+                    <img src={gstinCaptchaD.image} alt="GST captcha" className="h-10 rounded border border-gray-200" />
+                    <button type="button" onClick={fetchGstinCaptchaD} className="text-xs text-indigo-600 hover:underline">↻ Refresh</button>
+                  </div>
+                  <input
+                    value={gstinCaptchaInputD}
+                    onChange={e => setGstinCaptchaInputD(e.target.value)}
+                    placeholder="Enter captcha text shown above"
+                    className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-100"
+                  />
+                </div>
+              )}
+
+              {companyFormik.touched.GSTIN && companyFormik.errors.GSTIN && (
+                <p className="mt-1 text-xs text-red-500">{companyFormik.errors.GSTIN}</p>
+              )}
+              <VerifyBadge status={gstinStatus} message={gstinMsg} />
+            </div>
+
+            {/* CIN */}
+            <div>
+              <label className="text-sm text-gray-600 block mb-1.5">
+                CIN <span className="text-xs text-gray-400">(Corporate Identification Number)</span>
+              </label>
+              <div className="flex gap-2">
+                <input
+                  name="CIN"
+                  value={companyFormik.values.CIN}
+                  onChange={e => companyFormik.setFieldValue("CIN", e.target.value.toUpperCase())}
+                  onBlur={companyFormik.handleBlur}
+                  placeholder="L17110MH1973PLC019786"
+                  maxLength={21}
+                  className="flex-1 px-3 py-2 text-sm font-mono tracking-wider bg-gray-50 border border-gray-300 rounded-lg outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                />
+                <button
+                  type="button"
+                  onClick={verifyCinDashboard}
+                  disabled={cinStatus === "loading" || !CIN_REGEX.test(companyFormik.values.CIN)}
+                  className="px-3 py-2 text-xs font-semibold rounded-lg border border-indigo-500 text-indigo-700 hover:bg-indigo-50 disabled:opacity-40 disabled:cursor-not-allowed transition whitespace-nowrap"
+                >
+                  {cinStatus === "loading" ? "…" : "Verify"}
+                </button>
+              </div>
+              {companyFormik.touched.CIN && companyFormik.errors.CIN && (
+                <p className="mt-1 text-xs text-red-500">{companyFormik.errors.CIN}</p>
+              )}
+              <VerifyBadge status={cinStatus} message={cinMsg} />
+            </div>
+
+            <button
+              type="submit"
+              disabled={updatingCompany || gstinStatus === "mismatch" || cinStatus === "mismatch"}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg transition-colors cursor-pointer"
+            >
+              {updatingCompany ? "Saving…" : "Save Credentials"}
+            </button>
+          </form>
+        </Modal>
+      )}
 
       {/* ── Edit Skills modal ── */}
       <Modal

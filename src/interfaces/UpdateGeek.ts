@@ -19,4 +19,6 @@ export interface GeekFormData {
   secondarySkills: string[];
   brandsServiced: string[];
   languagePreferences: string[];
+  GSTIN?: string;
+  CIN?: string;
 }
