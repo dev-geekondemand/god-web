@@ -62,4 +62,3 @@ jobs:
           app-name: 'god-test-frontend'
           slot-name: 'Production'
           package: .
-          
