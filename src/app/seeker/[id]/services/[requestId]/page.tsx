@@ -4,7 +4,7 @@ import { useEffect, useState, ReactNode } from 'react';
 import { useParams } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import Image from 'next/image';
-import { autoRejectRequest, getRequestById } from '@/features/request/requestSlice';
+import { getRequestById } from '@/features/request/requestSlice';
 import { RootState } from '@/lib/store';
 import Link from 'next/link';
 import PageBanner from '@/app/components/PageBanner';
@@ -78,14 +78,6 @@ const SingleRequestPage = () => {
   const azureLoader = ({ src }: { src: string }) => src;
   const request = useAppSelector((state: RootState) => state.request?.request) as ServiceRequest;
 
-  useEffect(() => {
-    const hasExpired =
-      request?.createdAt &&
-      new Date(request.createdAt).getTime() + 24 * 60 * 60 * 1000 < Date.now();
-    if (hasExpired && (request?.status === 'Pending' || request?.status === 'Matched')) {
-      dispatch(autoRejectRequest(requestId));
-    }
-  }, [dispatch, request?.createdAt, request?.status, requestId]);
 
   const alreadyReviewed = request?.reviews?.some((r: Review) => r?.postedBy?._id === seeker?._id);
 

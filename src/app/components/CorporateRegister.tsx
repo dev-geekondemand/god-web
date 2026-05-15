@@ -22,6 +22,18 @@ const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 // CIN: L/U + 5 digits + 2 alpha (state) + 4 digits (year) + 3 alpha (company type) + 6 digits
 const CIN_REGEX = /^[LU][0-9]{5}[A-Z]{2}[0-9]{4}(PLC|PTC|NPL|OPC|GOI|FLC|FTC|FRN)[0-9]{6}$/;
 
+// Maps GSTIN numeric state code -> MCA CIN alpha state code(s)
+const GSTIN_STATE_TO_CIN: Record<string, string[]> = {
+  "01": ["JK"], "02": ["HP"], "03": ["PB"], "04": ["CH"], "05": ["UT"],
+  "06": ["HR"], "07": ["DL"], "08": ["RJ"], "09": ["UP"], "10": ["BR"],
+  "11": ["SK"], "12": ["AR"], "13": ["NL"], "14": ["MN"], "15": ["MZ"],
+  "16": ["TR"], "17": ["ML"], "18": ["AS"], "19": ["WB"], "20": ["JH"],
+  "21": ["OR"], "22": ["CG"], "23": ["MP"], "24": ["GJ"], "25": ["DD"],
+  "26": ["DN"], "27": ["MH"], "28": ["AP"], "29": ["KA"], "30": ["GA"],
+  "31": ["LD"], "32": ["KL"], "33": ["TN"], "34": ["PY"], "35": ["AN"],
+  "36": ["TG", "AP"], "37": ["AP", "TG"], "38": ["LA"],
+};
+
 type VerifyStatus = "idle" | "loading" | "verified" | "mismatch" | "api_error";
 
 function normalizeCompanyName(name: string): string {
@@ -89,10 +101,13 @@ export default function CorporateRegister() {
 
   const [gstinStatus, setGstinStatus] = useState<VerifyStatus>("idle");
   const [gstinMsg, setGstinMsg] = useState("");
+  const [gstinPortalName, setGstinPortalName] = useState("");
   const [gstinCaptcha, setGstinCaptcha] = useState<{ image: string; sessionId: string } | null>(null);
   const [gstinCaptchaInput, setGstinCaptchaInput] = useState("");
   const [cinStatus, setCinStatus] = useState<VerifyStatus>("idle");
   const [cinMsg, setCinMsg] = useState("");
+  const [crossStatus, setCrossStatus] = useState<"idle" | "verified" | "mismatch">("idle");
+  const [crossMsg, setCrossMsg] = useState("");
 
   const formik = useFormik({
     initialValues: {
@@ -125,6 +140,10 @@ export default function CorporateRegister() {
         toast.error("Please verify your CIN before continuing.");
         return;
       }
+      if (crossStatus === "mismatch") {
+        toast.error("GSTIN and CIN cross-verification failed. Please check your details.");
+        return;
+      }
       dispatch(sendGeekOTP(values.phone));
     },
   });
@@ -133,13 +152,18 @@ export default function CorporateRegister() {
   useEffect(() => {
     setGstinStatus("idle");
     setGstinMsg("");
+    setGstinPortalName("");
     setGstinCaptcha(null);
     setGstinCaptchaInput("");
+    setCrossStatus("idle");
+    setCrossMsg("");
   }, [formik.values.gstin]);
 
   useEffect(() => {
     setCinStatus("idle");
     setCinMsg("");
+    setCrossStatus("idle");
+    setCrossMsg("");
   }, [formik.values.cin]);
 
   // Reset verify status when company name changes (mismatch may become valid)
@@ -147,11 +171,42 @@ export default function CorporateRegister() {
     if (gstinStatus === "mismatch" || cinStatus === "mismatch") {
       setGstinStatus("idle");
       setGstinMsg("");
+      setGstinPortalName("");
       setCinStatus("idle");
       setCinMsg("");
     }
+    setCrossStatus("idle");
+    setCrossMsg("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.companyName]);
+
+  // Cross-verify GSTIN and CIN once both are individually verified
+  useEffect(() => {
+    if (gstinStatus !== "verified" || cinStatus !== "verified" || !gstinPortalName) {
+      if (gstinStatus !== "loading" && cinStatus !== "loading") {
+        setCrossStatus("idle");
+        setCrossMsg("");
+      }
+      return;
+    }
+    const gstStateCode = formik.values.gstin.substring(0, 2);
+    const cinStateCode = formik.values.cin.substring(6, 8);
+    const validCinCodes = GSTIN_STATE_TO_CIN[gstStateCode] ?? [];
+
+    if (!validCinCodes.includes(cinStateCode)) {
+      setCrossStatus("mismatch");
+      setCrossMsg(
+        `State mismatch — GSTIN state "${gstStateCode}" does not correspond to CIN state "${cinStateCode}". Both must be from the same state.`
+      );
+    } else if (!namesMatch(gstinPortalName, formik.values.companyName)) {
+      setCrossStatus("mismatch");
+      setCrossMsg(`Company name mismatch — GST portal shows "${gstinPortalName}" but entered name differs.`);
+    } else {
+      setCrossStatus("verified");
+      setCrossMsg(`GSTIN and CIN are consistent — same state, company name matches GST portal.`);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gstinStatus, cinStatus, gstinPortalName]);
 
   useEffect(() => {
     dispatch(getCategories());
@@ -295,6 +350,7 @@ export default function CorporateRegister() {
         setGstinMsg("Could not retrieve company name from GST portal");
         return;
       }
+      setGstinPortalName(portalName);
       if (namesMatch(portalName, companyName)) {
         setGstinStatus("verified");
         setGstinMsg(`Verified: ${portalName} (${data.status || "Active"})`);
@@ -422,14 +478,16 @@ export default function CorporateRegister() {
                       maxLength={15}
                       className={`${inputCls} flex-1 font-mono tracking-wider`}
                     />
-                    <button
-                      type="button"
-                      onClick={gstinCaptcha ? verifyGstin : fetchGstinCaptcha}
-                      disabled={gstinStatus === "loading" || !GSTIN_REGEX.test(formik.values.gstin)}
-                      className="px-4 py-2 text-xs font-semibold rounded-lg border border-teal-600 text-teal-700 hover:bg-teal-50 disabled:opacity-40 disabled:cursor-not-allowed transition whitespace-nowrap"
-                    >
-                      {gstinStatus === "loading" ? "…" : gstinCaptcha ? "Verify" : "Get Captcha"}
-                    </button>
+                    {!gstinCaptcha && (
+                      <button
+                        type="button"
+                        onClick={fetchGstinCaptcha}
+                        disabled={gstinStatus === "loading" || !GSTIN_REGEX.test(formik.values.gstin)}
+                        className="px-4 py-2 text-xs font-semibold rounded-lg border border-teal-600 text-teal-700 hover:bg-teal-50 disabled:opacity-40 disabled:cursor-not-allowed transition whitespace-nowrap"
+                      >
+                        {gstinStatus === "loading" ? "…" : "Get Captcha"}
+                      </button>
+                    )}
                   </div>
 
                   {/* Captcha UI — shown after step 1 */}
@@ -445,12 +503,22 @@ export default function CorporateRegister() {
                           ↻ Refresh
                         </button>
                       </div>
-                      <input
-                        value={gstinCaptchaInput}
-                        onChange={(e) => setGstinCaptchaInput(e.target.value)}
-                        placeholder="Enter captcha text shown above"
-                        className="block w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-teal-500/30 transition"
-                      />
+                      <div className="flex gap-2">
+                        <input
+                          value={gstinCaptchaInput}
+                          onChange={(e) => setGstinCaptchaInput(e.target.value)}
+                          placeholder="Enter captcha text shown above"
+                          className="flex-1 px-3 py-2 text-sm bg-white border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-teal-500/30 transition"
+                        />
+                        <button
+                          type="button"
+                          onClick={verifyGstin}
+                          disabled={gstinStatus === "loading" || !gstinCaptchaInput.trim()}
+                          className="px-4 py-2 text-xs font-semibold rounded-lg border border-teal-600 text-teal-700 hover:bg-teal-50 disabled:opacity-40 disabled:cursor-not-allowed transition whitespace-nowrap"
+                        >
+                          {gstinStatus === "loading" ? "…" : "Verify"}
+                        </button>
+                      </div>
                     </div>
                   )}
 
@@ -491,6 +559,18 @@ export default function CorporateRegister() {
                   )}
                   <VerifyBadge status={cinStatus} message={cinMsg} />
                 </div>
+
+                {/* Cross-verification result */}
+                {crossStatus !== "idle" && (
+                  <div className={`mt-1 flex items-start gap-2 p-3 rounded-lg text-xs border ${
+                    crossStatus === "verified"
+                      ? "bg-green-50 border-green-200 text-green-700"
+                      : "bg-red-50 border-red-200 text-red-600"
+                  }`}>
+                    <span className="mt-0.5 shrink-0">{crossStatus === "verified" ? "✓" : "✗"}</span>
+                    <span><strong>Cross-check:</strong> {crossMsg}</span>
+                  </div>
+                )}
               </div>
             </div>
 

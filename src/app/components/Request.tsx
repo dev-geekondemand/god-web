@@ -62,15 +62,8 @@ const Request: React.FC<RequestProps> = ({ requests, onAccept, onReject }) => {
     if (!curGeek?._id) dispatch(loadGeek());
   }, [dispatch, curGeek?._id]);
 
-  const hoursLeft = (date: Date) => {
-    const timeDiff = new Date().getTime() - date.getTime();
-    return 24 - Math.ceil(timeDiff / (1000 * 60 * 60));
-  };
-
-  const minutesLeft = (date: Date) => {
-    const timeDiff = new Date().getTime() - date.getTime();
-    return 60 - Math.ceil(timeDiff / (1000 * 60));
-  };
+  const isExpired = (req: ServiceRequest) =>
+    Date.now() - new Date(req.createdAt).getTime() > 24 * 60 * 60 * 1000;
 
   const handleClick = (req: ServiceRequest) => {
     if (req?._id && req?.geekResponseStatus === "Accepted") {
@@ -80,12 +73,9 @@ const Request: React.FC<RequestProps> = ({ requests, onAccept, onReject }) => {
     }
   };
 
-  const isExpired = (req: ServiceRequest) =>
-    hoursLeft(new Date(req.createdAt)) <= 0 && minutesLeft(new Date(req.createdAt)) <= 0;
-
   const displayStatus = (req: ServiceRequest) => {
     if (req.geekResponseStatus === "Accepted") return "Accepted";
-    if (isExpired(req) && req.geekResponseStatus === "Pending") return "Expired";
+    if (req.geekResponseStatus === "Expired" || (isExpired(req) && req.geekResponseStatus === "Pending")) return "Expired";
     return req.geekResponseStatus || req.status;
   };
 
@@ -143,8 +133,7 @@ const Request: React.FC<RequestProps> = ({ requests, onAccept, onReject }) => {
         {paginated.map((req) => {
           const status = displayStatus(req);
           const canRespond =
-            req.geekResponseStatus === "Pending" &&
-            (hoursLeft(new Date(req.createdAt)) >= 0 || minutesLeft(new Date(req.createdAt)) >= 0);
+            req.geekResponseStatus === "Pending" && !isExpired(req);
 
           return (
             <div
