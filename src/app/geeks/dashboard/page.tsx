@@ -30,9 +30,11 @@ import "react-widgets/styles.css";
 import {
   deleteRateCard,
   sendVerificationMail,
+  updateAvailability,
   updateGeekProfile,
   verificationStatus,
 } from "@/features/geek/geekSlice";
+import { AvailabilitySlot } from "@/interfaces/Geek";
 
 // ── GST/CIN helpers ───────────────────────────────────────────────────────────
 const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
@@ -133,6 +135,9 @@ const Dashboard = () => {
   const [openImageUpload, setOpenImageUpload] = useState(false);
   const [openRateCard, setOpenRateCard] = useState(false);
   const [openCompanyDetails, setOpenCompanyDetails] = useState(false);
+  const [openAvailability, setOpenAvailability] = useState(false);
+  const [availabilitySlots, setAvailabilitySlots] = useState<AvailabilitySlot[]>([]);
+  const [updatingAvailability, setUpdatingAvailability] = useState(false);
 
   // loading states
   const [updatingProfile, setUpdatingProfile] = useState(false);
@@ -423,6 +428,57 @@ const Dashboard = () => {
     await dispatch(deleteRateCard({ id: geek._id, rateCardId: rateId })).unwrap();
   };
 
+  const WEEK_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+  useEffect(() => {
+    if (geek?.availability?.slots) {
+      setAvailabilitySlots(geek.availability.slots);
+    }
+  }, [geek?.availability]);
+
+  const toggleDay = (day: string) => {
+    setAvailabilitySlots(prev => {
+      const exists = prev.find(s => s.day === day);
+      if (exists) return prev.filter(s => s.day !== day);
+      return [...prev, { day, timeSlots: [{ from: "09:00", to: "18:00" }] }];
+    });
+  };
+
+  const updateTimeSlot = (day: string, index: number, field: "from" | "to", value: string) => {
+    setAvailabilitySlots(prev =>
+      prev.map(s =>
+        s.day !== day ? s : {
+          ...s,
+          timeSlots: s.timeSlots.map((t, i) => i !== index ? t : { ...t, [field]: value }),
+        }
+      )
+    );
+  };
+
+  const addTimeSlot = (day: string) => {
+    setAvailabilitySlots(prev =>
+      prev.map(s => s.day !== day ? s : { ...s, timeSlots: [...s.timeSlots, { from: "09:00", to: "18:00" }] })
+    );
+  };
+
+  const removeTimeSlot = (day: string, index: number) => {
+    setAvailabilitySlots(prev =>
+      prev.map(s => s.day !== day ? s : { ...s, timeSlots: s.timeSlots.filter((_, i) => i !== index) })
+    );
+  };
+
+  const handleSaveAvailability = async () => {
+    try {
+      setUpdatingAvailability(true);
+      await dispatch(updateAvailability({ id: geekId, slots: availabilitySlots })).unwrap();
+      setOpenAvailability(false);
+    } catch (error: Error | unknown) {
+      if (error instanceof Error) toast.error(error.message);
+    } finally {
+      setUpdatingAvailability(false);
+    }
+  };
+
   useEffect(() => {
     if (geekState?.isRateCardDeleted === true && geekState?.isSuccess) {
       toast.dismiss();
@@ -660,43 +716,6 @@ const Dashboard = () => {
 
             {/* Right sidebar */}
             <div className="flex flex-col gap-5">
-              <Card>
-                <SectionTitle>Service Mode</SectionTitle>
-                <div className="flex flex-col gap-1.5">
-                  {modeLabels.map(mode => (
-                    <div key={mode} className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm border ${
-                      isModeActive(mode)
-                        ? `${isCorporate ? "border-indigo-200 bg-indigo-50 text-indigo-700" : "border-teal-200 bg-teal-50 text-teal-700"} font-medium`
-                        : `${isCorporate ? "border-indigo-100 bg-indigo-50 text-indigo-400" : "border-gray-100 bg-gray-50 text-gray-400"}`
-                    }`}>
-                      {mode}
-                      {isModeActive(mode) && <BadgeCheck className={`w-3.5 h-3.5 ${isCorporate ? "text-indigo-600" : "text-teal-600"}`} />}
-                    </div>
-                  ))}
-                </div>
-              </Card>
-
-              <Card>
-                <SectionTitle action={
-                  <button onClick={() => setOpenAddressForm(true)} className={`text-xs ${isCorporate ? "text-indigo-600" : "text-teal-600"} hover:underline cursor-pointer flex items-center gap-1`}>
-                    <Pencil className="w-3 h-3" /> Edit
-                  </button>
-                }>
-                  Address
-                </SectionTitle>
-                {geek?.address?.city ? (
-                  <div className="flex gap-2">
-                    <MapPin className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
-                    <address className="not-italic text-sm text-gray-600 leading-relaxed">
-                      {[geek.address.line1, geek.address.line2, geek.address.city, geek.address.state, geek.address.pin]
-                        .filter(Boolean).join(", ")}
-                    </address>
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-400">No address added</p>
-                )}
-              </Card>
-
               {isCorporate && (
                 <Card>
                   <SectionTitle action={
@@ -735,19 +754,6 @@ const Dashboard = () => {
                 </Card>
               )}
 
-              {geek?.languagePreferences?.length > 0 && (
-                <Card>
-                  <SectionTitle>Languages</SectionTitle>
-                  <div className="flex flex-wrap gap-1.5">
-                    {geek.languagePreferences.map((lang: string) => (
-                      <span key={lang} className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded border border-gray-200">
-                        {lang}
-                      </span>
-                    ))}
-                  </div>
-                </Card>
-              )}
-
               {/* Subscription */}
               <Card>
                 <SectionTitle>Subscription</SectionTitle>
@@ -778,6 +784,87 @@ const Dashboard = () => {
                     </div>
                   );
                 })()}
+              </Card>
+
+              <Card>
+                <SectionTitle>Service Mode</SectionTitle>
+                <div className="flex flex-col gap-1.5">
+                  {modeLabels.map(mode => (
+                    <div key={mode} className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm border ${
+                      isModeActive(mode)
+                        ? `${isCorporate ? "border-indigo-200 bg-indigo-50 text-indigo-700" : "border-teal-200 bg-teal-50 text-teal-700"} font-medium`
+                        : `${isCorporate ? "border-indigo-100 bg-indigo-50 text-indigo-400" : "border-gray-100 bg-gray-50 text-gray-400"}`
+                    }`}>
+                      {mode}
+                      {isModeActive(mode) && <BadgeCheck className={`w-3.5 h-3.5 ${isCorporate ? "text-indigo-600" : "text-teal-600"}`} />}
+                    </div>
+                  ))}
+                </div>
+              </Card>
+
+              <Card>
+                <SectionTitle action={
+                  <button onClick={() => setOpenAddressForm(true)} className={`text-xs ${isCorporate ? "text-indigo-600" : "text-teal-600"} hover:underline cursor-pointer flex items-center gap-1`}>
+                    <Pencil className="w-3 h-3" /> Edit
+                  </button>
+                }>
+                  Address
+                </SectionTitle>
+                {geek?.address?.city ? (
+                  <div className="flex gap-2">
+                    <MapPin className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                    <address className="not-italic text-sm text-gray-600 leading-relaxed">
+                      {[geek.address.line1, geek.address.line2, geek.address.city, geek.address.state, geek.address.pin]
+                        .filter(Boolean).join(", ")}
+                    </address>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-400">No address added</p>
+                )}
+              </Card>
+
+              {geek?.languagePreferences?.length > 0 && (
+                <Card>
+                  <SectionTitle>Languages</SectionTitle>
+                  <div className="flex flex-wrap gap-1.5">
+                    {geek.languagePreferences.map((lang: string) => (
+                      <span key={lang} className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded border border-gray-200">
+                        {lang}
+                      </span>
+                    ))}
+                  </div>
+                </Card>
+              )}
+
+              {/* Availability */}
+              <Card>
+                <SectionTitle action={
+                  <button onClick={() => setOpenAvailability(true)} className={`text-xs ${isCorporate ? "text-indigo-600" : "text-teal-600"} hover:underline cursor-pointer flex items-center gap-1`}>
+                    <Pencil className="w-3 h-3" /> Edit
+                  </button>
+                }>
+                  Availability
+                </SectionTitle>
+                {(geek?.availability?.slots?.length ?? 0) > 0 ? (
+                  <div className="flex flex-col gap-2">
+                    {geek?.availability?.slots?.map(slot => (
+                      <div key={slot.day} className="flex items-start gap-2">
+                        <span className={`text-xs font-semibold w-8 shrink-0 mt-0.5 ${isCorporate ? "text-indigo-700" : "text-teal-700"}`}>
+                          {slot.day.slice(0, 3)}
+                        </span>
+                        <div className="flex flex-wrap gap-1">
+                          {slot.timeSlots.map((t, i) => (
+                            <span key={i} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded border border-gray-200">
+                              {t.from} – {t.to}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-400">No availability set</p>
+                )}
               </Card>
             </div>
           </div>
@@ -998,6 +1085,80 @@ const Dashboard = () => {
           </form>
         </Modal>
       )}
+
+      {/* ── Availability modal ── */}
+      <Modal
+        open={openAvailability}
+        onClose={() => setOpenAvailability(false)}
+        title="Set Availability"
+        subtitle="Choose the days and times you are available"
+      >
+        <div className="px-5 py-5 flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
+            {WEEK_DAYS.map(day => {
+              const slot = availabilitySlots.find(s => s.day === day);
+              const isActive = !!slot;
+              return (
+                <div key={day} className={`rounded-lg border p-3 ${isActive ? (isCorporate ? "border-indigo-200 bg-indigo-50" : "border-teal-200 bg-teal-50") : "border-gray-200 bg-white"}`}>
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={isActive}
+                        onChange={() => toggleDay(day)}
+                        className={`rounded ${isCorporate ? "accent-indigo-600" : "accent-teal-600"}`}
+                      />
+                      <span className={`text-sm font-medium ${isActive ? (isCorporate ? "text-indigo-800" : "text-teal-800") : "text-gray-600"}`}>{day}</span>
+                    </label>
+                    {isActive && (
+                      <button
+                        type="button"
+                        onClick={() => addTimeSlot(day)}
+                        className={`text-xs ${isCorporate ? "text-indigo-600" : "text-teal-600"} hover:underline cursor-pointer`}
+                      >
+                        + Add slot
+                      </button>
+                    )}
+                  </div>
+                  {isActive && slot && (
+                    <div className="mt-2 flex flex-col gap-2">
+                      {slot.timeSlots.map((t, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                          <input
+                            type="time"
+                            value={t.from}
+                            onChange={e => updateTimeSlot(day, i, "from", e.target.value)}
+                            className="text-xs border border-gray-300 rounded px-2 py-1 bg-white outline-none focus:border-teal-400"
+                          />
+                          <span className="text-xs text-gray-400">to</span>
+                          <input
+                            type="time"
+                            value={t.to}
+                            onChange={e => updateTimeSlot(day, i, "to", e.target.value)}
+                            className="text-xs border border-gray-300 rounded px-2 py-1 bg-white outline-none focus:border-teal-400"
+                          />
+                          {slot.timeSlots.length > 1 && (
+                            <button type="button" onClick={() => removeTimeSlot(day, i)} className="text-gray-300 hover:text-red-500 cursor-pointer">
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <button
+            disabled={updatingAvailability}
+            onClick={handleSaveAvailability}
+            className={`w-full ${isCorporate ? "bg-indigo-600 hover:bg-indigo-700" : "bg-teal-600 hover:bg-teal-700"} disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg transition-colors cursor-pointer`}
+          >
+            {updatingAvailability ? "Saving…" : "Save Availability"}
+          </button>
+        </div>
+      </Modal>
 
       {/* ── Edit Skills modal ── */}
       <Modal

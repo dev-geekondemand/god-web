@@ -19,9 +19,8 @@ interface GeeksHere {
 }
 
 const planConfig: Record<string, { label: string; color: string }> = {
-    Professional: { label: 'Professional', color: 'text-purple-700 border-purple-200 bg-purple-50' },
-    Advance:      { label: 'Advance',      color: 'text-blue-700 border-blue-200 bg-blue-50' },
-    // Startup:      { label: 'Startup',      color: 'text-teal-700 border-teal-200 bg-teal-50' },
+    Professional: { label: 'Professional', color: 'text-amber-700 border-amber-200 bg-amber-50' },
+    Advance:      { label: 'Advance',      color: 'text-teal-700 border-teal-200 bg-teal-50' },
 };
 
 const FeaturedGeeks = () => {
@@ -68,7 +67,8 @@ const FeaturedGeeks = () => {
                     ) : (
                         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-l border-gray-200'>
                             {geeks?.map((geek) => {
-                                const plan = planConfig[geek.subscriptionPlan] ?? "";
+                                const plan = planConfig[geek.subscriptionPlan] ?? null;
+                                const isCorporate = !!(geek.__t === 'Corporate' || geek.companyName);
                                 return (
                                     <button
                                         onClick={() => handleClick(geek._id)}
@@ -94,14 +94,22 @@ const FeaturedGeeks = () => {
 
                                                 {/* Badges row */}
                                                 <div className='flex flex-wrap gap-1'>
-                                                    {geek.isAdhaarVerified && (
-                                                        <span className='text-[10px] font-semibold px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200'>
-                                                            ID Verified
+                                                    {isCorporate && (
+                                                        <span className='text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 inline-flex items-center gap-0.5'>
+                                                            <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H3m8-10h.01M12 17h.01M9 17h.01" />
+                                                            </svg>
+                                                            Corporate
                                                         </span>
                                                     )}
-                                                    {geek.subscriptionPlan && (
+                                                    {plan && (
                                                         <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${plan.color}`}>
                                                             {plan.label}
+                                                        </span>
+                                                    )}
+                                                    {geek.isAdhaarVerified && (
+                                                        <span className='text-[10px] font-semibold px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200'>
+                                                            ✓ Verified
                                                         </span>
                                                     )}
                                                 </div>

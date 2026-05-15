@@ -12,6 +12,20 @@ export interface RateCard {
 	rate: number;
 }
 
+export interface TimeSlot {
+	from: string;
+	to: string;
+}
+
+export interface AvailabilitySlot {
+	day: string;
+	timeSlots: TimeSlot[];
+}
+
+export interface Availability {
+	slots: AvailabilitySlot[];
+}
+
 export interface Address {
 	
 	pin: string;
@@ -69,7 +83,7 @@ interface Geek {
 		public_id: string;
 		url: string;
 	};
-	availability: string[];
+	availability?: Availability;
 	services: Service[];
 	rateCard: RateCard[];
 	requests: ServiceRequest[];

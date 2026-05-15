@@ -497,6 +497,29 @@ const GeekById = () => {
               )}
             </div>
 
+            {/* Availability */}
+            {(geek?.availability?.slots?.length ?? 0) > 0 && (
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+                <p className="text-base font-semibold text-gray-900 mb-3">Availability</p>
+                <div className="flex flex-col gap-2">
+                  {geek?.availability?.slots?.map(slot => (
+                    <div key={slot.day} className="flex items-start gap-2">
+                      <span className={`text-xs font-semibold w-8 shrink-0 mt-0.5 ${isCorporate ? "text-indigo-700" : "text-teal-700"}`}>
+                        {slot.day.slice(0, 3)}
+                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        {slot.timeSlots.map((t, i) => (
+                          <span key={i} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded border border-gray-200">
+                            {t.from} – {t.to}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Select Category */}
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
               <p className="text-base font-semibold text-gray-900 mb-4">Select Category</p>

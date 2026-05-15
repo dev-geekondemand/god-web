@@ -3,7 +3,7 @@ import geekService from "./geekService";
 import {toast} from "react-hot-toast";
 import { GeekFormData } from "@/interfaces/UpdateGeek";
 import { Address } from "@/interfaces/Service";
-import Geek, { RateCard } from "@/interfaces/Geek";
+import Geek, { RateCard, AvailabilitySlot } from "@/interfaces/Geek";
 
 
 interface RegisterGeekData{
@@ -70,6 +70,8 @@ interface CreateCorporateGeekData {
     yoe: number;
     brandsServiced?: string[];
     refCode?: string;
+    GSTIN?: string;
+    CIN?: string;
 }
 
 export const createCorporateGeek = createAsyncThunk('geek/createCorporate', async (data: CreateCorporateGeekData, thunkAPI) => {
@@ -297,6 +299,22 @@ export const verifyMail = createAsyncThunk(
     }catch(error){
       if (error) {
       return thunkAPI.rejectWithValue((error as { response: { data: unknown } }).response?.data || (error as Error).message);
+      } else {
+        return thunkAPI.rejectWithValue('An unknown error occurred');
+      }
+    }
+  }
+)
+
+export const updateAvailability = createAsyncThunk(
+  "geek/updateAvailability",
+  async ({ id, slots }: { id: string; slots: AvailabilitySlot[] }, thunkAPI) => {
+    try {
+      const response = await geekService.updateAvailability(id, slots);
+      return response;
+    } catch (error) {
+      if (error) {
+        return thunkAPI.rejectWithValue((error as { response: { data: unknown } }).response?.data || (error as Error).message);
       } else {
         return thunkAPI.rejectWithValue('An unknown error occurred');
       }
@@ -651,6 +669,22 @@ const geekSlice = createSlice({
             state.isSuccess = false;
             state.message = action.error.message;
             toast.error(action.error.message as string);
+        }).addCase(updateAvailability.pending, (state) => {
+            state.isLoading = true;
+            state.isSuccess = false;
+            state.isError = false;
+        }).addCase(updateAvailability.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.isError = false;
+            state.message = action.payload?.message;
+            toast.success('Availability updated.');
+        }).addCase(updateAvailability.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.isSuccess = false;
+            state.message = action.error.message;
+            toast.error('Failed to update availability.');
         })
     }
 })

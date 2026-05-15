@@ -2,7 +2,7 @@ import api from "@/utils/api";
 // import { url } from "@/utils/url";
 import { GeekFormData } from "@/interfaces/UpdateGeek";
 import { Address } from "@/interfaces/Service";
-import  { RateCard } from "@/interfaces/Geek";
+import  { RateCard, AvailabilitySlot } from "@/interfaces/Geek";
 
 interface registerData {
     fullName : {
@@ -154,6 +154,8 @@ interface CorporateGeekPayload {
   yoe: number;
   brandsServiced?: string[];
   refCode?: string;
+  GSTIN?: string;
+  CIN?: string;
 }
 
 const createCorporateGeek = async (data: CorporateGeekPayload) => {
@@ -181,6 +183,11 @@ const adminCreateCorporateGeek = async (data: AdminCorporateGeekPayload) => {
   return response.data;
 };
 
+const updateAvailability = async (id: string, slots: AvailabilitySlot[]) => {
+  const response = await api.put(`geek/${id}/availability`, { slots }, { withCredentials: true });
+  return response.data;
+};
+
 const geekService = {
     getGeeks,
     createGeek,
@@ -201,6 +208,7 @@ const geekService = {
     verifyMail,
     createCorporateGeek,
     adminCreateCorporateGeek,
+    updateAvailability,
 }
 
 export default geekService

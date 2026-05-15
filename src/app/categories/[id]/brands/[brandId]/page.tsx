@@ -25,6 +25,11 @@ interface GeekState {
 
 const LIMIT = 12; // items per page
 
+const PLAN_CONFIG: Record<string, { label: string; color: string }> = {
+  Professional: { label: 'Professional', color: 'text-amber-700 border-amber-200 bg-amber-50' },
+  Advance:      { label: 'Advance',      color: 'text-teal-700 border-teal-200 bg-teal-50' },
+};
+
 const GeeksByCategories = () => {
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
@@ -206,30 +211,55 @@ const geeks = geekState?.geeks as Geek[];
                       <GeekSkeletonCard key={index} />
                     ))
                   : geeks?.length > 0
-                    ? geeks.map((geek, index) => (
-                        <button
-                          onClick={() => handleClick(geek._id)}
-                          key={index}
-                          className='flex flex-col items-center bg-white gap-3 shadow rounded-lg p-4'
-                        >
-                          <Image
-                            loader={azureLoader}
-                            src={geek.profileImage?.url || "/assets/images/placeholder_user.jpg"}
-                            alt={geek.fullName?.first || "Geek"}
-                            width={500}
-                            height={300}
-                            className='rounded-md w-full h-54 object-cover'
-                          />
-                          <div className='w-full flex flex-col gap-1'>
-                            <p className="text-lg text-gray-800">
-                              {geek.fullName?.first} {geek.fullName?.last}
-                            </p>
-                            <p className='text-sm text-gray-500'>
-                              {geek.primarySkill?.title || "Skill not available"}
-                            </p>
-                          </div>
-                        </button>
-                      ))
+                    ? geeks.map((geek, index) => {
+                        const plan = PLAN_CONFIG[geek.subscriptionPlan] ?? null;
+                        const isCorporate = !!(geek.__t === 'Corporate' || geek.companyName);
+                        return (
+                          <button
+                            onClick={() => handleClick(geek._id)}
+                            key={index}
+                            className='flex flex-col items-center bg-white gap-3 shadow rounded-lg p-4'
+                          >
+                            <div className='relative w-full'>
+                              <Image
+                                loader={azureLoader}
+                                src={geek.profileImage?.url || "/assets/images/placeholder_user.jpg"}
+                                alt={geek.fullName?.first || "Geek"}
+                                width={500}
+                                height={300}
+                                className='rounded-md w-full h-54 object-cover'
+                              />
+                              {(isCorporate || plan) && (
+                                <div className='absolute top-2 left-2 flex flex-wrap gap-1'>
+                                  {isCorporate && (
+                                    <span className='text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-600 text-white shadow inline-flex items-center gap-0.5'>
+                                      <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H3m8-10h.01M12 17h.01M9 17h.01" />
+                                      </svg>
+                                      Corporate
+                                    </span>
+                                  )}
+                                  {plan && (
+                                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shadow ${
+                                      plan.label === 'Professional' ? 'bg-amber-500 text-white' : 'bg-teal-500 text-white'
+                                    }`}>
+                                      {plan.label}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                            <div className='w-full flex flex-col gap-1'>
+                              <p className="text-lg text-gray-800">
+                                {geek.fullName?.first} {geek.fullName?.last}
+                              </p>
+                              <p className='text-sm text-gray-500'>
+                                {geek.primarySkill?.title || "Skill not available"}
+                              </p>
+                            </div>
+                          </button>
+                        );
+                      })
                     : (
                       <div className='w-full col-start-2 max-w-6xl mx-auto h-full flex flex-col items-center justify-center'>
                                               <div className="flex flex-col items-center justify-center p-4 text-center w-full">
