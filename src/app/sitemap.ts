@@ -3,10 +3,13 @@ import { MetadataRoute } from "next";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.geekondemand.in";
 const API_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL || "https://god-backend.vercel.app"}/api`;
 
+const FETCH_TIMEOUT_MS = 15000;
+
 async function getApiKey(): Promise<string | null> {
   try {
     const res = await fetch(`${API_URL}/apikey/generate`, {
       next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
     if (!res.ok) return null;
     const data = await res.json();
@@ -22,6 +25,7 @@ async function fetchWithApiKey<T>(path: string, apiKey: string | null): Promise<
     const res = await fetch(`${API_URL}/${path}`, {
       headers,
       next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
     if (!res.ok) return null;
     return res.json();
