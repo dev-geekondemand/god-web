@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import {
@@ -14,7 +14,9 @@ import Link from 'next/link'
 import { Category } from '@/interfaces/Category'
 import Image from 'next/image'
 
-
+type TimeSlot = { from: string; to: string }
+type AvailabilitySlotItem = { day: string; timeSlots: TimeSlot[] }
+export type SelectedSlot = { day: string; timeSlot: TimeSlot }
 
 const DialogComponent = ({
    showDialog,
@@ -31,6 +33,9 @@ const DialogComponent = ({
    selectedSkill,
    setSelectedSkill,
    isLoading,
+   availability,
+   selectedSlot,
+   setSelectedSlot,
   }: {
     seekerId: string,
     showDialog: boolean,
@@ -46,10 +51,13 @@ const DialogComponent = ({
     selectedSkill?: Category,
     setSelectedSkill?: React.Dispatch<React.SetStateAction<Category | undefined>>,
     isLoading?: boolean,
+    availability?: { slots: AvailabilitySlotItem[] },
+    selectedSlot?: SelectedSlot,
+    setSelectedSlot?: React.Dispatch<React.SetStateAction<SelectedSlot | undefined>>,
   }) => {
 
   const [open, setOpen] = useState(false)
-  const azureLoader = ({ src }: { src: string }) => src;
+  const [selectedDay, setSelectedDay] = useState<string | undefined>()
 
   const handleModeSelect = (mode: string) => {
     setSelectedMode(mode)
@@ -60,7 +68,13 @@ const DialogComponent = ({
     setShowDialog(false)
   }
 
-  const canConfirm = !!selectedMode && (selectedMode !== 'Offline' || isSeekerAddress);
+  const handleDaySelect = (day: string) => {
+    setSelectedDay(day)
+    if (selectedSlot?.day !== day) setSelectedSlot?.(undefined)
+  }
+
+  const hasAvailability = (availability?.slots?.length ?? 0) > 0
+  const canConfirm = !!selectedMode && (selectedMode !== 'Offline' || isSeekerAddress) && (!hasAvailability || !!selectedSlot);
 
   return (
     <Dialog open={showDialog} onOpenChange={handleClose}>
@@ -88,7 +102,7 @@ const DialogComponent = ({
                   >
                     {skill?.image?.url && (
                       <div className="w-7 h-7 relative flex-shrink-0">
-                        <Image loader={azureLoader} src={skill.image.url} alt={skill.title} fill className="rounded-full object-cover" />
+                        <Image src={skill.image.url} alt={skill.title} fill className="rounded-full object-cover" sizes="28px" />
                       </div>
                     )}
                     {skill.title}
@@ -133,6 +147,56 @@ const DialogComponent = ({
                 Add Now
               </Link>
             </p>
+          )}
+
+          {hasAvailability && (
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold text-gray-700">
+                Preferred Slot <span className="text-red-400">*</span>
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {availability!.slots.map(slot => (
+                  <button
+                    key={slot.day}
+                    type="button"
+                    onClick={() => handleDaySelect(slot.day)}
+                    className={`text-xs px-3 py-1.5 rounded-full border font-medium transition ${
+                      selectedDay === slot.day
+                        ? 'border-teal-500 bg-teal-50 text-teal-700'
+                        : 'border-gray-200 text-gray-600 hover:border-teal-300'
+                    }`}
+                  >
+                    {slot.day.slice(0, 3)}
+                  </button>
+                ))}
+              </div>
+              {selectedDay && (
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {availability!.slots.find(s => s.day === selectedDay)?.timeSlots.map((ts, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setSelectedSlot?.({ day: selectedDay, timeSlot: ts })}
+                      className={`text-xs px-3 py-1.5 rounded-lg border font-medium transition ${
+                        selectedSlot?.day === selectedDay && selectedSlot?.timeSlot.from === ts.from
+                          ? 'border-teal-500 bg-teal-50 text-teal-700'
+                          : 'border-gray-200 text-gray-600 hover:border-teal-300'
+                      }`}
+                    >
+                      {ts.from} – {ts.to}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {!selectedSlot && (
+                <p className="text-xs text-gray-400">Select a day then a time slot.</p>
+              )}
+              {selectedSlot && (
+                <p className="text-xs text-teal-600 font-medium">
+                  {selectedSlot.day}, {selectedSlot.timeSlot.from} – {selectedSlot.timeSlot.to}
+                </p>
+              )}
+            </div>
           )}
         </div>
 

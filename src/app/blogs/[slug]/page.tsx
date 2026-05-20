@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import BlogContent from '@/app/components/BlogContent';
 import { getAllBlogs, getBlogFromSlug, getTags, getCategories } from '@/features/blogs/blogSlice';
 import { useAppDispatch } from '@/lib/hooks';
@@ -88,7 +88,6 @@ const slug = params.slug?.toString() || '';
     .slice(0, 5)
     .map(({ blog }) => blog);
 
-  const azureLoader = ({ src }:{src:string}) => src;
 
   return (
     <section className='w-full flex flex-col justify-center items-center'>
@@ -177,7 +176,7 @@ const slug = params.slug?.toString() || '';
                                     </div>
 
                                     <div className='w-full  relative'>
-                                        <Image loader={azureLoader} src={blog?.coverImage?.url ? blog?.coverImage?.url : "/assets/images/blog.png"} width={800} height={800} className='rounded-lg' alt="Blog Image" />
+                                        <Image src={blog?.coverImage?.url ? blog?.coverImage?.url : "/assets/images/blog.png"} width={800} height={800} className='rounded-lg' alt="Blog Image" />
                                     </div>
 
                                    <BlogContent html={blog?.description ? blog?.description?.toString() : ""} />

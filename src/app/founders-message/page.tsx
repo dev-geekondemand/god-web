@@ -11,7 +11,7 @@ const FounderMessage = () => {
 
                 <div className="bg-white p-4  rounded-md shadow-sm">
                     <div className='w-full h-[30vh] flex items-center rounded-md founder-bg border p-4 relative'>
-                        <Image src="/assets/logo-big.webp" className='w-full h-full' width={300} height={200} alt="Founder" />
+                        <Image src="/assets/logo-big.webp" className='w-full' width={300} height={200} alt="Founder" style={{ height: 'auto' }} />
                             <div className='w-30 h-30  rounded-full border absolute -bottom-16 left-5 border-gray-300 bg-gray-50'>
                                 <Image src="/assets/founder.jpg" className='w-30 h-30 rounded-full' width={200} height={200} alt="Founder" />
                             </div>

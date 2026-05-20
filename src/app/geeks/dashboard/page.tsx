@@ -1,4 +1,4 @@
-// GeekDashboard.tsx
+﻿// GeekDashboard.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -487,7 +487,6 @@ const Dashboard = () => {
     }
   }, [geekState?.isRateCardDeleted, geekState?.isSuccess]);
 
-  const azureLoader = ({ src }: { src: string }) => src;
 
   // ── Display helpers ───────────────────────────────────────────────────────────
   const getSecondarySkillsWithBrands = (secondarySkills: Category[] = [], brandsServiced: Brand[] = []) =>
@@ -532,7 +531,6 @@ const Dashboard = () => {
             <div className="p-5 flex flex-col sm:flex-row gap-4">
               <ProfileImage
                 imageUrl={geek?.profileImage?.url}
-                azureLoader={azureLoader}
                 setOpenImageUpload={setOpenImageUpload}
                 contained
               />

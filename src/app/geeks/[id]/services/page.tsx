@@ -190,7 +190,7 @@ const ServiceCreateForm = () => {
                                     <div className='flex items-center gap-3'>
                                         
                                         <div className='w-9 h-9 border flex gap-2 relative border-black rounded-full'>
-                                            <Image objectFit='cover' className='rounded-full' src={"/assets/images/jobs/laptop-repair.webp"} alt="user Image" layout='fill'  />           
+                                            <Image className='rounded-full object-cover' src={"/assets/images/jobs/laptop-repair.webp"} alt="user Image" fill sizes="36px" />
                                         </div>
                                         <Image src={"/assets/icons/star.svg"} alt="Star" width={20} height={20} />
                                         {service?.totalRating} reviews

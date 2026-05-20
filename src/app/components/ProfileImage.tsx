@@ -1,16 +1,14 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import Image from "next/image";
 
 interface ProfileImageProps {
   imageUrl?: string;
-  azureLoader: ({ src }: { src: string }) => string;
   setOpenImageUpload: (val: boolean) => void;
   contained?: boolean;
 }
 
 const ProfileImage: React.FC<ProfileImageProps> = ({
   imageUrl,
-  azureLoader,
   setOpenImageUpload,
   contained = false,
 }) => {
@@ -25,7 +23,7 @@ const ProfileImage: React.FC<ProfileImageProps> = ({
       {/* Profile Image with Hover Options */}
       <div className={containerClass}>
         <Image
-          loader={azureLoader}
+         
           width={500}
           height={500}
           className="object-cover w-full h-full"
@@ -62,7 +60,7 @@ const ProfileImage: React.FC<ProfileImageProps> = ({
             </button>
             <Image
              
-              loader={azureLoader}
+             
               width={800}
               height={800}
               src={imageUrl || "/assets/profile.jpg"}

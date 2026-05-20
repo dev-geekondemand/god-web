@@ -95,7 +95,7 @@ const Navbar = () => {
 
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
-            <Image src="/assets/logo-big.webp" width={140} height={18} alt="Geek on Demand" />
+            <Image src="/assets/logo-big.webp" width={140} height={57} alt="Geek on Demand" priority style={{ width: '140px', height: '57px' }} />
           </Link>
 
           {/* Center: navlinks (desktop) */}
@@ -241,7 +241,7 @@ const Navbar = () => {
       >
         <div className="p-4 flex justify-between items-center border-b">
           <Link href="/" onClick={() => setSidebarOpen(false)}>
-            <Image src="/assets/logo-big.webp" width={110} height={16} alt="Logo" />
+            <Image src="/assets/logo-big.webp" width={110} height={45} alt="Logo" style={{ width: '110px', height: '45px' }} />
           </Link>
           <button
             onClick={() => setSidebarOpen(false)}

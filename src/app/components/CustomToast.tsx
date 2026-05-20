@@ -21,7 +21,7 @@ const CustomToast: React.FC<CustomToastProps> = ({ t, title, message, avatar }) 
           {avatar && (
             <div className="flex-shrink-0 pt-0.5">
               <Image
-                className="h-10 w-20 rounded-full"
+                className="h-10 w-10 rounded-full object-contain"
                 src={avatar}
                 alt="avatar"
                 width={40}

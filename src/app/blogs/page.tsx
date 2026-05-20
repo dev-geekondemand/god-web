@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { getAllBlogs } from '@/features/blogs/blogSlice';
 import { useAppDispatch } from '@/lib/hooks';
@@ -27,7 +27,6 @@ const Blogs = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch]);
-    const azureLoader = ({ src }: { src: string }) => src;
 
     const totalPages = Math.ceil((blogs?.length || 0) / PAGE_SIZE);
     const paginatedBlogs = blogs?.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -56,13 +55,13 @@ const Blogs = () => {
                 <Link href={`/blogs/${blog?.slug}`} key={index} className='bg-white border-none p-0 shadow rounded-md'>
                     <div className="flex flex-col group gap-2 items-start justify-start h-fit">
                         <div className='w-full h-[240px] relative rounded-t-md overflow-hidden'>
-                        <Image loader={azureLoader} objectFit="cover" src={blog?.coverImage?.url} alt='Blog Image' className='object-cover rounded-t-md group-hover:scale-110 transition transform duration-500' layout='fill' />
+                        <Image fill src={blog?.coverImage?.url} alt='Blog Image' className='object-cover rounded-t-md group-hover:scale-110 transition transform duration-500' sizes="(max-width: 768px) 100vw, 400px" />
                         </div>
                        <div className='px-5 py-4 flex flex-col gap-3 h-full w-full justify-end'>
 
                                 <div className='flex gap-2 text-gray-600 text-sm items-center'>
                                     <div className='w-7 relative h-7 rounded-full'>
-                                        <Image src="/assets/logo-big.webp" className='rounded-full object-contain' layout='fill' alt='Blog Author Image' />
+                                        <Image src="/assets/logo-big.webp" className='rounded-full object-contain' fill alt='Blog Author Image' sizes="28px" />
                                     </div>
                                     <p className=" ">{blog?.author}</p>
                                     <span>{new Date(blog?.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>

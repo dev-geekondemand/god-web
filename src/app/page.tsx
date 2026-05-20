@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import Image from 'next/image.js';
 import Categories from './components/Categories.tsx';
@@ -43,7 +43,6 @@ export default function Home() {
   },[])
 
   const brands = useSelector((state: any) => state.brand?.brands);
-  const azureloader = ({src}:{src:string})=>{return src}
 
   return (
     <>
@@ -134,7 +133,7 @@ export default function Home() {
               <div className='flex gap-16 p-6'>
                 {brands?.map((brand: Brand) => (
                   <Image
-                    loader={azureloader}
+                   
                     key={brand?._id}
                     width={100}
                     height={80}

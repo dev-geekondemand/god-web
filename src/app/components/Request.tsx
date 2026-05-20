@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { ServiceRequest } from "@/interfaces/ServiceRequest";
 import React, { useEffect } from "react";
@@ -55,7 +55,6 @@ const Request: React.FC<RequestProps> = ({ requests, onAccept, onReject }) => {
   const [filter, setFilter] = React.useState<string>("All");
   const [page, setPage] = React.useState(1);
 
-  const azureLoader = ({ src }: { src: string }) => src;
   const curGeek = useSelector((state: RootState) => state.geek.geek) as Geek;
 
   useEffect(() => {
@@ -65,8 +64,11 @@ const Request: React.FC<RequestProps> = ({ requests, onAccept, onReject }) => {
   const isExpired = (req: ServiceRequest) =>
     Date.now() - new Date(req.createdAt).getTime() > 24 * 60 * 60 * 1000;
 
+  const isAcceptedOrCompleted = (req: ServiceRequest) =>
+    req.geekResponseStatus === "Accepted" || req.status === "Completed";
+
   const handleClick = (req: ServiceRequest) => {
-    if (req?._id && req?.geekResponseStatus === "Accepted") {
+    if (req?._id && isAcceptedOrCompleted(req)) {
       router.push(`/geeks/${curGeek?._id}/requests/${req._id}`);
     } else {
       toast.error("Only Accepted requests can be viewed.");
@@ -74,13 +76,19 @@ const Request: React.FC<RequestProps> = ({ requests, onAccept, onReject }) => {
   };
 
   const displayStatus = (req: ServiceRequest) => {
+    if (req.status === "Completed") return "Completed";
     if (req.geekResponseStatus === "Accepted") return "Accepted";
     if (req.geekResponseStatus === "Expired" || (isExpired(req) && req.geekResponseStatus === "Pending")) return "Expired";
     return req.geekResponseStatus || req.status;
   };
 
-  const tabs = ["All", "Pending", "Accepted", "Rejected"];
-  const filtered = filter === "All" ? requests : requests.filter((r) => r.geekResponseStatus === filter);
+  const tabs = ["All", "Pending", "Accepted", "Rejected", "Completed", "Expired"];
+  const filtered =
+    filter === "All"
+      ? requests
+      : filter === "Completed"
+      ? requests.filter((r) => r.status === "Completed")
+      : requests.filter((r) => r.geekResponseStatus === filter);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
   const paginated = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
@@ -144,7 +152,7 @@ const Request: React.FC<RequestProps> = ({ requests, onAccept, onReject }) => {
                 {/* Image */}
                 <div onClick={() => handleClick(req)} className="flex-shrink-0 cursor-pointer">
                   <Image
-                    loader={azureLoader}
+                   
                     width={100}
                     height={100}
                     className="w-20 h-20 object-cover rounded-lg"
@@ -168,7 +176,7 @@ const Request: React.FC<RequestProps> = ({ requests, onAccept, onReject }) => {
                   </div>
 
                   <div className="mt-2 max-w-full overflow-hidden">
-                    {req.geekResponseStatus === "Accepted" ? (
+                    {isAcceptedOrCompleted(req) ? (
                       <HoverCardComponent
                         linkText={"From: " + req.seeker?.fullName?.first + " " + (req.seeker?.fullName?.last ?? "")}
                         avatarImg={req.seeker?.profileImage || "/assets/images/placeholder_user.jpg"}
@@ -246,7 +254,7 @@ const Request: React.FC<RequestProps> = ({ requests, onAccept, onReject }) => {
                         Reject
                       </button>
                     </div>
-                  ) : req.geekResponseStatus === "Accepted" ? (
+                  ) : isAcceptedOrCompleted(req) ? (
                     <button
                       onClick={() => handleClick(req)}
                       className="flex items-center gap-1.5 bg-teal-500 hover:bg-teal-600 text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition-colors"

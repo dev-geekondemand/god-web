@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
@@ -26,7 +26,6 @@ const Categories = () => {
   const isCatLoading = useSelector((state:RootState) => state.category?.isPending);
   
   // Limit to the first 12 categories
-  const azureLoader = ({ src }:{src:string}) => src;
 
   useEffect(()=>{
     if (typeof window === "undefined") return;
@@ -62,7 +61,7 @@ const Categories = () => {
             {displayCategories?.map((c) => (
                 <div  className="border border-white bg-white group relative shadow-sm hover:border min-h-[160px] hover:border-teal-500 transition transform duration-200 cursor-pointer rounded-lg flex py-2 px-4" key={c._id}>
                     <div className="flex flex-col items-center w-full">
-                        <Image className='mb-4 mt-3' src={c.smallBanner?.url} alt='Category Image' width={50} height={50} loader={azureLoader} />
+                        <Image className='mb-4 mt-3' src={c.smallBanner?.url} alt='Category Image' width={50} height={50} />
                         {/* <Image src={c.Banner} alt='Category Banner' width={60} height={40} /> */}
                         <p className='text-xs text-center font-bold text-gray-800'>{c.title}</p>
                        

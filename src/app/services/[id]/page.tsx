@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent } from "@/components/ui/card"
@@ -57,7 +57,6 @@ const Service = () => {
 
     const service = useSelector((state: RootState) => state.service?.service) as Service;
 
-    const azureLoader = ({ src }:{src:string}) => src;
     
 
   return (
@@ -101,11 +100,12 @@ const Service = () => {
                             <Card className='py-0 px-0'>
                                 <CardContent className="flex h-[380px] w-full relative items-center justify-center ">
                                 <Image
-                                    loader={azureLoader}
-                                    className="h-fit rounded-lg"
+                                   
+                                    className="h-fit rounded-lg object-cover"
                                     src={img?.url ? img?.url : "/assets/images/blogImg.jpg"}
                                     alt="Image 1"
-                                    layout='fill'
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, 600px"
                                 />
                                 </CardContent>
                             </Card>
@@ -115,11 +115,12 @@ const Service = () => {
                             <Card className='py-0 px-0'>
                                 <CardContent className="flex h-[380px]  relative items-center justify-center ">
                                 <Image
-                                    loader={azureLoader}
+                                   
                                     className="h-fit rounded-lg object-cover"
                                     src={service?.category?.image?.url ? service?.category?.image?.url : "/assets/images/blogImg.jpg"}
                                     alt="Image 1"
-                                    layout='fill'
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, 600px"
                                 />
                                 </CardContent>
                             </Card>
@@ -143,11 +144,12 @@ const Service = () => {
                             <Card className='py-0 px-0'>
                                 <CardContent className="flex h-[110px] relative items-center justify-center ">
                                 <Image
-                                    loader={azureLoader}
-                                    className="h-fit rounded-lg"
+                                   
+                                    className="h-fit rounded-lg object-cover"
                                     src={img.url ? img.url : "/assets/images/blogImg.jpg"}
                                     alt="Image 1"
-                                    layout='fill'
+                                    fill
+                                    sizes="(max-width: 768px) 50vw, 200px"
                                 />
                                 </CardContent>
                             </Card>
@@ -248,7 +250,7 @@ const Service = () => {
                                     {service?.images?.map((img, i) => (
                                         i < 6 && (
                                             <div className="relative h-20 col-span-2 sm:col-span-1 rounded-md" key={img?.public_id}>
-                                            <Image loader={azureLoader} className="rounded-md" src={img?.url as string} layout="fill" alt="Gallary Image" />
+                                            <Image className="rounded-md object-cover" src={img?.url as string} fill alt="Gallary Image" sizes="(max-width: 640px) 33vw, 100px" />
                                             </div>
                                         )
                                         ))}
@@ -364,11 +366,11 @@ const Service = () => {
                     <div className='w-full flex flex-col gap-1 p-3 justify-center items-center bg-gray-200/60 rounded-lg h-36'>
                         <div className='w-14 h-14 overflow-hidden rounded-full relative'>
                             <Image
-                                loader={azureLoader}
-                                layout="fill"
-                                objectFit="cover"
-                                className='object-cover w-full rounded-t-md hover:scale-110 transition transform duration-500' 
-                                src={service?.createdBy?.profileImage?.url ? service?.createdBy?.profileImage?.url : "/assets/images/person.png"} alt='Category Image' />
+                               
+                                fill
+                                className='object-cover w-full rounded-t-md hover:scale-110 transition transform duration-500'
+                                src={service?.createdBy?.profileImage?.url ? service?.createdBy?.profileImage?.url : "/assets/images/person.png"} alt='Category Image'
+                                sizes="56px" />
                             
                         </div> 
                        <div className='flex flex-col items-center justify-center w-full'>

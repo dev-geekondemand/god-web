@@ -1,4 +1,4 @@
-// import TimeDisplay from '../TimeFormat';
+﻿// import TimeDisplay from '../TimeFormat';
 'use client';
 
 import { ChatMessageInterface } from '@/interfaces/Chat';
@@ -31,7 +31,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message,profileImage, isExpan
 	const timeColor = isUser ? 'text-white' : 'text-gray-800';
 	const corner = isUser ? 'rounded-tr-none' : 'rounded-tl-none';
 
-	const azureLoader = ({ src }:{src:string}) => src;
 
 	return (
 		<div className={` flex ${alignment} items-start`}>
@@ -53,7 +52,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message,profileImage, isExpan
 				<div
 					className={`${isExpanded ? 'w-10 h-10' : 'w-7 h-7'} my-2 rounded-full ${bgColor} flex items-center justify-center font-bold ${textColor}`}>
 					<Image
-					loader={azureLoader}
+
 					width={isExpanded ? 20 : 10}
 					height={isExpanded ? 20 : 10}
 					src={profileImage ? profileImage : "/assets/images/placeholder_user.jpg"}

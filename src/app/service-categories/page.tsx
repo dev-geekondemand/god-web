@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { getCategories } from '@/features/category/categorySlice'
 import { Category } from '@/interfaces/Category'
@@ -23,7 +23,6 @@ const Categories = () => {
     const categories = useSelector((state: RootState) => state.category?.categories) as Category[];
     const isLoading = useSelector((state:RootState) => state.category?.isPending);
     
-    const azureLoader = ({ src }:{src:string}) => src;
 
   return (
     <section className='w-full flex flex-col justify-center items-center'>
@@ -39,7 +38,7 @@ const Categories = () => {
                         <div className="flex flex-col  rounded-t-md w-full items-start overflow-hidden">
                                 <div className=' rounded-t-md relative overflow-hidden max-h-[500px] w-full'>
                                     <Image
-                                    loader={azureLoader}
+                                   
                                      width={340}
                                      height={180}
                                      className='object-cover flex items-center justify-center w-full rounded-t-md hover:scale-110 transition transform duration-500' src={c.image?.url} alt='Category Image' />
@@ -48,7 +47,7 @@ const Categories = () => {
                             <div className='w-full flex gap-2 justify-between items-center px-5 py-5'>
                                 <div className='w-full flex items-center gap-4'>
                                 <div className='bg-purple-200 rounded-full p-2'>
-                                {c.smallBanner &&<Image loader={azureLoader} src={c.smallBanner?.url} alt='Category Banner' width={30} height={30} />}
+                                {c.smallBanner &&<Image src={c.smallBanner?.url} alt='Category Banner' width={30} height={30} />}
                                 </div>
                                 <p className='text-sm text-start font-semibold text-gray-800'>{c.title?.length > 25 ? `${c.title?.slice(0, 25)}...` : c.title }</p>
                                 </div>

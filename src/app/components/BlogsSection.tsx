@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import { Card, CardContent } from "@/components/ui/card"
 import {
   Carousel,
@@ -31,7 +31,6 @@ const BlogsSection = () => {
 
 
     const blogs = useSelector((state: RootState) => state.blog?.blogs) as Blog[];
-    const azureLoader = ({ src }:{src:string}) => src;
     const isLoading = useSelector((state:RootState) => state.blog?.isLoading);
 
   return (
@@ -63,11 +62,12 @@ const BlogsSection = () => {
                           <CardContent className="flex flex-col group gap-0 p-0 items-start justify-start h-full">
                             <div className='w-full h-[180px] relative overflow-hidden'>
                               <Image
-                                loader={azureLoader}
+                               
                                 src={blog?.coverImage?.url || "/assets/images/blog.png"}
                                 alt='Blog Image'
                                 className='object-cover group-hover:scale-105 transition-transform duration-500'
                                 fill
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                               />
                             </div>
 

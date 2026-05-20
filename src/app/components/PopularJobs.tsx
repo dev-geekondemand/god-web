@@ -65,9 +65,8 @@ const PopularJobs = () => {
                         <Link href={`/services/${job.GUID}`} className="flex flex-col rounded-t-md w-full items-start overflow-hidden">
                                 <div className='w-[400px] h-[250px] rounded-t-md relative overflow-hidden'>
                                     <Image
-                                     layout="fill"
-                                     objectFit="cover"
-                                     className='object-cover w-full rounded-t-md hover:scale-110 transition transform duration-500' src={"/assets/images/jobs/laptop-repair.webp"} alt='Category Image' />
+                                     fill
+                                     className='object-cover w-full rounded-t-md hover:scale-110 transition transform duration-500' src={"/assets/images/jobs/laptop-repair.webp"} alt='Category Image' sizes="400px" />
                                     
                                 </div>                            
                                 {/* <Image src={c.Banner} alt='Category Banner' width={60} height={40} /> */}

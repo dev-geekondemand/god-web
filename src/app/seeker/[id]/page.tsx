@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -23,7 +23,6 @@ const UserProfile = () => {
   const [uploading, setUploading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  const azureLoader = ({ src }: { src: string }) => src;
 
   const handleImageChange = async (file: File) => {
     if (!file || !user) {
@@ -129,7 +128,7 @@ const UserProfile = () => {
             <label htmlFor="profileImage" className="cursor-pointer block">
               <div className="w-24 h-24 rounded-full overflow-hidden ring-4 ring-gray-100">
                 <Image
-                  loader={azureLoader}
+                 
                   src={imagePreview || user?.profileImage || "/assets/images/placeholder_user.jpg"}
                   alt="Profile"
                   width={96}

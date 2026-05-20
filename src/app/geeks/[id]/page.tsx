@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { getGeekById } from '@/features/geek/geekSlice'
 import { useAppDispatch } from '@/lib/hooks'
@@ -13,7 +13,7 @@ import Geek from '@/interfaces/Geek'
 import { Category } from '@/interfaces/Category'
 import { createRequest, getSeekerRequests } from '@/features/request/requestSlice'
 import User from '@/interfaces/Seeker'
-import DialogComponent from '@/app/components/Dialog'
+import DialogComponent, { SelectedSlot } from '@/app/components/Dialog'
 import { ServiceRequest } from '@/interfaces/ServiceRequest'
 import Brand from '@/interfaces/Brand'
 import { getBrands } from '@/features/brands/brandsSlice'
@@ -47,10 +47,10 @@ const GeekById = () => {
   const [isRequestedService, setIsRequestedService] = useState(false)
   const [primarySkillBrands, setPrimarySkillBrands] = useState<Brand[]>([])
   const [secondarySkillsWithBrands, setSecondarySkillsWithBrands] = useState<SkillWithBrands[]>([])
+  const [selectedSlot, setSelectedSlot] = useState<SelectedSlot | undefined>()
   const [overView, setOverview] = useState(true)
   const [expertise, setExpertise] = useState(true)
 
-  const azureLoader = ({ src }: { src: string }) => src
 
   useEffect(() => {
     if (id) {
@@ -87,7 +87,27 @@ const GeekById = () => {
     if (!geek?._id) { toast.error('Geek not found'); return }
     if (loggedInGeek?._id === geek._id) { toast.error('You cannot book your own service'); return }
     if (!loggedInSeeker?._id) { toast.error('You are not logged in as a Seeker.'); return }
+    setSelectedSlot(undefined)
     setShowDialog(true)
+  }
+
+  const getNextDateForDay = (dayName: string, timeFrom: string): string => {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    const targetDay = days.indexOf(dayName)
+    const now = new Date()
+    let daysUntil = targetDay - now.getDay()
+    if (daysUntil < 0) daysUntil += 7
+    if (daysUntil === 0) {
+      const [h, m] = timeFrom.split(':').map(Number)
+      const t = new Date(now)
+      t.setHours(h, m, 0, 0)
+      if (t <= now) daysUntil = 7
+    }
+    const next = new Date(now)
+    next.setDate(now.getDate() + daysUntil)
+    const [h, m] = timeFrom.split(':').map(Number)
+    next.setHours(h, m, 0, 0)
+    return next.toISOString()
   }
 
   const handleBookService = async () => {
@@ -95,14 +115,17 @@ const GeekById = () => {
     if (!finalCategoryId) { toast.error('Please select a category.'); return }
     if (!selectedMode) { toast.error('Please select a mode of service.'); return }
     if (selectedMode === 'Offline' && !isSeekerAddress) { toast.error('Please add your address first.'); return }
+    const hasAvailability = (geek?.availability?.slots?.length ?? 0) > 0
+    if (hasAvailability && !selectedSlot) { toast.error('Please select a preferred time slot.'); return }
     if (requestState?.requests?.length > 0) {
       const alreadyExists = seekerRequests?.some(r =>
         r?.category?._id === finalCategoryId && r?.geek?._id === geek?._id && r?.geekResponseStatus === 'Pending'
       )
       if (alreadyExists) { toast.error('You already have a pending request for this category.'); return }
     }
+    const scheduledAt = selectedSlot ? getNextDateForDay(selectedSlot.day, selectedSlot.timeSlot.from) : undefined
     setIsLoading(true)
-    await dispatch(createRequest({ geek: geek._id, category: finalCategoryId, issue: '', mode: selectedMode, location: { city: '', state: '', line1: '' } }))
+    await dispatch(createRequest({ geek: geek._id, category: finalCategoryId, issue: '', mode: selectedMode, location: { city: '', state: '', line1: '' }, scheduledAt }))
     dispatch(getSeekerRequests())
     setIsLoading(false)
     setShowDialog(false)
@@ -174,7 +197,7 @@ const GeekById = () => {
             <div className="relative shrink-0">
               <div className={`w-24 h-24 sm:w-32 sm:h-32 rounded-2xl overflow-hidden border-2 ${isCorporate ? 'border-indigo-200' : 'border-teal-200'} shadow`}>
                 <Image
-                  loader={azureLoader}
+                 
                   src={geek?.profileImage?.url || '/assets/images/placeholder_user.jpg'}
                   alt={geek?.fullName?.first || 'Geek'}
                   width={128}
@@ -539,13 +562,13 @@ const GeekById = () => {
                           : 'border-gray-200 hover:border-gray-300 bg-white'
                       }`}
                     >
-                      <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-200 shrink-0 relative">
+                      <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-200 shrink-0">
                         <Image
-                          loader={azureLoader}
                           src={skill?.image?.url || '/assets/images/placeholder_user.jpg'}
                           alt={skill.title}
-                          fill
-                          className="object-cover"
+                          width={32}
+                          height={32}
+                          className="w-full h-full object-cover"
                         />
                       </div>
                       <span className="text-sm font-medium text-gray-800">{skill.title}</span>
@@ -586,6 +609,9 @@ const GeekById = () => {
           selectedSkill={selectedSkill}
           setSelectedSkill={setSelectedSkill}
           isLoading={isLoading}
+          availability={geek?.availability}
+          selectedSlot={selectedSlot}
+          setSelectedSlot={setSelectedSlot}
         />
       )}
     </section>

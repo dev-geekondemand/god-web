@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import GlobalSkeleton from '@/app/components/Sekeletn'
 import {  getBrandsByCategory } from '@/features/brands/brandsSlice'
@@ -32,7 +32,6 @@ const Brands = () => {
     const isLoading = useSelector((state: RootState) => state.brand?.isLoading);
     const brands = brandState?.brands as Brand[];
     const category = brandState.category
-    const azureLoader = ({ src }:{src:string}) => src;
     
     
 
@@ -50,7 +49,7 @@ const Brands = () => {
                         <div className="flex flex-col  rounded-t-md w-full h-full items-center justify-center">
                                 <div className='rounded-t-md relative w-full '>
                                     <Image
-                                     loader={azureLoader}
+                                    
                                      width={150}
                                      height={100}
                                      className='object-cover w-full rounded-t-md hover:scale-110 transition transform duration-500' src={c.image?.url || "/assets/images/placeholder.webp"} alt='Brand Image' />

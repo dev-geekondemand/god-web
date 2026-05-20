@@ -174,10 +174,10 @@ const Footer = () => {
                         <h6 className="text-sm font-bold">Download our App:</h6>
                         <div className='flex gap-3 lg:flex-row flex-col'>
                           <Link href={"https://tinyurl.com/GEEKDM/"} target='_blank' className='me-2'>
-                        <Image src={"/assets/images/goolge-play.svg"} width={120} height={50} alt='google play' />
+                        <Image src={"/assets/images/goolge-play.svg"} width={120} height={34} alt='google play' style={{ width: '120px', height: '34px' }} />
                         </Link>
                         <Link href={"https://tinyurl.com/GEEKND/"}>
-                        <Image src={"/assets/images/app-store.svg"} width={120} height={50} alt='app store' />
+                        <Image src={"/assets/images/app-store.svg"} width={120} height={34} alt='app store' style={{ width: '120px', height: '34px' }} />
                         </Link>
                         </div>
                     </div>
@@ -189,11 +189,12 @@ const Footer = () => {
                 {socialLinks.map((link, index) => (
                     <li key={index}>
                     <a href={link.url} className='' target="_blank" rel="noopener noreferrer">
-                        <Image 
-                        src={link.icon} 
-                        alt={`${link.platform} icon`} 
-                        width={24} 
-                        height={24} 
+                        <Image
+                        src={link.icon}
+                        alt={`${link.platform} icon`}
+                        width={24}
+                        height={24}
+                        style={{ width: '24px', height: '24px' }}
                         className="hover:rotate-y-360 transition transform duration-500"
                         />
                     </a>

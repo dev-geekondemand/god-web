@@ -4,10 +4,11 @@ import api from "@/utils/api";
 
 export interface Request{
     category: string;
-    geek: string;    
+    geek: string;
     issue: string;
     mode: string;
     location:Address;
+    scheduledAt?: string;
 }
 
 
@@ -62,7 +63,7 @@ const autoRejectRequest = async (id: string) => {
 };
 
 const addSeekerReview = async (id: string, data: Partial<Review>) => {
-    const response = await api.put(`request/${id}/add-seeker-review`, {data}, {
+    const response = await api.put(`request/${id}/add-seeker-review`, data, {
         withCredentials: true
     });
     return response.data;

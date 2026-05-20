@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useAppDispatch } from '@/lib/hooks';
@@ -127,7 +127,6 @@ const router= useRouter();
       }, 1000);
     }
   };
-const azureLoader = ({ src }:{src:string}) => src;
 
 
 const geeks = geekState?.geeks as Geek[];
@@ -222,7 +221,7 @@ const geeks = geekState?.geeks as Geek[];
                           >
                             <div className='relative w-full'>
                               <Image
-                                loader={azureLoader}
+                               
                                 src={geek.profileImage?.url || "/assets/images/placeholder_user.jpg"}
                                 alt={geek.fullName?.first || "Geek"}
                                 width={500}
@@ -264,7 +263,7 @@ const geeks = geekState?.geeks as Geek[];
                       <div className='w-full col-start-2 max-w-6xl mx-auto h-full flex flex-col items-center justify-center'>
                                               <div className="flex flex-col items-center justify-center p-4 text-center w-full">
                                                 <Image
-                                                  loader={azureLoader}
+                                                 
                                                   src="/assets/images/coming-soon.jpg"
                                                   alt="No Geeks Found"
                                                   width={500}

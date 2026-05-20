@@ -43,7 +43,6 @@ const PLANS = [
     highlight: false,
     features: [
       { label: "Basic public listing", yes: true },
-      { label: "Built-in messaging", yes: true },
       { label: "Social media & website links", yes: false },
       { label: "Featured on homepage", yes: false },
       { label: "Top placement in categories", yes: false },
@@ -64,7 +63,6 @@ const PLANS = [
     badge: "Popular",
     features: [
       { label: "Basic public listing", yes: true },
-      { label: "Built-in messaging", yes: true },
       { label: "Social media & website links", yes: true },
       { label: "Featured on homepage", yes: true },
       { label: "Top placement in categories", yes: true },
@@ -85,7 +83,6 @@ const PLANS = [
     badge: "Best Value",
     features: [
       { label: "Basic public listing", yes: true },
-      { label: "Built-in messaging", yes: true },
       { label: "Social media & website links", yes: true },
       { label: "Featured on homepage", yes: true },
       { label: "Top placement in categories", yes: true },

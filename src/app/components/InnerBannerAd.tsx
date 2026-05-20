@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -27,7 +27,6 @@ interface Props {
 
 type SizeKey = keyof typeof AD_SIZES;
 
-const azLoader = ({ src }: { src: string }) => src;
 
 function matchesSize(ad: Ad, sizeKey: SizeKey) {
   const { width, height } = AD_SIZES[sizeKey];
@@ -44,14 +43,14 @@ function AdSlot({ ad, sizeKey, className, stretch }: { ad: Ad; sizeKey: SizeKey;
 
   const banner = stretch ? (
     <div className={`relative w-full h-full overflow-hidden bg-gray-100 ${className}`}>
-      <Image loader={azLoader} src={imgUrl} alt="Advertisement" fill className="object-cover" />
+      <Image src={imgUrl} alt="Advertisement" fill className="object-cover" sizes="100vw" />
     </div>
   ) : (
     <div
       className={`relative w-full overflow-hidden bg-gray-100 ${className}`}
       style={{ aspectRatio: `${w}/${h}` }}
     >
-      <Image loader={azLoader} src={imgUrl} alt="Advertisement" width={w} height={h} className="object-cover w-full h-full" />
+      <Image src={imgUrl} alt="Advertisement" width={w} height={h} className="object-cover w-full h-full" />
     </div>
   );
 

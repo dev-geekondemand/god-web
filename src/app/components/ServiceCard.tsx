@@ -1,11 +1,10 @@
-import { Service } from '@/interfaces/Service';
+﻿import { Service } from '@/interfaces/Service';
 import Image from 'next/image'
 import Link from 'next/link'
 
 const ServiceCard = (props: { col: number; service: Service }) => {
     const {col,service} = props;
 
-     const azureLoader = ({ src }:{src:string}) => src;
     
   return (
     <div className={`${col===4 ?  "col-span-4 rounded-b-xl pb-4" : "col-span-12 rounded-md p-4"}  relative grid grid-cols-6 w-full  border border-gray-200 bg-white  `} >
@@ -17,7 +16,7 @@ const ServiceCard = (props: { col: number; service: Service }) => {
            
             <Image 
             
-            loader={azureLoader}
+           
             width={col===4 ? 320 : 220} 
             height={140} 
             className={`${col===4 ? "" : "rounded-lg"}`}  
@@ -31,7 +30,7 @@ const ServiceCard = (props: { col: number; service: Service }) => {
                 <div className='flex items-center gap-3'>
                     
                     <div className='w-9 h-9 border flex gap-2 relative border-black rounded-full'>
-                        <Image objectFit='cover' className='rounded-full' src={"/assets/images/jobs/laptop-repair.webp"} alt="user Image" layout='fill'  />           
+                        <Image className='rounded-full object-cover' src={"/assets/images/jobs/laptop-repair.webp"} alt="user Image" fill sizes="36px" />
                     </div>
                     <Image src={"/assets/icons/star.svg"} alt="Star" width={20} height={20} />
                     {service?.totalRating} reviews

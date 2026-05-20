@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useRef, useState } from "react";
 import Image from "next/image";
@@ -31,7 +31,6 @@ const ProfileImageUpload: React.FC<Props> = ({ imageUrl, geekId }) => {
     }
   };
 
-  const azureLoader = ({ src }: { src: string }) => src;
 
   return (
     <div className="p-6 flex flex-col items-center gap-5">
@@ -45,7 +44,7 @@ const ProfileImageUpload: React.FC<Props> = ({ imageUrl, geekId }) => {
         onClick={() => fileInputRef.current?.click()}
       >
         <Image
-          loader={azureLoader}
+         
           src={preview || imageUrl || "/assets/images/placeholder_user.jpg"}
           alt="Profile Picture"
           width={160}

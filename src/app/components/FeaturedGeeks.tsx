@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import React, { useEffect } from 'react'
 import Image from 'next/image';
 import Link from 'next/link';
@@ -51,7 +51,6 @@ const FeaturedGeeks = () => {
         }
     };
 
-    const azureLoader = ({ src }: { src: string }) => src;
 
     return (
         <div className='max-w-7xl w-full mx-auto py-0'>
@@ -78,12 +77,12 @@ const FeaturedGeeks = () => {
                                         <div className="flex w-full items-center justify-start sm:px-5 py-3">
                                             <div className='w-[80px] h-[80px] overflow-hidden rounded-full relative shrink-0'>
                                                 <Image
-                                                    layout="fill"
-                                                    objectFit="cover"
-                                                    loader={azureLoader}
+                                                    fill
+                                                   
                                                     className='object-cover w-full rounded-t-md hover:scale-110 transition transform duration-500'
                                                     src={geek.profileImage?.url ? geek.profileImage.url : "/assets/images/placeholder_user.jpg"}
                                                     alt='Geek profile'
+                                                    sizes="80px"
                                                 />
                                             </div>
                                             <div className='flex flex-col gap-1.5 items-start justify-start p-3 min-w-0'>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useEffect, useState } from 'react';
 import CustomInput from '../components/CustonInput';
 import Image from 'next/image';
@@ -100,7 +100,8 @@ const Providers = () => {
 
   const handleClick=(geekId:string)=>{
     if(isAuthenticated || isGeekAuthenticated ){
-      router.push(`/geeks/${geekId}?categoryId=${selectedCategory?._id}`,{});
+      const query = selectedCategory?._id ? `?categoryId=${selectedCategory._id}` : '';
+      router.push(`/geeks/${geekId}${query}`, {});
     }else{
       toast.dismiss();
       toast.custom((t) => (
@@ -187,7 +188,6 @@ const Providers = () => {
   };
 
 
-const azureLoader = ({ src }:{src:string}) => src;
 
   
 
@@ -309,14 +309,14 @@ const azureLoader = ({ src }:{src:string}) => src;
                             key={index}
                             className='flex flex-col items-center bg-white gap-3 shadow rounded-lg p-4'
                           >
-                            <div className='relative w-full'>
+                            <div className='relative w-full aspect-[4/3] overflow-hidden rounded-md'>
                               <Image
-                                loader={azureLoader}
                                 src={geek.profileImage?.url || "/assets/images/placeholder_user.jpg"}
                                 alt={geek.fullName?.first || "Geek"}
-                                width={500}
-                                height={300}
-                                className='rounded-md w-full h-54 object-cover'
+                                fill
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                className='object-cover'
+                                priority={index === 0}
                               />
                               {(isCorporate || plan) && (
                                 <div className='absolute top-2 left-2 flex flex-wrap gap-1'>
@@ -362,7 +362,7 @@ const azureLoader = ({ src }:{src:string}) => src;
                       <div className='w-full col-start-2 max-w-6xl mx-auto h-full flex flex-col items-center justify-center'>
                         <div className="flex flex-col items-center justify-center p-4 text-center w-full">
                           <Image
-                            loader={azureLoader}
+                           
                             src="/assets/images/coming-soon.jpg"
                             alt="No Geeks Found"
                             width={500}

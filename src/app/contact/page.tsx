@@ -110,7 +110,8 @@ const Contact = () => {
           <Image
             src="/assets/images/contact.jpeg"
             alt="Contact Illustration"
-            layout='fill'
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
           />
         </div>
         {/* Form Section */}

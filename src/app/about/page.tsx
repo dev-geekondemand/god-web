@@ -124,7 +124,7 @@ const page = () => {
           </div>
 
             <div className='md:absolute relative w-[95%] h-[400px] md:w-[340px] md:h-[350px] xl:w-[470px] xl:h-[470px] top-7 xl:left-1/7 lg:left-1/4 md:left-1/7'>
-              <Image className='rounded-lg' src="/assets/images/about/about-01.png" layout='fill' alt="about us image" />
+              <Image className='rounded-lg' src="/assets/images/about/about-01.png" fill alt="about us image" sizes="(max-width: 768px) 95vw, 470px" />
             </div>
         </div>
 
@@ -440,9 +440,8 @@ market by building a dedicated, subscription based marketplace supported by Agen
               <div className="flex w-full items-center justify-start sm:px-5">
                       <div className='w-[60px] h-[60px] relative'>
                           <Image
-                            layout="fill"
-                            objectFit="cover"
-                            className='object-cover' src={"assets/images/about/expert-team-1.svg"} alt='Category Image' />
+                            fill
+                            className='object-cover' src={"assets/images/about/expert-team-1.svg"} alt='Category Image' sizes="60px" />
                           
                       </div>                            
                   <div className=' flex flex-col gap-2 items-start justify-center p-3'>
@@ -458,9 +457,8 @@ market by building a dedicated, subscription based marketplace supported by Agen
               <div className="flex w-full items-center justify-start sm:px-5">
                       <div className='w-[60px] h-[60px] relative'>
                           <Image
-                            layout="fill"
-                            objectFit="cover"
-                            className='object-cover' src={"/assets/images/about/about-documents-1.svg"} alt='Category Image' />
+                            fill
+                            className='object-cover' src={"/assets/images/about/about-documents-1.svg"} alt='Category Image' sizes="60px" />
                           
                       </div>                            
                   <div className=' flex flex-col gap-2 items-start justify-center p-3'>
@@ -476,9 +474,8 @@ market by building a dedicated, subscription based marketplace supported by Agen
               <div className="flex w-full items-center justify-start sm:px-5">
                       <div className='w-[60px] h-[60px] relative'>
                           <Image
-                            layout="fill"
-                            objectFit="cover"
-                            className='object-cover' src={"/assets/images/about/expereience.svg"} alt='Category Image' />
+                            fill
+                            className='object-cover' src={"/assets/images/about/expereience.svg"} alt='Category Image' sizes="60px" />
                           
                       </div>                            
                   <div className=' flex flex-col gap-2 items-start justify-center p-3'>

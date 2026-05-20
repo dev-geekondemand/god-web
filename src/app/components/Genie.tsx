@@ -43,6 +43,7 @@ const Genie = () => {
               width={100}
               height={100}
               alt="AI Genie"
+              style={{ height: 'auto' }}
             />
           </button>
 
