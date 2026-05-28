@@ -164,12 +164,23 @@ const Request: React.FC<RequestProps> = ({ requests, onAccept, onReject }) => {
                 {/* Info */}
                 <div className="flex-1 min-w-0 w-full overflow-hidden">
                   <div className="flex items-start justify-between gap-3 flex-wrap">
-                    <button
-                      onClick={() => handleClick(req)}
-                      className="text-base font-semibold text-gray-800 hover:text-teal-600 transition-colors text-left"
-                    >
-                      {req?.category?.title}
-                    </button>
+                    <div className="flex flex-col gap-0.5">
+                      <button
+                        onClick={() => handleClick(req)}
+                        className="text-base font-semibold text-gray-800 hover:text-teal-600 transition-colors text-left"
+                      >
+                        {req?.category?.title}
+                      </button>
+                      {req?.brand?.name && (
+                        <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                          <svg className="w-3 h-3 text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" />
+                            <line x1="7" y1="7" x2="7.01" y2="7" />
+                          </svg>
+                          {req.brand.name}
+                        </span>
+                      )}
+                    </div>
                     <span className={`text-xs font-medium px-2.5 py-1 rounded-full flex-shrink-0 ${statusBadge(status)}`}>
                       {status}
                     </span>

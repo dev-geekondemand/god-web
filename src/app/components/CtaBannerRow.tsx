@@ -15,7 +15,7 @@ const CtaBannerRow = () => {
           className="col-span-1 flex flex-col items-center gap-3 w-full h-full"
         >
           <Image
-            src="/assets/images/book_geek.png"
+            src="/assets/New-Img/book_geek.png"
             alt="Book a Geek"
             width={500}
             height={350}
@@ -26,13 +26,17 @@ const CtaBannerRow = () => {
           </button>
         </Link>
 
+        <div className="col-span-1  flex flex-col items-center gap-3 w-full h-full">
+          <InnerBannerAd placement="home" stretch={false} className="md:max-h-[76vh] object-contain" medium_rectangle />
+        </div>
+
         {/* Right CTA – Become a Geek */}
         <Link
           href="/register?type=geek"
           className="col-span-1 flex flex-col items-center gap-3 w-full h-full"
         >
           <Image
-            src="/assets/images/become_geek.png"
+            src="/assets/New-Img/become_geek.png"
             alt="Become a Geek"
             width={500}
             height={350}
@@ -43,9 +47,7 @@ const CtaBannerRow = () => {
           </button>
         </Link>
 
-        <div className="col-span-1  flex flex-col items-center gap-3 w-full h-full">
-          <InnerBannerAd placement="home" stretch={false} className="md:max-h-[76vh] object-contain" medium_rectangle />
-        </div>
+        
 
       </div>
     </section>

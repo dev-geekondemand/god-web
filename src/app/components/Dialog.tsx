@@ -13,6 +13,7 @@ import {
 import Link from 'next/link'
 import { Category } from '@/interfaces/Category'
 import Image from 'next/image'
+import Brand from '@/interfaces/Brand'
 
 type TimeSlot = { from: string; to: string }
 type AvailabilitySlotItem = { day: string; timeSlots: TimeSlot[] }
@@ -36,6 +37,9 @@ const DialogComponent = ({
    availability,
    selectedSlot,
    setSelectedSlot,
+   skillBrands,
+   selectedBrand,
+   setSelectedBrand,
   }: {
     seekerId: string,
     showDialog: boolean,
@@ -54,6 +58,9 @@ const DialogComponent = ({
     availability?: { slots: AvailabilitySlotItem[] },
     selectedSlot?: SelectedSlot,
     setSelectedSlot?: React.Dispatch<React.SetStateAction<SelectedSlot | undefined>>,
+    skillBrands?: Brand[],
+    selectedBrand?: Brand,
+    setSelectedBrand?: React.Dispatch<React.SetStateAction<Brand | undefined>>,
   }) => {
 
   const [open, setOpen] = useState(false)
@@ -73,8 +80,9 @@ const DialogComponent = ({
     if (selectedSlot?.day !== day) setSelectedSlot?.(undefined)
   }
 
+  const hasBrands = (skillBrands?.length ?? 0) > 0
   const hasAvailability = (availability?.slots?.length ?? 0) > 0
-  const canConfirm = !!selectedMode && (selectedMode !== 'Offline' || isSeekerAddress) && (!hasAvailability || !!selectedSlot);
+  const canConfirm = !!selectedMode && (selectedMode !== 'Offline' || isSeekerAddress) && (!hasAvailability || !!selectedSlot) && (!hasBrands || !!selectedBrand);
 
   return (
     <Dialog open={showDialog} onOpenChange={handleClose}>
@@ -109,6 +117,37 @@ const DialogComponent = ({
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {hasBrands && (
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold text-gray-700">
+                Brand <span className="text-red-400">*</span>
+              </label>
+              <div className="flex flex-col gap-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar">
+                {skillBrands!.map((brand) => (
+                  <div
+                    key={brand._id}
+                    onClick={() => setSelectedBrand?.(brand)}
+                    className={`flex items-center gap-3 px-3 py-2 text-sm rounded-md cursor-pointer border transition-colors ${
+                      selectedBrand?._id === brand._id
+                        ? 'border-teal-500 bg-teal-50 text-teal-700 font-medium'
+                        : 'border-gray-200 hover:border-teal-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    {brand?.image?.url && (
+                      <div className="w-7 h-7 relative flex-shrink-0">
+                        <Image src={brand.image.url} alt={brand.name} fill className="rounded-full object-cover" sizes="28px" />
+                      </div>
+                    )}
+                    {brand.name}
+                  </div>
+                ))}
+              </div>
+              {!selectedBrand && (
+                <p className="text-xs text-amber-600">Please select a brand to continue.</p>
+              )}
             </div>
           )}
 

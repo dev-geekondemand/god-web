@@ -393,6 +393,12 @@ const SingleRequestPage = () => {
                 <span className="text-gray-400 flex-shrink-0">Mode</span>
                 <span className="text-gray-800 font-medium">{request?.mode || '—'}</span>
               </div>
+              {request?.brand?.name && (
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-gray-400 flex-shrink-0">Brand</span>
+                  <span className="text-gray-800 font-medium text-right">{request.brand.name}</span>
+                </div>
+              )}
               <div className="flex items-start justify-between gap-3">
                 <span className="text-gray-400 flex-shrink-0">Booked On</span>
                 <span className="text-gray-800 text-right">{fmt(request?.createdAt) || '—'}</span>

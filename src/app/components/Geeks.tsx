@@ -62,10 +62,15 @@ const Providers = () => {
     maxRate: '',
     lat: '',
     lng: '',
+    name: '',
+    area: '',
+    availableDay: '',
+    availableFrom: '',
+    availableTo: '',
   });
   const [loading, setLoading] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFilters(prev => ({ ...prev, [name]: value }));
   };
@@ -182,6 +187,11 @@ const Providers = () => {
       maxRate: '',
       lat: userLat != null ? String(userLat) : '',
       lng: userLng != null ? String(userLng) : '',
+      name: '',
+      area: '',
+      availableDay: '',
+      availableFrom: '',
+      availableTo: '',
     });
     setSelectedCategory(null);
     setSelectedBrand(null);
@@ -198,93 +208,164 @@ const Providers = () => {
       
       <PageBanner title="Geeks" crumbs={[{ label: 'Geeks' }]} />
 
-      <div className="grid w-full py-20 grid-cols-12 gap-4 relative max-w-7xl mx-auto">
-        {/* Filters */}
-        <div className="lg:col-span-3 col-span-12 lg:sticky lg:top-20 p-2 self-start">
-          <div className='bg-white shadow rounded-lg p-4 gap-5 flex flex-col divide-y'>
-            <h3 className="text-xl font-bold pb-2">Filters</h3>
+      <div className="grid w-full py-10 grid-cols-12 gap-4 relative max-w-7xl mx-auto px-4">
+        {/* ── Filters sidebar ──────────────────────────────────────────── */}
+        <div className="lg:col-span-3 col-span-12 lg:sticky lg:top-22 self-start">
+          <div className='bg-white shadow-sm border border-gray-100 rounded-xl overflow-hidden'>
 
-            <div className='flex flex-col gap-3 pb-4'>
-              <p className="text-sm">Search by Skill</p>
-               <CustomSelect
-                    categories={categories}
-                    selectedCategory={selectedCategory}
-                    onChange={handleChange}
+            {/* Header */}
+            <div className='flex items-center justify-between px-4 py-3 border-b border-gray-100'>
+              <span className="text-sm font-semibold text-gray-800">Filters</span>
+              <button
+                onClick={resetFilters}
+                className="text-xs text-teal-600 hover:text-teal-700 font-medium"
+              >
+                Reset all
+              </button>
+            </div>
+
+            <div className='flex flex-col gap-0 divide-y divide-gray-50'>
+
+              {/* Skill */}
+              <div className='px-4 py-3'>
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Skill</p>
+                <CustomSelect
+                  categories={categories}
+                  selectedCategory={selectedCategory}
+                  onChange={handleChange}
                 />
-            </div>
+              </div>
 
-            <div className='flex flex-col gap-3 pb-4'>
-              <p className="text-sm">Search by Brand</p>
-                <div className="relative w-full mx-auto">
-                      {/* Custom Select Button */}
+              {/* Brand */}
+              <div className='px-4 py-3'>
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Brand</p>
+                <div className="relative w-full">
+                  <div
+                    onClick={toggleDropdown}
+                    className="bg-gray-50 border border-gray-200 text-sm text-gray-700 rounded-lg px-3 py-2 cursor-pointer flex justify-between items-center"
+                  >
+                    <span className={selectedBrand ? 'text-gray-800' : 'text-gray-400'}>
+                      {selectedBrand?.name || 'Any brand'}
+                    </span>
+                    <svg className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} viewBox="0 0 1024 1024" fill="currentColor">
+                      <path d="M903.232 256l56.768 50.432L512 768 64 306.432 120.768 256 512 659.072z" />
+                    </svg>
+                  </div>
+                  {isOpen && (
+                    <div className="absolute z-50 left-0 right-0 bg-white border border-gray-200 rounded-lg mt-1 max-h-44 overflow-y-auto shadow-md custom-scrollbar">
                       <div
-                        onClick={toggleDropdown}
-                        className="bg-white border text-sm text-gray-700 border-gray-300 rounded-md px-4 py-2 cursor-pointer"
+                        onClick={() => { setFilters(f => ({ ...f, brandId: '' })); setSelectedBrand(null); setIsOpen(false); }}
+                        className="px-3 py-2 text-sm cursor-pointer text-gray-400 hover:bg-gray-50"
                       >
-                        {selectedBrand?.name || 'Select Brand'}
+                        Any brand
                       </div>
-
-                      {/* Dropdown Options (Always open upwards) */}
-                      <div
-                        className={`absolute z-50 left-0 custom-scrollbar right-0 bg-white border border-b-0 border-gray-800 rounded-sm -scroll-m-8 mt-1 max-h-48 overflow-y-scroll ${isOpen ? 'block' : 'hidden'} bottom-full`}
-                      >
-                        {brands?.map((b, index) => (
-                          <div
-                            key={index}
-                            onClick={() => {
-                              setFilters({ ...filters, brandId: b._id });
-                              setSelectedBrand(b);
-                              setIsOpen(false);
-                            }}
-                            className="px-4 py-2 text-sm cursor-pointer hover:bg-teal-500"
-                          >
-                            {b?.name}
-                          </div>
-                        ))}
-                      </div>
+                      {brands?.map((b, i) => (
+                        <div
+                          key={i}
+                          onClick={() => { setFilters(f => ({ ...f, brandId: b._id })); setSelectedBrand(b); setIsOpen(false); }}
+                          className={`px-3 py-2 text-sm cursor-pointer hover:bg-teal-50 hover:text-teal-700 ${selectedBrand?._id === b._id ? 'bg-teal-50 text-teal-700 font-medium' : ''}`}
+                        >
+                          {b?.name}
+                        </div>
+                      ))}
                     </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Location — city + state in a 2-col grid */}
+              <div className='px-4 py-3'>
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Location</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    name='city'
+                    value={filters.city}
+                    onChange={handleInputChange}
+                    placeholder="City"
+                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
+                  />
+                  <input
+                    name='state'
+                    value={filters.state}
+                    onChange={handleInputChange}
+                    placeholder="State"
+                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
+                  />
+                </div>
+              </div>
+
+              {/* Name + Area — 2-col grid */}
+              <div className='px-4 py-3'>
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Search</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    name='name'
+                    value={filters.name}
+                    onChange={handleInputChange}
+                    placeholder="Name"
+                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
+                  />
+                  <input
+                    name='area'
+                    value={filters.area}
+                    onChange={handleInputChange}
+                    placeholder="Area"
+                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
+                  />
+                </div>
+              </div>
+
+              {/* Availability */}
+              <div className='px-4 py-3'>
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Availability</p>
+                <select
+                  name='availableDay'
+                  value={filters.availableDay}
+                  onChange={handleInputChange}
+                  className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
+                >
+                  <option value="">Any day</option>
+                  {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(day => (
+                    <option key={day} value={day}>{day}</option>
+                  ))}
+                </select>
+                {filters.availableDay && (
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    <div>
+                      <label className='text-xs text-gray-400 block mb-1'>From</label>
+                      <input
+                        type='time'
+                        name='availableFrom'
+                        value={filters.availableFrom}
+                        onChange={handleInputChange}
+                        className="border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
+                      />
+                    </div>
+                    <div>
+                      <label className='text-xs text-gray-400 block mb-1'>To</label>
+                      <input
+                        type='time'
+                        name='availableTo'
+                        value={filters.availableTo}
+                        onChange={handleInputChange}
+                        className="border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
             </div>
 
-            <div className='flex flex-col gap-3 pb-4'>
-              <p className="text-sm">City</p>
-              <CustomInput
-                placeholder="City"
-                title=""
-                required={false}
-                type='text'
-                name='city'
-                value={filters.city}
-                onChange={handleInputChange}
-                labelFor='city'
-                labelBg=""
-                disabled={false}
-                readOnly={false}
-              />
+            {/* Apply button */}
+            <div className="px-4 py-3 border-t border-gray-100">
+              <button
+                onClick={handleSubmit}
+                className='bg-gray-900 text-white hover:bg-black transition w-full py-2.5 rounded-lg text-sm font-medium'
+              >
+                Apply Filters
+              </button>
             </div>
-
-            <div className='flex flex-col gap-3 pb-4'>
-              <p className="text-sm">State</p>
-              <CustomInput
-                placeholder="State"
-                title=""
-                required={false}
-                type='text'
-                name='state'
-                value={filters.state}
-                onChange={handleInputChange}
-                labelFor='state'
-                labelBg=""
-                disabled={false}
-                readOnly={false}
-              />
-            </div>
-
-            <button
-              onClick={handleSubmit}
-              className='bg-gray-800 text-white hover:bg-black transition w-full py-2 rounded-md mt-4'
-            >
-              Apply Filters
-            </button>
           </div>
         </div>
 

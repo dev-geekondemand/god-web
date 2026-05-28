@@ -2,6 +2,7 @@ import { Category } from "./Category"
 import Geek, { Address } from "./Geek"
 import User from "./Seeker"
 import { UserIssue } from "./UserIssue"
+import Brand from "./Brand"
 
 
 export interface Review {
@@ -37,4 +38,5 @@ export interface ServiceRequest {
    overview: {
       description: string
    }
+   brand?: Brand
 }

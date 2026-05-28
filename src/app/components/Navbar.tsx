@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux';
 import { logoutUser, UserState } from '@/features/seeker/seekerSlice';
 import CustomModel from './CustomModal';
 import { GeekInitialState, logoutGeek } from '@/features/geek/geekSlice';
-import { Bell, UserRound } from 'lucide-react';
+import { Bell, UserRound, ChevronDown, LayoutDashboard, CreditCard, ClipboardList, LogOut } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -125,81 +125,105 @@ const Navbar = () => {
                 Sign In
               </Link>
             ) : (
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-gray-500">Welcome,</span>
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="flex items-center gap-1.5 cursor-pointer focus:outline-none">
-                    <span className="font-medium text-gray-800">{displayName}</span>
-                    <UserRound className="w-5 h-5 text-gray-600" />
-                    {isGeekAuthenticated && <NotifBadge count={geekUnread} />}
-                    {isAuthenticated && !isGeekAuthenticated && <NotifBadge count={seekerUnread} />}
-                  </DropdownMenuTrigger>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="group flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 hover:bg-gray-100 transition-all duration-150 focus:outline-none cursor-pointer">
+                  <UserRound className="w-4 h-4 text-gray-600" />
+                  <span className="font-medium text-gray-800 text-sm">{displayName}</span>
+                  {isGeekAuthenticated && <NotifBadge count={geekUnread} />}
+                  {isAuthenticated && !isGeekAuthenticated && <NotifBadge count={seekerUnread} />}
+                  <ChevronDown className="w-3.5 h-3.5 text-gray-400 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                </DropdownMenuTrigger>
 
-                  <DropdownMenuContent className="w-52 mt-2">
-                    <DropdownMenuLabel className="flex items-center justify-between">
-                      <span>My Account</span>
-                      {isGeekAuthenticated && (
-                        <Link
-                          href={`/geeks/${geek?._id}/requests`}
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Bell className="w-4 h-4 text-gray-500 hover:text-teal-600 transition-colors" />
-                        </Link>
-                      )}
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-
+                <DropdownMenuContent
+                  className="w-56 p-1.5 rounded-xl border border-gray-100 shadow-xl duration-150"
+                  align="end"
+                  sideOffset={10}
+                >
+                  <DropdownMenuLabel className="px-2.5 py-2.5 flex items-center justify-between">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[10px] uppercase tracking-widest text-gray-400 font-medium">Signed in as</span>
+                      <span className="text-sm font-semibold text-gray-800">{displayName}</span>
+                    </div>
                     {isGeekAuthenticated && (
-                      <DropdownMenuItem onClick={() => router.push('/geeks/dashboard')}>
-                        My Profile
-                      </DropdownMenuItem>
-                    )}
-                    {isGeekAuthenticated && (
-                      <DropdownMenuItem onClick={() => router.push('/geeks/subscription')}>
-                        Subscription
-                      </DropdownMenuItem>
-                    )}
-                    {isGeekAuthenticated && (
-                      <DropdownMenuItem
-                        className="flex items-center justify-between"
-                        onClick={() => router.push(`/geeks/${geek?._id}/requests`)}
+                      <Link
+                        href={`/geeks/${geek?._id}/requests`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="p-1.5 rounded-lg hover:bg-teal-50 transition-colors"
                       >
-                        Notifications
-                        <NotifBadge count={geekUnread} />
-                      </DropdownMenuItem>
+                        <Bell className="w-4 h-4 text-gray-400 hover:text-teal-600 transition-colors" />
+                      </Link>
                     )}
-                    {isAuthenticated && (
-                      <DropdownMenuItem onClick={() => router.push(`/seeker/${user?._id}`)}>
-                        My Profile
-                      </DropdownMenuItem>
-                    )}
-                    {isAuthenticated && (
-                      <DropdownMenuItem
-                        className="flex items-center justify-between"
-                        onClick={() => router.push(`/seeker/${user?._id}/services`)}
-                      >
-                        My Services
-                        <NotifBadge count={seekerUnread} />
-                      </DropdownMenuItem>
-                    )}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="my-1" />
 
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={(e) => e.preventDefault()}>
-                      <CustomModel
-                        text="Logout"
-                        title="Are you sure you want to Logout?"
-                        description="You will be logged out of your account."
-                        onCancel={() => setOpenModal(false)}
-                        onOk={handleLogout}
-                        openModal={openModal}
-                        setOpenModal={setOpenModal}
-                        toggleModal={() => setOpenModal(!openModal)}
-                        isOpen={openModal}
-                      />
+                  {isGeekAuthenticated && (
+                    <DropdownMenuItem
+                      className="cursor-pointer rounded-lg px-2.5 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 focus:bg-teal-50 focus:text-teal-700 gap-2.5 transition-colors"
+                      onClick={() => router.push('/geeks/dashboard')}
+                    >
+                      <LayoutDashboard className="w-4 h-4" />
+                      My Profile
                     </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+                  )}
+                  {isGeekAuthenticated && (
+                    <DropdownMenuItem
+                      className="cursor-pointer rounded-lg px-2.5 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 focus:bg-teal-50 focus:text-teal-700 gap-2.5 transition-colors"
+                      onClick={() => router.push('/geeks/subscription')}
+                    >
+                      <CreditCard className="w-4 h-4" />
+                      Subscription
+                    </DropdownMenuItem>
+                  )}
+                  {isGeekAuthenticated && (
+                    <DropdownMenuItem
+                      className="cursor-pointer rounded-lg px-2.5 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 focus:bg-teal-50 focus:text-teal-700 gap-2.5 transition-colors"
+                      onClick={() => router.push(`/geeks/${geek?._id}/requests`)}
+                    >
+                      <Bell className="w-4 h-4" />
+                      Notifications
+                      <span className="ml-auto"><NotifBadge count={geekUnread} /></span>
+                    </DropdownMenuItem>
+                  )}
+                  {isAuthenticated && (
+                    <DropdownMenuItem
+                      className="cursor-pointer rounded-lg px-2.5 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 focus:bg-teal-50 focus:text-teal-700 gap-2.5 transition-colors"
+                      onClick={() => router.push(`/seeker/${user?._id}`)}
+                    >
+                      <UserRound className="w-4 h-4" />
+                      My Profile
+                    </DropdownMenuItem>
+                  )}
+                  {isAuthenticated && (
+                    <DropdownMenuItem
+                      className="cursor-pointer rounded-lg px-2.5 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 focus:bg-teal-50 focus:text-teal-700 gap-2.5 transition-colors"
+                      onClick={() => router.push(`/seeker/${user?._id}/services`)}
+                    >
+                      <ClipboardList className="w-4 h-4" />
+                      My Requests
+                      <span className="ml-auto"><NotifBadge count={seekerUnread} /></span>
+                    </DropdownMenuItem>
+                  )}
+
+                  <DropdownMenuSeparator className="my-1" />
+                  <DropdownMenuItem
+                    className="cursor-pointer rounded-lg px-2.5 py-2 text-sm text-red-500 hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600 gap-2.5 transition-colors"
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <CustomModel
+                      text="Logout"
+                      title="Are you sure you want to Logout?"
+                      description="You will be logged out of your account."
+                      onCancel={() => setOpenModal(false)}
+                      onOk={handleLogout}
+                      openModal={openModal}
+                      setOpenModal={setOpenModal}
+                      toggleModal={() => setOpenModal(!openModal)}
+                      isOpen={openModal}
+                    />
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
 
             {!isGeekAuthenticated && (

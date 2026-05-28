@@ -33,7 +33,7 @@ const Categories = () => {
                 {isLoading ? <GlobalSkeleton cards={9} cols={1} lgCols={3} /> :<div className='w-full grid md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-10 justify-center items-center'>
                     {
                         categories?.map((c) => (
-                            <Link href={`/categories/${c._id}/brands`} key={c._id} className='border border-gray-300 bg-white group relative shadow-xs hover:border cursor-pointer rounded-lg flex'>
+                            <Link href={`/categories/${c.slug || c._id}/brands`} key={c._id} className='border border-gray-300 bg-white group relative shadow-xs hover:border cursor-pointer rounded-lg flex'>
                         
                         <div className="flex flex-col  rounded-t-md w-full items-start overflow-hidden">
                                 <div className=' rounded-t-md relative overflow-hidden max-h-[500px] w-full'>

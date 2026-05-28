@@ -4,7 +4,7 @@ import { useEffect, useState, ReactNode } from 'react';
 import { useParams } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import Image from 'next/image';
-import { getRequestById } from '@/features/request/requestSlice';
+import { cancelRequest, getRequestById } from '@/features/request/requestSlice';
 import { RootState } from '@/lib/store';
 import Link from 'next/link';
 import PageBanner from '@/app/components/PageBanner';
@@ -150,6 +150,8 @@ const SingleRequestPage = () => {
   const [includes, setIncludes] = useState(true);
   const [gallery, setGallery] = useState(true);
   const [video, setVideo] = useState(true);
+  const [confirmCancel, setConfirmCancel] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   const seeker = useSelector((state: RootState) => state.seeker?.user) as User;
 
@@ -162,6 +164,15 @@ const SingleRequestPage = () => {
   const alreadyReviewed = request?.reviews?.some((r: Review) => r?.postedBy?._id === seeker?._id);
   const isOwner = request?.seeker?._id === seeker?._id;
   const isCompleted = request?.status === 'Completed';
+  const isPending = request?.status === 'Pending';
+
+  const handleCancel = async () => {
+    setCancelling(true);
+    await dispatch(cancelRequest(requestId));
+    await dispatch(getRequestById(requestId));
+    setCancelling(false);
+    setConfirmCancel(false);
+  };
 
   return (
     <section className="w-full h-full relative flex flex-col items-center justify-center gap-5">
@@ -470,8 +481,57 @@ const SingleRequestPage = () => {
               )}
             </div>
           </div>
+
+          {/* Cancel button — only for pending requests */}
+          {isOwner && isPending && (
+            <button
+              onClick={() => setConfirmCancel(true)}
+              className="w-full flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-sm font-semibold rounded-xl px-4 py-2.5 transition-colors"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" />
+              </svg>
+              Cancel Request
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Confirm Cancel Modal */}
+      {confirmCancel && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 flex flex-col gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-gray-900">Cancel Request</h3>
+                <p className="text-sm text-gray-500">This action cannot be undone.</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600">Are you sure you want to cancel your request for <span className="font-semibold text-gray-800">{request?.category?.title}</span>? The geek will be notified.</p>
+            <div className="flex gap-3 mt-1">
+              <button
+                onClick={() => setConfirmCancel(false)}
+                disabled={cancelling}
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-xl px-4 py-2.5 transition-colors"
+              >
+                Keep it
+              </button>
+              <button
+                onClick={handleCancel}
+                disabled={cancelling}
+                className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white text-sm font-semibold rounded-xl px-4 py-2.5 transition-colors"
+              >
+                {cancelling ? 'Cancelling…' : 'Yes, Cancel'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

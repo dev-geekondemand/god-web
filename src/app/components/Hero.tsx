@@ -22,42 +22,42 @@ const HeroSectionTen = () => {
   const slicedCategories = categories.slice(0,6);
   const displayCategories = [
     {
-      id:slicedCategories[0]?._id,
+      id: slicedCategories[0]?.slug || slicedCategories[0]?._id,
       title:"Laptops & Desktop",
       subtitle:"Service & Repair",
       image:"/cat-icons/Laptops.png"
     },
     {
-      id:slicedCategories[1]?._id,
+      id: slicedCategories[1]?.slug || slicedCategories[1]?._id,
       title:"Printer",
       subtitle:"Service & Repair",
       image:"/cat-icons/Printer.png",
     },
     {
-      id:slicedCategories[3]?._id,
-      title:"Router", 
+      id: slicedCategories[3]?.slug || slicedCategories[3]?._id,
+      title:"Router",
       subtitle:"Service & Repair",
       image:"/cat-icons/Router.png",
     },
     {
-      id:slicedCategories[2]?._id,
+      id: slicedCategories[2]?.slug || slicedCategories[2]?._id,
       title:"Scanner",
       subtitle:"Service & Repair",
       image:"/cat-icons/Scanner.png",
     },
     {
-      id:slicedCategories[4]?._id,
+      id: slicedCategories[4]?.slug || slicedCategories[4]?._id,
       title:"Software",
       subtitle:"Install & Update",
       image:"/cat-icons/Software.png",
     },
     {
-      id:slicedCategories[5]?._id,
+      id: slicedCategories[5]?.slug || slicedCategories[5]?._id,
       title:"Antivirus",
       subtitle:"Install & Update",
       image:"/cat-icons/Antivirus.png",
     },
-    
+
   ]
 
 const dispatch = useAppDispatch();
@@ -157,8 +157,8 @@ const handleSearch = (category: string | null) => {
 
       <div className="">
         <div className="max-w-7xl mx-auto ">
-          <div className="grid  grid-cols-2 gap-6 items-start">
-            <div className="col-span-2 order-2 md:order-1 md:col-span-1">
+          <div className="grid grid-cols-1 md:grid-cols-2  items-stretch">
+            <div className="">
               <div
                 className="wow fadeInUp"
               >
@@ -215,7 +215,7 @@ const handleSearch = (category: string | null) => {
                                   type="button"
                                   onClick={() => {
                                     setSelected(option.title);
-                                    setCategory(option._id);
+                                    setCategory(option.slug || option._id);
                                     setOpen(false);
                                   }}
                                   className="w-full text-left p-2 rounded hover:bg-gray-300 cursor-pointer"
@@ -350,51 +350,13 @@ const handleSearch = (category: string | null) => {
                 </div>
               </div>
             </div>
-            <div className="col-span-2 order-1 md:order-2 md:col-span-1 grid grid-cols-2 gap-2 h-[50vh] md:h-[80vh] max-h-[600px]">
-              {/* Image 1 — full height, left half */}
-              <div className="relative col-span-1 h-full">
-                <Image
-                  src={"/assets/New-Img/Banner/image1.png"}
-                  fill
-                  alt="banner image"
-                  priority
-                  sizes="(max-width: 768px) 40vw, 20vw"
-                  className="object-cover rounded-lg"
-                />
-              </div>
-              {/* Right half — top: image 2, bottom: image 3 + 4 */}
-              <div className="col-span-1 grid grid-rows-2 gap-2 h-full">
-                <div className="relative row-span-1">
-                  <Image
-                    src={"/assets/New-Img/Banner/Image2.png"}
-                    fill
-                    alt="banner image 2"
-                    priority
-                    sizes="(max-width: 768px) 40vw, 20vw"
-                    className="object-cover rounded-lg"
-                  />
-                </div>
-                <div className="row-span-1 grid grid-cols-2 gap-2">
-                  <div className="relative">
-                    <Image
-                      src={"/assets/New-Img/Banner/Image3.png"}
-                      fill
-                      alt="banner image 3"
-                      sizes="(max-width: 768px) 20vw, 10vw"
-                      className="object-cover rounded-lg"
-                    />
-                  </div>
-                  <div className="relative">
-                    <Image
-                      src={"/assets/New-Img/Banner/Image4.png"}
-                      fill
-                      alt="banner image 4"
-                      sizes="(max-width: 768px) 20vw, 10vw"
-                      className="object-cover rounded-lg"
-                    />
-                  </div>
-                </div>
-              </div>
+            <div className="hidden md:block relative wow fadeInUp">
+              <Image
+                src={"/assets/main_hero.png"}
+                fill
+                alt="banner image"
+                className="object-contain"
+              />
             </div>
           </div>
         </div>

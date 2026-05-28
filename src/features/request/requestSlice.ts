@@ -86,6 +86,19 @@ export const getRequestById = createAsyncThunk('request/get-by-id', async (id: s
 })
 
 
+export const cancelRequest = createAsyncThunk('request/cancel-request', async (id: string, thunkAPI) => {
+    try {
+        const response = await requestService.cancelRequest(id);
+        return response;
+    } catch (error) {
+        if (error) {
+            return thunkAPI.rejectWithValue((error as { response: { data: unknown } }).response?.data || (error as Error).message);
+        } else {
+            return thunkAPI.rejectWithValue('An unknown error occurred');
+        }
+    }
+})
+
 export const autoRejectRequest = createAsyncThunk('request/auto-reject-request', async (id: string,thunkAPI) => {
     try{
         const response = await requestService.autoRejectRequest(id);
@@ -246,6 +259,24 @@ const requestSlice = createSlice({
             state.isSuccess = false;
             state.message = action.error.message;
             toast.error("Failed to get request.");
+        }).addCase(cancelRequest.pending, (state) => {
+            state.isLoading = true;
+            state.isSuccess = false;
+            state.isError = false;
+        })
+        .addCase(cancelRequest.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.isError = false;
+            state.request = action.payload;
+            toast.success("Request cancelled.");
+        })
+        .addCase(cancelRequest.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.isSuccess = false;
+            state.message = action.error.message;
+            toast.error("Failed to cancel request.");
         }).addCase(autoRejectRequest.pending, (state) => {
             state.isLoading = true;
             state.isSuccess = false;

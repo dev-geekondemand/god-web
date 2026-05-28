@@ -9,6 +9,7 @@ export interface Request{
     mode: string;
     location:Address;
     scheduledAt?: string;
+    brand?: string;
 }
 
 
@@ -55,6 +56,13 @@ const getRequestById = async (id: string) => {
     return response.data;
 };
 
+const cancelRequest = async (id: string) => {
+    const response = await api.put(`request/${id}/cancel`, {}, {
+        withCredentials: true
+    });
+    return response.data;
+};
+
 const autoRejectRequest = async (id: string) => {
     const response = await api.put(`request/${id}/auto-reject`, {}, {
         withCredentials: true
@@ -69,11 +77,12 @@ const addSeekerReview = async (id: string, data: Partial<Review>) => {
     return response.data;
 };
 
-const requestService = { 
+const requestService = {
     createRequest,
     getGeekRequests,
     acceptRequest,
     rejectRequest,
+    cancelRequest,
     getSeekerRequests,
     getRequestById,
     autoRejectRequest,

@@ -48,6 +48,7 @@ const GeekById = () => {
   const [primarySkillBrands, setPrimarySkillBrands] = useState<Brand[]>([])
   const [secondarySkillsWithBrands, setSecondarySkillsWithBrands] = useState<SkillWithBrands[]>([])
   const [selectedSlot, setSelectedSlot] = useState<SelectedSlot | undefined>()
+  const [selectedBrand, setSelectedBrand] = useState<Brand | undefined>()
   const [overView, setOverview] = useState(true)
   const [expertise, setExpertise] = useState(true)
 
@@ -117,6 +118,9 @@ const GeekById = () => {
     if (selectedMode === 'Offline' && !isSeekerAddress) { toast.error('Please add your address first.'); return }
     const hasAvailability = (geek?.availability?.slots?.length ?? 0) > 0
     if (hasAvailability && !selectedSlot) { toast.error('Please select a preferred time slot.'); return }
+    // Brand is required when the geek has brands for the selected skill
+    const skillBrands = getSkillBrands(selectedSkill)
+    if (skillBrands.length > 0 && !selectedBrand) { toast.error('Please select a brand.'); return }
     if (requestState?.requests?.length > 0) {
       const alreadyExists = seekerRequests?.some(r =>
         r?.category?._id === finalCategoryId && r?.geek?._id === geek?._id && r?.geekResponseStatus === 'Pending'
@@ -125,7 +129,7 @@ const GeekById = () => {
     }
     const scheduledAt = selectedSlot ? getNextDateForDay(selectedSlot.day, selectedSlot.timeSlot.from) : undefined
     setIsLoading(true)
-    await dispatch(createRequest({ geek: geek._id, category: finalCategoryId, issue: '', mode: selectedMode, location: { city: '', state: '', line1: '' }, scheduledAt }))
+    await dispatch(createRequest({ geek: geek._id, category: finalCategoryId, issue: '', mode: selectedMode, location: { city: '', state: '', line1: '' }, scheduledAt, ...(selectedBrand && { brand: selectedBrand._id }) }))
     dispatch(getSeekerRequests())
     setIsLoading(false)
     setShowDialog(false)
@@ -157,6 +161,19 @@ const GeekById = () => {
       })) || []
     )
   }, [geek, brands])
+
+  // Returns the brands associated with a given skill category for this geek
+  const getSkillBrands = (skill?: Category): Brand[] => {
+    if (!skill) return []
+    if (skill._id === geek?.primarySkill?._id) return primarySkillBrands
+    const entry = secondarySkillsWithBrands.find(s => s.category._id === skill._id)
+    return entry?.brands ?? []
+  }
+
+  // Reset brand when skill changes
+  useEffect(() => {
+    setSelectedBrand(undefined)
+  }, [selectedSkill])
 
   if (isGeekLoading) {
     return (
@@ -612,6 +629,9 @@ const GeekById = () => {
           availability={geek?.availability}
           selectedSlot={selectedSlot}
           setSelectedSlot={setSelectedSlot}
+          skillBrands={getSkillBrands(selectedSkill)}
+          selectedBrand={selectedBrand}
+          setSelectedBrand={setSelectedBrand}
         />
       )}
     </section>

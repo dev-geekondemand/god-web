@@ -33,7 +33,7 @@ const ScrollToTopButton = () => {
       
 
     <div
-      className={`fixed bottom-6 right-6 z-50 transition-opacity ${
+      className={`fixed bottom-6 right-6 z-30 transition-opacity ${
         showButton ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
     >

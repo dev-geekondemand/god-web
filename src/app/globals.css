@@ -399,3 +399,14 @@
   background-size: 400% 100%;
   animation: shimmer 1.4s ease infinite;
 }
+
+/* Ensure Razorpay checkout renders above all fixed/sticky app elements */
+#razorpay-container {
+  z-index: 99999 !important;
+}
+.razorpay-container {
+  z-index: 99999 !important;
+}
+iframe#razorpay-checkout-frame {
+  z-index: 99999 !important;
+}
