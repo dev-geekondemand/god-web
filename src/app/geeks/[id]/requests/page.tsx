@@ -4,28 +4,31 @@ import { acceptRequest, getGeekRequests, rejectRequest } from "@/features/reques
 import { ServiceRequest } from "@/interfaces/ServiceRequest";
 import { useAppDispatch } from "@/lib/hooks";
 import { RootState } from "@/lib/store";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import PageBanner from "@/app/components/PageBanner";
 import { useSelector } from "react-redux";
 
+
 const Requests = () => {
   const dispatch = useAppDispatch();
-  const geekId = useSelector((state: RootState) => state.geek?.geek?._id);
 
   useEffect(() => {
     dispatch(getGeekRequests());
+    const onVisible = () => {
+      if (document.visibilityState === "visible") dispatch(getGeekRequests());
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
   }, [dispatch]);
 
   const requests = useSelector((state: RootState) => state.request?.requests) as ServiceRequest[];
 
-  const handleAccept = (id: string) => {
-    dispatch(acceptRequest(id));
-    window.location.reload();
+  const handleAccept = async (id: string) => {
+    await dispatch(acceptRequest(id));
   };
 
-  const handleReject = (id: string) => {
-    dispatch(rejectRequest(id));
-    window.location.reload();
+  const handleReject = async (id: string) => {
+    await dispatch(rejectRequest(id));
   };
 
   return (

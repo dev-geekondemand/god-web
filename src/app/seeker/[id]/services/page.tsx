@@ -58,15 +58,23 @@ const Requests = () => {
 
   useEffect(() => {
     dispatch(getSeekerRequests());
+    const onVisible = () => {
+      if (document.visibilityState === "visible") dispatch(getSeekerRequests());
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
   }, [dispatch]);
 
   const requests = useSelector((state: RootState) => state.request?.requests) as ServiceRequest[];
   const existingRequests = requests.filter((r) => r.geek?._id !== undefined);
 
+  const getDisplayStatus = (r: ServiceRequest) =>
+    r.status === "Completed" ? "Completed" : (r.geekResponseStatus || r.status);
+
   const getCounts = () => {
     const counts: Record<string, number> = { All: existingRequests.length };
     TABS.slice(1).forEach((tab) => {
-      counts[tab] = existingRequests.filter((r) => (r.geekResponseStatus || r.status) === tab).length;
+      counts[tab] = existingRequests.filter((r) => getDisplayStatus(r) === tab).length;
     });
     return counts;
   };
@@ -75,7 +83,7 @@ const Requests = () => {
   const filtered =
     filter === "All"
       ? existingRequests
-      : existingRequests.filter((r) => (r.geekResponseStatus || r.status) === filter);
+      : existingRequests.filter((r) => getDisplayStatus(r) === filter);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -135,7 +143,7 @@ const Requests = () => {
             const geek = req.geek instanceof Object ? req.geek : null;
             const geekName = geek ? `${geek.fullName?.first ?? ""} ${geek.fullName?.last ?? ""}`.trim() : "";
             const geekAvatar = geek?.profileImage?.url || "/assets/images/placeholder_user.jpg";
-            const displayStatus = req.geekResponseStatus || req.status;
+            const displayStatus = getDisplayStatus(req);
             const accent = cardAccentColor[displayStatus] || "border-l-gray-300";
 
             return (

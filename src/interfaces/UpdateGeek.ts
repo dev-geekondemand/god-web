@@ -20,5 +20,4 @@ export interface GeekFormData {
   brandsServiced: string[];
   languagePreferences: string[];
   GSTIN?: string;
-  CIN?: string;
 }

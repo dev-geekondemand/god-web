@@ -19,21 +19,6 @@ import PageBanner from "./PageBanner";
 
 // GSTIN: 2 digits + 5 alpha + 4 digits + 1 alpha + 1 alphanumeric + Z + 1 alphanumeric
 const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
-// CIN: L/U + 5 digits + 2 alpha (state) + 4 digits (year) + 3 alpha (company type) + 6 digits
-const CIN_REGEX = /^[LU][0-9]{5}[A-Z]{2}[0-9]{4}(PLC|PTC|NPL|OPC|GOI|FLC|FTC|FRN)[0-9]{6}$/;
-
-// Maps GSTIN numeric state code -> MCA CIN alpha state code(s)
-const GSTIN_STATE_TO_CIN: Record<string, string[]> = {
-  "01": ["JK"], "02": ["HP"], "03": ["PB"], "04": ["CH"], "05": ["UT"],
-  "06": ["HR"], "07": ["DL"], "08": ["RJ"], "09": ["UP"], "10": ["BR"],
-  "11": ["SK"], "12": ["AR"], "13": ["NL"], "14": ["MN"], "15": ["MZ"],
-  "16": ["TR"], "17": ["ML"], "18": ["AS"], "19": ["WB"], "20": ["JH"],
-  "21": ["OR"], "22": ["CG"], "23": ["MP"], "24": ["GJ"], "25": ["DD"],
-  "26": ["DN"], "27": ["MH"], "28": ["AP"], "29": ["KA"], "30": ["GA"],
-  "31": ["LD"], "32": ["KL"], "33": ["TN"], "34": ["PY"], "35": ["AN"],
-  "36": ["TG", "AP"], "37": ["AP", "TG"], "38": ["LA"],
-};
-
 type VerifyStatus = "idle" | "loading" | "verified" | "mismatch" | "api_error";
 
 function normalizeCompanyName(name: string): string {
@@ -63,9 +48,6 @@ const validationSchema = Yup.object({
   gstin: Yup.string()
     .required("GSTIN is required")
     .matches(GSTIN_REGEX, "Invalid GSTIN format (e.g. 27AABCU9603R1ZX)"),
-  cin: Yup.string()
-    .required("CIN is required")
-    .matches(CIN_REGEX, "Invalid CIN format (e.g. L17110MH1973PLC019786)"),
   category: Yup.string().required("Primary skill is required"),
   brands: Yup.array().min(1, "Select at least one brand"),
   yoe: Yup.number().min(0, "Cannot be negative").required("Years of experience is required"),
@@ -104,10 +86,6 @@ export default function CorporateRegister() {
   const [gstinPortalName, setGstinPortalName] = useState("");
   const [gstinCaptcha, setGstinCaptcha] = useState<{ image: string; sessionId: string } | null>(null);
   const [gstinCaptchaInput, setGstinCaptchaInput] = useState("");
-  const [cinStatus, setCinStatus] = useState<VerifyStatus>("idle");
-  const [cinMsg, setCinMsg] = useState("");
-  const [crossStatus, setCrossStatus] = useState<"idle" | "verified" | "mismatch">("idle");
-  const [crossMsg, setCrossMsg] = useState("");
 
   const formik = useFormik({
     initialValues: {
@@ -116,7 +94,6 @@ export default function CorporateRegister() {
       lastName: "",
       companyName: "",
       gstin: "",
-      cin: "",
       category: "",
       brands: [] as Brand[],
       yoe: 0,
@@ -128,85 +105,32 @@ export default function CorporateRegister() {
         toast.error("GSTIN company name does not match. Please correct before proceeding.");
         return;
       }
-      if (cinStatus === "mismatch") {
-        toast.error("CIN company name does not match. Please correct before proceeding.");
-        return;
-      }
       if (gstinStatus === "idle") {
         toast.error("Please verify your GSTIN before continuing.");
-        return;
-      }
-      if (cinStatus === "idle") {
-        toast.error("Please verify your CIN before continuing.");
-        return;
-      }
-      if (crossStatus === "mismatch") {
-        toast.error("GSTIN and CIN cross-verification failed. Please check your details.");
         return;
       }
       dispatch(sendGeekOTP(values.phone));
     },
   });
 
-  // Reset verify status when GSTIN/CIN field changes
+  // Reset verify status when GSTIN field changes
   useEffect(() => {
     setGstinStatus("idle");
     setGstinMsg("");
     setGstinPortalName("");
     setGstinCaptcha(null);
     setGstinCaptchaInput("");
-    setCrossStatus("idle");
-    setCrossMsg("");
   }, [formik.values.gstin]);
-
-  useEffect(() => {
-    setCinStatus("idle");
-    setCinMsg("");
-    setCrossStatus("idle");
-    setCrossMsg("");
-  }, [formik.values.cin]);
 
   // Reset verify status when company name changes (mismatch may become valid)
   useEffect(() => {
-    if (gstinStatus === "mismatch" || cinStatus === "mismatch") {
+    if (gstinStatus === "mismatch") {
       setGstinStatus("idle");
       setGstinMsg("");
       setGstinPortalName("");
-      setCinStatus("idle");
-      setCinMsg("");
     }
-    setCrossStatus("idle");
-    setCrossMsg("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.companyName]);
-
-  // Cross-verify GSTIN and CIN once both are individually verified
-  useEffect(() => {
-    if (gstinStatus !== "verified" || cinStatus !== "verified" || !gstinPortalName) {
-      if (gstinStatus !== "loading" && cinStatus !== "loading") {
-        setCrossStatus("idle");
-        setCrossMsg("");
-      }
-      return;
-    }
-    const gstStateCode = formik.values.gstin.substring(0, 2);
-    const cinStateCode = formik.values.cin.substring(6, 8);
-    const validCinCodes = GSTIN_STATE_TO_CIN[gstStateCode] ?? [];
-
-    if (!validCinCodes.includes(cinStateCode)) {
-      setCrossStatus("mismatch");
-      setCrossMsg(
-        `State mismatch — GSTIN state "${gstStateCode}" does not correspond to CIN state "${cinStateCode}". Both must be from the same state.`
-      );
-    } else if (!namesMatch(gstinPortalName, formik.values.companyName)) {
-      setCrossStatus("mismatch");
-      setCrossMsg(`Company name mismatch — GST portal shows "${gstinPortalName}" but entered name differs.`);
-    } else {
-      setCrossStatus("verified");
-      setCrossMsg(`GSTIN and CIN are consistent — same state, company name matches GST portal.`);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gstinStatus, cinStatus, gstinPortalName]);
 
   useEffect(() => {
     dispatch(getCategories());
@@ -229,7 +153,7 @@ export default function CorporateRegister() {
 
   useEffect(() => {
     if (geekState.isSuccess && geekState.isOTPSent) {
-      const { phone, firstName, lastName, companyName, gstin, cin, category, yoe, brands, refCode } = formik.values;
+      const { phone, firstName, lastName, companyName, gstin, category, yoe, brands, refCode } = formik.values;
       const brandIds = brands.map((b: Brand) => b._id);
       const params = new URLSearchParams({
         phone,
@@ -237,7 +161,6 @@ export default function CorporateRegister() {
         lastName,
         companyName,
         gstin,
-        cin,
         category,
         yoe: String(yoe),
         refCode,
@@ -362,33 +285,6 @@ export default function CorporateRegister() {
       setGstinStatus("api_error");
       setGstinMsg("Verification request failed — check your connection");
       setGstinCaptcha(null);
-    }
-  }
-
-  // CIN — structural validation (format + state code + year); MCA has no public API
-  async function verifyCin() {
-    const cin = formik.values.cin.trim().toUpperCase();
-    if (!CIN_REGEX.test(cin)) {
-      toast.error("Enter a valid CIN before verifying.");
-      return;
-    }
-
-    setCinStatus("loading");
-    setCinMsg("");
-    try {
-      const res = await fetch(`/api/verify-cin?cin=${cin}`);
-      const data = await res.json();
-      if (res.status === 400) {
-        setCinStatus("mismatch");
-        setCinMsg(data.error || "CIN verification failed");
-        return;
-      }
-      // Structural validation passed
-      setCinStatus("verified");
-      setCinMsg(data.message || "CIN structure verified (state code & year valid)");
-    } catch {
-      setCinStatus("api_error");
-      setCinMsg("Verification request failed — check your connection");
     }
   }
 
@@ -528,49 +424,6 @@ export default function CorporateRegister() {
                   <VerifyBadge status={gstinStatus} message={gstinMsg} />
                 </div>
 
-                {/* CIN */}
-                <div>
-                  <label className={labelCls}>
-                    CIN <span className="text-red-500">*</span>
-                    <span className="ml-1 text-xs font-normal text-gray-400">(Corporate Identification Number)</span>
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      name="cin"
-                      value={formik.values.cin}
-                      onChange={(e) => formik.setFieldValue("cin", e.target.value.toUpperCase())}
-                      onBlur={formik.handleBlur}
-                      placeholder="L17110MH1973PLC019786"
-                      type="text"
-                      maxLength={21}
-                      className={`${inputCls} flex-1 font-mono tracking-wider`}
-                    />
-                    <button
-                      type="button"
-                      onClick={verifyCin}
-                      disabled={cinStatus === "loading" || !CIN_REGEX.test(formik.values.cin)}
-                      className="px-4 py-2 text-xs font-semibold rounded-lg border border-teal-600 text-teal-700 hover:bg-teal-50 disabled:opacity-40 disabled:cursor-not-allowed transition whitespace-nowrap"
-                    >
-                      {cinStatus === "loading" ? "Verifying…" : "Verify"}
-                    </button>
-                  </div>
-                  {formik.touched.cin && formik.errors.cin && (
-                    <p className={errorCls}>{formik.errors.cin}</p>
-                  )}
-                  <VerifyBadge status={cinStatus} message={cinMsg} />
-                </div>
-
-                {/* Cross-verification result */}
-                {crossStatus !== "idle" && (
-                  <div className={`mt-1 flex items-start gap-2 p-3 rounded-lg text-xs border ${
-                    crossStatus === "verified"
-                      ? "bg-green-50 border-green-200 text-green-700"
-                      : "bg-red-50 border-red-200 text-red-600"
-                  }`}>
-                    <span className="mt-0.5 shrink-0">{crossStatus === "verified" ? "✓" : "✗"}</span>
-                    <span><strong>Cross-check:</strong> {crossMsg}</span>
-                  </div>
-                )}
               </div>
             </div>
 

@@ -30,7 +30,6 @@ const VerifyOTP = () => {
   const brands = searchParams.get('brands');
   const companyName = searchParams.get('companyName');
   const gstin = searchParams.get('gstin');
-  const cin = searchParams.get('cin');
 
   console.log(brands);
   
@@ -96,7 +95,6 @@ const VerifyOTP = () => {
             refCode: refCode ?? '',
             brandsServiced: brands ? JSON.parse(brands) : [],
             GSTIN: gstin ?? undefined,
-            CIN: cin ?? undefined,
           }));
         } else {
           dispatch(loginWithOTP(loginPayload));

@@ -155,7 +155,6 @@ interface CorporateGeekPayload {
   brandsServiced?: string[];
   refCode?: string;
   GSTIN?: string;
-  CIN?: string;
 }
 
 const createCorporateGeek = async (data: CorporateGeekPayload) => {
@@ -171,7 +170,6 @@ interface AdminCorporateGeekPayload {
   yoe: number;
   email?: string;
   GSTIN?: string;
-  CIN?: string;
   teamSize?: number;
   secondarySkills?: string[];
   brandsServiced?: string[];

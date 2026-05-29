@@ -216,6 +216,8 @@ const requestSlice = createSlice({
             state.isSuccess = true;
             state.isError = false;
             state.request = action.payload;
+            const idx = (state.requests as ServiceRequest[]).findIndex((r) => r._id === action.payload?._id);
+            if (idx !== -1) (state.requests as ServiceRequest[])[idx] = action.payload;
             toast.success("Request accepted.");
         })
         .addCase(acceptRequest.rejected, (state, action) => {
@@ -234,6 +236,8 @@ const requestSlice = createSlice({
             state.isSuccess = true;
             state.isError = false;
             state.request = action.payload;
+            const idx = (state.requests as ServiceRequest[]).findIndex((r) => r._id === action.payload?._id);
+            if (idx !== -1) (state.requests as ServiceRequest[])[idx] = action.payload;
             toast.success("Request rejected.");
         })
         .addCase(rejectRequest.rejected, (state, action) => {
@@ -269,6 +273,8 @@ const requestSlice = createSlice({
             state.isSuccess = true;
             state.isError = false;
             state.request = action.payload;
+            const idx = (state.requests as ServiceRequest[]).findIndex((r) => r._id === action.payload?._id);
+            if (idx !== -1) (state.requests as ServiceRequest[])[idx] = action.payload;
             toast.success("Request cancelled.");
         })
         .addCase(cancelRequest.rejected, (state, action) => {
@@ -287,6 +293,8 @@ const requestSlice = createSlice({
             state.isSuccess = true;
             state.isError = false;
             state.request = action.payload;
+            const idx = (state.requests as ServiceRequest[]).findIndex((r) => r._id === action.payload?._id);
+            if (idx !== -1) (state.requests as ServiceRequest[])[idx] = action.payload;
             toast.success("Request status updated.");
         })
         .addCase(autoRejectRequest.rejected, (state, action) => {

@@ -517,17 +517,6 @@ const GeekById = () => {
                     </span>
                   </div>
                 )}
-                {isCorporate && geek?.CIN && (
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-xs text-gray-400 uppercase tracking-wide flex items-center gap-1">
-                      CIN
-                      <span className="text-green-500 text-xs font-semibold">✓ Verified</span>
-                    </span>
-                    <span className="text-gray-700 font-mono text-xs tracking-wider">
-                      {geek.CIN.slice(0, 3)}{"·".repeat(12)}{geek.CIN.slice(-6)}
-                    </span>
-                  </div>
-                )}
               </div>
 
               {!isRequestedService && (

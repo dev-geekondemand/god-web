@@ -52,7 +52,6 @@ interface Geek {
 	};
 	companyName?: string;
 	GSTIN?: string;
-	CIN?: string;
 	teamSize?: number;
 	idProof: {
 		type: 'Aadhar' | string;

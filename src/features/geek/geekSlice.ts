@@ -71,7 +71,6 @@ interface CreateCorporateGeekData {
     brandsServiced?: string[];
     refCode?: string;
     GSTIN?: string;
-    CIN?: string;
 }
 
 export const createCorporateGeek = createAsyncThunk('geek/createCorporate', async (data: CreateCorporateGeekData, thunkAPI) => {
