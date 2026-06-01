@@ -11,8 +11,6 @@ import CustomSelect from '../components/CustomSelect';
 import Geek from '@/interfaces/Geek';
 import Pagination from '../components/Pagination';
 import { Category } from '@/interfaces/Category';
-import toast from 'react-hot-toast';
-import CustomToast from '../components/CustomToast';
 import GeekSkeletonCard from '../components/GeekSkeletenCard';
 import { fetchUserLocation } from '@/features/locationSlice';
 import { getBrands, getBrandsByCategory } from '@/features/brands/brandsSlice';
@@ -96,28 +94,13 @@ const Providers = () => {
   const geeks = geekState?.geeks as Geek[];
 
   const totalPages = geekState?.pages
-  const isAuthenticated = useSelector((state: RootState) => state.seeker.isAuthenticated);
-  const isGeekAuthenticated = useSelector((state: RootState) => state.geek.isAuthenticated);
-
   const router = useRouter();
 
   
 
   const handleClick=(geekId:string)=>{
-    if(isAuthenticated || isGeekAuthenticated ){
-      const query = selectedCategory?._id ? `?categoryId=${selectedCategory._id}` : '';
-      router.push(`/geeks/${geekId}${query}`, {});
-    }else{
-      toast.dismiss();
-      toast.custom((t) => (
-        <CustomToast
-          t={t}
-          title="Not Logged in."
-          message="You are not logged in."
-          avatar="/assets/logo-big.webp"
-        />
-      ));
-    }
+    const query = selectedCategory?._id ? `?categoryId=${selectedCategory._id}` : '';
+    router.push(`/geeks/${geekId}${query}`, {});
   };
 
   const curCity = useSelector((state: RootState) => state.location.city);

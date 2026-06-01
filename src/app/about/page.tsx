@@ -1,4 +1,4 @@
-import Image from 'next/image'
+﻿import Image from 'next/image'
 import Link from 'next/link'
 import PageBanner from '@/app/components/PageBanner'
 import {
@@ -135,12 +135,12 @@ const page = () => {
           </div>
           <div className='flex  flex-col gap-6'>
             <p className="text-sm leading-5.5 md:leading-6 text-gray-700">
-            In today’s fast-moving digital world, businesses can’t afford downtime. Whether you are running a startup, a growing MSME, or an established enterprise, technology is at the core of everything you do. At <b>GeekOnDemand</b>, we make sure your technology always works for you.
+            In today's fast-moving digital world, businesses can't afford downtime. Whether you are running a startup, a growing MSME, or an established enterprise, technology is at the core of everything you do. At <b>GeekOnDemand</b>, we make sure your technology always works for you.
             </p>
             <p className="text-sm leading-5.5 md:leading-6 text-gray-700">
               Born from the idea that IT support should be hassle-free, transparent, and reliable, GeekOnDemand connects you with expert IT professionals in India who solve everything from laptop repair in Hyderabad to server support, cloud solutions, and cybersecurity services across India — all at your fingertips.
             </p>
-            <p className="text-sm leading-5.5 md:leading-6 text-gray-700">Our platform offers <b>on-demand IT services in India</b>, with <b>24/7 tech support</b> that’s available anytime, anywhere. No middlemen. No hidden fees. Just <b>direct access to skilled GeekOnDemand tech professionals</b> who care about solving your problems quickly and efficiently.</p>
+            <p className="text-sm leading-5.5 md:leading-6 text-gray-700">Our platform offers <b>on-demand IT services in India</b>, with <b>24/7 tech support</b> that's available anytime, anywhere. No middlemen. No hidden fees. Just <b>direct access to skilled GeekOnDemand tech professionals</b> who care about solving your problems quickly and efficiently.</p>
           </div>
 
           {/* <ul className='w-full grid grid-cols-2 mt-6 space-x-3 space-y-5 text-gray-700 text-sm'>
@@ -161,29 +161,22 @@ const page = () => {
 
     </div>
 
-            <div className='flex flex-col md:flex-row mb-8 bg-white w-full max-w-6xl mx-auto gap-20'>
-          <section className='w-full mt-3 py-10 flex justify-center border border-gray-500 rounded-md items-center'>
-            <div className='max-w-7xl w-full mx-auto flex flex-col gap-10 px-6'>
-              <h3 className='h3 text-gray-800 text-center'>Our Mission</h3>
-              <p className='text-sm text-gray-600 text-center max-w-4xl mx-auto'>To become India’s most trusted, AIpowered IT support platform — bringing
-reliability, transparency, and speed to IT
-services across consumer and business
-segments.</p>
+            <div className='flex flex-col md:flex-row mb-8 bg-white w-full max-w-6xl mx-auto gap-8 items-stretch'>
+          <section className='w-full py-10 flex justify-center border border-gray-500 rounded-md items-center'>
+            <div className='w-full flex flex-col gap-6 px-8 text-center'>
+              <h3 className='h3 text-gray-800'>Our Mission</h3>
+              <p className='text-sm text-gray-600 max-w-xl mx-auto leading-6'>
+                To become India's most trusted, AI-powered IT support platform — bringing reliability, transparency, and speed to IT services across consumer and business segments.
+              </p>
             </div>
           </section>
 
-          {/* Our Vision Section */}
-          <section className='w-full flex justify-center border border-gray-500 rounded-md items-center'>
-            <div className='max-w-7xl w-full mx-auto flex flex-col gap-6 px-6'>
-              <h3 className='h3 text-gray-800 text-center'>Our Vision</h3>
-              <p className='text-sm text-gray-600 text-center max-w-4xl mx-auto'>
-                To bridge the gap between the demand for
-skilled, verified IT professionals and the chaotic,
-unstructured nature of today’s tech support
-market by building a dedicated, subscription based marketplace supported by Agentic AI.
+          <section className='w-full py-10 flex justify-center border border-gray-500 rounded-md items-center'>
+            <div className='w-full flex flex-col gap-6 px-8 text-center'>
+              <h3 className='h3 text-gray-800'>Our Vision</h3>
+              <p className='text-sm text-gray-600 max-w-xl mx-auto leading-6'>
+                To bridge the gap between skilled IT professionals and today's chaotic tech support market by building a dedicated, subscription-based marketplace powered by Agentic AI.
               </p>
-
-             
             </div>
           </section>
         </div>
@@ -204,10 +197,10 @@ market by building a dedicated, subscription based marketplace supported by Agen
         </div>
 
         {/* Two-Column Layout */}
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-10 md:divide-x-2 divide-gray-400  items-start'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-10 md:divide-x-2 divide-gray-400 items-stretch'>
           
           {/* For Seekers */}
-          <div className=' px-8  flex flex-col gap-4 '>
+          <div className=' px-8 flex flex-col gap-4 h-full'>
             <h4 className='h4 text-gray-800 flex items-center gap-2'>
               <span className='text-teal-600 text-lg'>For Seekers</span> (Businesses & Individuals)
             </h4>
@@ -232,7 +225,7 @@ market by building a dedicated, subscription based marketplace supported by Agen
           </div>
 
           {/* For Geeks */}
-          <div className=' px-8  flex flex-col gap-4  '>
+          <div className=' px-8 flex flex-col gap-4 h-full'>
             <h4 className='h4 text-gray-800 flex items-center gap-2'>
               <span className='text-teal-600 text-lg'>For Geeks</span> (IT Professionals)
             </h4>
@@ -243,11 +236,11 @@ market by building a dedicated, subscription based marketplace supported by Agen
               </li>
               <li className='flex items-start gap-2'>
                 <Image src={"/assets/icons/check-circle.svg"} width={16} height={16} alt='check' />
-                Access IT career opportunities in India and work directly with global clients.
+                Access IT career opportunities in India and beyond.
               </li>
               <li className='flex items-start gap-2'>
                 <Image src={"/assets/icons/check-circle.svg"} width={16} height={16} alt='check' />
-                Get paid fairly with zero platform commissions.
+                Get quality projects in laptop repair, network setup, cloud migration, cybersecurity audits, and more.
               </li>
               <li className='flex items-start gap-2'>
                 <Image src={"/assets/icons/check-circle.svg"} width={16} height={16} alt='check' />
@@ -353,7 +346,7 @@ market by building a dedicated, subscription based marketplace supported by Agen
       <div className='w-full max-w-7xl mx-auto grid grid-cols-12 gap-6 justify-center items-center'>
           <div className='col-span-12 md:col-span-6 flex flex-col gap-6'>
             <h1 className="h2">Why Choose GeekOnDemand?</h1>
-            <p className="body-2 text-gray-600">India’s First Zero-Commission Tech Support Marketplace.</p>
+            <p className="body-2 text-gray-600">India's First Zero-Commission Tech Support Marketplace.</p>
             <Accordion type="single" collapsible className="w-full mt-2 text-base flex flex-col gap-2">
             <AccordionItem value="item-1" className='border-b-0'>
               <AccordionTrigger className='text-base bg-gray-100 rounded-lg px-3 mb-1'>Verified, Skilled & Trusted Geeks</AccordionTrigger>
@@ -364,7 +357,7 @@ market by building a dedicated, subscription based marketplace supported by Agen
             <AccordionItem value="item-2" className='border-b-0'>
               <AccordionTrigger className='text-base bg-gray-100 rounded-lg px-3 mb-1'>Zero Commission Model – 100% Earnings to Geeks</AccordionTrigger>
               <AccordionContent className='bg-white px-3 text-gray-700'>
-              GeekOnDemand does not take any commission from the Geek’s earnings.
+              GeekOnDemand does not take any commission from the Geek's earnings.
                 This ensures:
                 <ul className='flex flex-col gap-1 mt-1'>
                 <li className='flex items-start gap-2'><CircleCheck className='text-gray-950 mt-1' size={12} />Better pricing for customers</li>
@@ -385,7 +378,7 @@ market by building a dedicated, subscription based marketplace supported by Agen
             <AccordionItem value="item-4" className='border-b-0'>
               <AccordionTrigger className='text-base bg-gray-100 rounded-lg px-3 mb-1'>Pan-India Availability</AccordionTrigger>
               <AccordionContent className='bg-white px-3 text-gray-700'>
-              Whether it’s metros or Tier-2/Tier-3 cities, customers get access to tech experts anytime, anywhere.
+              Whether it's metros or Tier-2/Tier-3 cities, customers get access to tech experts anytime, anywhere.
               </AccordionContent>
             </AccordionItem>
 
@@ -601,7 +594,7 @@ market by building a dedicated, subscription based marketplace supported by Agen
 
           {/* Heading */}
           <div className='flex flex-col gap-4 text-center items-center justify-center'>
-            <h3 className='h2 text-gray-800'>What’s Next for GeekOnDemand?</h3>
+            <h3 className='h2 text-gray-800'>What's Next for GeekOnDemand?</h3>
             <p className='body-2 text-gray-600 max-w-5xl'>
               We are just getting started. Our focus is on continuously improving the GeekOnDemand platform, adding AI-driven features, expanding our network of IT service providers in Hyderabad and across India, and creating more IT career opportunities for talented professionals.
             </p>

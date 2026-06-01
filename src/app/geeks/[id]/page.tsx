@@ -6,7 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { useParams, useSearchParams } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/lib/store'
 import Geek from '@/interfaces/Geek'
@@ -34,6 +34,7 @@ const PLAN_COLOR: Record<string, string> = {
 const GeekById = () => {
   const dispatch = useAppDispatch()
   const params = useParams()
+  const router = useRouter()
   const id = params.id
   const catId = useSearchParams().get('categoryId')
   const categoryId = catId && catId !== 'undefined' ? catId : null
@@ -53,16 +54,6 @@ const GeekById = () => {
   const [expertise, setExpertise] = useState(true)
 
 
-  useEffect(() => {
-    if (id) {
-      dispatch(getGeekById(id.toString()))
-      dispatch(getBrands())
-      dispatch(getSeekerRequests())
-    } else {
-      toast.error('Geek not found')
-    }
-  }, [dispatch, id])
-
   const geek = useSelector((state: RootState) => state.geek?.geekById) as Geek
   const loggedInGeek = useSelector((state: RootState) => state.geek?.geek) as Geek
   const isGeekLoading = useSelector((state: RootState) => state.geek?.isLoading)
@@ -70,6 +61,21 @@ const GeekById = () => {
   const requestState = useSelector((state: RootState) => state.request)
   const seekerRequests = useSelector((state: RootState) => state.request?.requests) as ServiceRequest[]
   const brands = useSelector((state: RootState) => state.brand?.brands) as Brand[]
+
+  useEffect(() => {
+    if (id) {
+      dispatch(getGeekById(id.toString()))
+      dispatch(getBrands())
+    } else {
+      toast.error('Geek not found')
+    }
+  }, [dispatch, id])
+
+  useEffect(() => {
+    if (loggedInSeeker?._id) {
+      dispatch(getSeekerRequests())
+    }
+  }, [dispatch, loggedInSeeker?._id])
 
   const isCorporate = !!(geek?.__t === 'Corporate' || geek?.companyName) 
 
@@ -87,7 +93,7 @@ const GeekById = () => {
   const handleClick = () => {
     if (!geek?._id) { toast.error('Geek not found'); return }
     if (loggedInGeek?._id === geek._id) { toast.error('You cannot book your own service'); return }
-    if (!loggedInSeeker?._id) { toast.error('You are not logged in as a Seeker.'); return }
+    if (!loggedInSeeker?._id) { router.push(`/login?redirect=/geeks/${id}`); return }
     setSelectedSlot(undefined)
     setShowDialog(true)
   }
@@ -316,7 +322,7 @@ const GeekById = () => {
                 Book Service
               </button>
               {isCorporate && geek?.GSTIN && (
-                <span className="text-xs text-gray-400">GSTIN: {geek.GSTIN}</span>
+                <span className="text-xs font-semibold text-green-600">GSTIN Verified</span>
               )}
             </div>
           </div>
@@ -508,13 +514,8 @@ const GeekById = () => {
                 )}
                 {isCorporate && geek?.GSTIN && (
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-xs text-gray-400 uppercase tracking-wide flex items-center gap-1">
-                      GSTIN
-                      <span className="text-green-500 text-xs font-semibold">✓ Verified</span>
-                    </span>
-                    <span className="text-gray-700 font-mono text-xs tracking-wider">
-                      {geek.GSTIN.slice(0, 2)}{"·".repeat(9)}{geek.GSTIN.slice(-4)}
-                    </span>
+                    <span className="text-xs text-gray-400 uppercase tracking-wide">GSTIN</span>
+                    <span className="text-green-600 text-xs font-semibold">✓ Verified</span>
                   </div>
                 )}
               </div>

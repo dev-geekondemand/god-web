@@ -91,8 +91,8 @@ const slug = params.slug?.toString() || '';
 
   return (
     <section className='w-full flex flex-col justify-center items-center'>
-            <div className='w-full relative py-20 bg-teal-500/10 rounded-br-[60%]' >
-                <div className='w-full   relative flex justify-center items-center py-10  text-center'>
+            <div className='w-full relative py-10 bg-teal-500/10 rounded-br-[60%]' >
+                <div className='w-full   relative flex justify-center items-center py-4  text-center'>
                     <div className='xl:max-w-6xl w-full h-full lg:max-w-5xl md:max-w-3xl sm:max-w-xl mx-auto'>
                         <div className='flex flex-wrap w-full'>
                             <div className='w-full flex flex-col gap-3 items-center justify-center'>
@@ -146,9 +146,9 @@ const slug = params.slug?.toString() || '';
                                       {resolvedCategories && resolvedCategories.length > 0 && (
                                         <div className='flex flex-wrap gap-2'>
                                           {resolvedCategories.map((cat) => (
-                                            <span key={cat._id} className='px-3 py-1 rounded-full text-xs font-medium bg-teal-50 text-teal-700 border border-teal-200'>
+                                            <Link key={cat._id} href={`/blogs/category/${cat.slug || cat._id}`} className='px-3 py-1 rounded-full text-xs font-medium bg-teal-50 text-teal-700 border border-teal-200 hover:bg-teal-100 transition-colors'>
                                               {cat.name}
-                                            </span>
+                                            </Link>
                                           ))}
                                         </div>
                                       )}
@@ -203,9 +203,9 @@ const slug = params.slug?.toString() || '';
                                       <h3 className='text-gray-800 font-semibold text-lg mb-4'>Categories</h3>
                                       <div className='flex flex-col gap-2'>
                                         {resolvedCategories.map((cat) => (
-                                          <span key={cat._id} className='text-gray-600 text-sm py-1 border-b border-gray-100 last:border-0'>
+                                          <Link key={cat._id} href={`/blogs/category/${cat.slug || cat._id}`} className='text-gray-600 text-sm py-1 border-b border-gray-100 last:border-0 hover:text-teal-600 transition-colors'>
                                             {cat.name}
-                                          </span>
+                                          </Link>
                                         ))}
                                       </div>
                                     </div>

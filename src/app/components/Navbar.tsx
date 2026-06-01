@@ -87,6 +87,16 @@ const Navbar = () => {
 
   const isLoggedIn = isAuthenticated || isGeekAuthenticated;
   const displayName = user?.fullName?.first || geek?.fullName?.first || '';
+  const ctaLabel = isGeekAuthenticated ? 'Become a Seeker' : isAuthenticated ? 'Become a Geek' : 'Get Started';
+  const handleCta = () => {
+    if (!isLoggedIn) {
+      router.push('/register?type=geek');
+    } else if (isGeekAuthenticated) {
+      toast.error('Please logout first to register as a Seeker.', { position: 'top-center' });
+    } else {
+      toast.error('Please logout first to register as a Geek.', { position: 'top-center' });
+    }
+  };
 
   return (
     <>
@@ -226,20 +236,12 @@ const Navbar = () => {
               </DropdownMenu>
             )}
 
-            {!isGeekAuthenticated && (
-              <CustomButton
-                handleClick={() => {
-                  if (!isLoggedIn) {
-                    router.push('/register?type=geek');
-                  } else {
-                    toast.error('Please logout first to register as a Geek.', { position: 'top-center' });
-                  }
-                }}
-                text="Get Started"
-                type="submit"
-                width="text-sm w-fit"
-              />
-            )}
+            <CustomButton
+              handleClick={handleCta}
+              text={ctaLabel}
+              type="submit"
+              width="text-sm w-fit"
+            />
           </div>
 
           {/* Mobile: hamburger */}
@@ -375,23 +377,14 @@ const Navbar = () => {
               </>
             )}
 
-            {!isGeekAuthenticated && (
-              <div className="mt-2">
-                <CustomButton
-                  handleClick={() => {
-                    if (!isLoggedIn) {
-                      router.push('/register?type=geek');
-                    } else {
-                      toast.error('Please logout first to register as a Geek.', { position: 'top-center' });
-                    }
-                    setSidebarOpen(false);
-                  }}
-                  text="Get Started"
-                  type="submit"
-                  width="text-sm w-full"
-                />
-              </div>
-            )}
+            <div className="mt-2">
+              <CustomButton
+                handleClick={() => { handleCta(); setSidebarOpen(false); }}
+                text={ctaLabel}
+                type="submit"
+                width="text-sm w-full"
+              />
+            </div>
           </div>
         </div>
       </div>

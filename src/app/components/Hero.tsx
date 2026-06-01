@@ -119,7 +119,7 @@ const handleSearch = (category: string | null) => {
 
   
 
-    <section className=" relative p-3 bg-white min-h-auto my-4">
+    <section className="relative p-6 bg-white h-[calc(100vh-80px)] overflow-hidden">
         {hydrated && showPrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="bg-white w-[90%] max-w-md rounded-2xl p-6 shadow-xl animate-fadeIn">
@@ -155,9 +155,9 @@ const handleSearch = (category: string | null) => {
         </div>
       )}
 
-      <div className="">
-        <div className="max-w-7xl mx-auto ">
-          <div className="grid grid-cols-1 md:grid-cols-2  items-stretch">
+      <div className="h-full">
+        <div className="max-w-7xl mx-auto h-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 items-stretch h-full">
             <div className="">
               <div
                 className="wow fadeInUp"
@@ -166,8 +166,8 @@ const handleSearch = (category: string | null) => {
                   Service & Repair {" "}
                   <span className="text-teal-700" data-type-text="Carpenders">@Home</span>
                 </h2>
-                <p className="my-2 ml-2 font-bold  text-teal-800 md:text-lg tracking-widest  font-mono  sm:text-base text-sm ">IT Tech Support – Anytime, Anywhere.</p>
-                <div className="flex items-center gap-2 sm:gap-4 md:gap-8 w-full md:w-[80%] mb-3 py-3 rounded-lg">
+                <p className="my-3 ml-2 font-bold  text-teal-800 md:text-lg tracking-widest  font-mono  sm:text-base text-sm ">IT Tech Support – Anytime, Anywhere.</p>
+                <div className="flex items-center gap-2 sm:gap-4 md:gap-8 w-full md:w-[80%] mb-3 py-2 rounded-lg">
                   {/* Location Input */}
                   <div className="relative w-full">
                     <input
@@ -247,9 +247,9 @@ const handleSearch = (category: string | null) => {
                   </button>
                 </div> */}
 
-                <div className="w-full md:w-[80%] h-full flex flex-col gap-3 border p-4 rounded-lg border-gray-600">
+                <div className="w-full md:w-[80%] flex flex-col gap-2 border p-3 rounded-lg border-gray-600">
                   <h2 className="text-xl font-medium text-gray-600">What are you looking for?</h2>
-                  <div className="md:p-4 flex flex-col w-full md:gap-4 gap-2 justify-start">
+                  <div className="flex flex-col w-full gap-2 justify-start">
                     <div className="flex  w-full">
                      
                    {displayCategories?.slice(0,3)?.map((cat,i)=>{
@@ -293,7 +293,7 @@ const handleSearch = (category: string | null) => {
                     </div>
                   </div>
 
-                  <div className="mt-2 flex justify-center">
+                  <div className="mt-1 flex justify-center">
                     <Link href="/categories" className="text-sm font-medium bg-teal-600 px-4 py-2 text-white rounded-lg hover:underline">
                       View all categories &rarr;
                     </Link>
@@ -303,8 +303,8 @@ const handleSearch = (category: string | null) => {
                 
                 
 
-                <div className="flex items-center flex-wrap mt-8">
-                  <div className="flex items-center mr-4 mt-4">
+                <div className="flex items-center flex-wrap mt-3">
+                  <div className="flex items-center mr-4 mt-2">
                   <Image
                       width={40}
                       height={40}
@@ -318,7 +318,7 @@ const handleSearch = (category: string | null) => {
                     </div>
                   </div>
 
-                  <div className="flex items-center mr-4 mt-4">
+                  <div className="flex items-center mr-4 mt-2">
                     <Image
                       width={40}
                       height={40}
@@ -333,7 +333,7 @@ const handleSearch = (category: string | null) => {
                     </div>
                   </div>
 
-                  <div className="flex items-center mr-4 mt-4">
+                  <div className="flex items-center mr-4 mt-2">
                   <Image
                       width={40}
                       height={40}

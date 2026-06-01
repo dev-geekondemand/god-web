@@ -8,8 +8,6 @@ import { useSelector } from 'react-redux';
 import Geek from '@/interfaces/Geek';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Pagination from '@/app/components/Pagination';
-import CustomToast from '@/app/components/CustomToast';
-import toast from 'react-hot-toast';
 import GeekSkeletonCard from '@/app/components/GeekSkeletenCard';
 import { fetchUserLocation } from '@/features/locationSlice';
 import Link from 'next/link';
@@ -60,9 +58,6 @@ const GeeksByCategories = () => {
 
   const geekState = useSelector((state: RootState) => state.geek?.geeks) as unknown as GeekState;
   const geeksLoading = useSelector((state: RootState) => state.geek?.isLoading);
-  const isAuthenticated     = useSelector((state: RootState) => state.seeker.isAuthenticated);
-  const isGeekAuthenticated = useSelector((state: RootState) => state.geek.isAuthenticated);
-
   // ── Resolved IDs (slug → _id) ────────────────────────────────────────────
   const [resolvedCategoryId, setResolvedCategoryId] = useState<string | null>(null);
   const [resolvedBrandId,    setResolvedBrandId]    = useState<string | null>(null);
@@ -200,15 +195,7 @@ const GeeksByCategories = () => {
   };
 
   const handleClick = (geekId: string) => {
-    if (isAuthenticated || isGeekAuthenticated) {
-      router.push(`/geeks/${geekId}?categoryId=${resolvedCategoryId}`);
-    } else {
-      toast.dismiss();
-      toast.custom((t) => (
-        <CustomToast t={t} title="Not Logged in." message="You are not logged in." avatar="/assets/logo-big.webp" />
-      ));
-      setTimeout(() => router.push('/login/seeker'), 1000);
-    }
+    router.push(`/geeks/${geekId}?categoryId=${resolvedCategoryId}`);
   };
 
   // ── Derived state ─────────────────────────────────────────────────────────
