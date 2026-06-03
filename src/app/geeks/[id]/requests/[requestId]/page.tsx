@@ -172,7 +172,7 @@ const SingleRequestPage = () => {
       <div hidden={!uploadedMedia} onClick={() => setUploadedMedia(false)} className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50" />
       {uploadedMedia && (
         <div className="fixed top-12 bottom-12 left-4 right-4 z-50 max-w-xl mx-auto overflow-y-auto bg-white shadow-2xl rounded-2xl">
-          <MediaUploader requestId={requestId} isUploadedOpen={uploadedMedia} setIsUploadedOpen={setUploadedMedia} />
+          <MediaUploader requestId={requestId} isUploadedOpen={uploadedMedia} setIsUploadedOpen={setUploadedMedia} onSuccess={() => dispatch(getRequestById(requestId))} />
         </div>
       )}
 

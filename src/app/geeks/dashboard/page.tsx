@@ -29,6 +29,7 @@ import { Multiselect } from "react-widgets";
 import "react-widgets/styles.css";
 import {
   deleteRateCard,
+  loadGeek,
   sendVerificationMail,
   updateAvailability,
   updateGeekProfile,
@@ -206,6 +207,9 @@ const Dashboard = () => {
             languagePreferences: values.languagePreferences,
           },
         })).unwrap();
+        setOpenProfile(false);
+        toast.success("Profile updated");
+        dispatch(loadGeek());
       } catch (error: Error | unknown) {
         if (error instanceof Error) toast.error(error.message);
         else console.error("Unknown error:", error);
@@ -255,6 +259,9 @@ const Dashboard = () => {
             brandsServiced: Array.from(new Map(allBrands.map(b => [b._id, b])).values()).map(b => b._id),
           },
         })).unwrap();
+        setOpenSkills(false);
+        toast.success("Skills updated");
+        dispatch(loadGeek());
       } catch (error: Error | unknown) {
         if (error instanceof Error) toast.error(error.message);
         else console.error("Unknown error:", error);
@@ -365,39 +372,19 @@ const Dashboard = () => {
   }, [geek, brands, categories]);
 
   // ── Side effects ──────────────────────────────────────────────────────────────
-  const handleEmailVerify = () => {
-    setIsMailSent(true);
-    dispatch(sendVerificationMail(geek?._id || ""));
-  };
-
-  useEffect(() => {
-    if (geekState?.isMailSent === true && geekState?.isSuccess) {
+  const handleEmailVerify = async () => {
+    try {
+      await dispatch(sendVerificationMail(geek?._id || "")).unwrap();
       setIsMailSent(true);
       toast.dismiss();
       toast.success("Verification mail sent", {
         id: "mailSent", position: "top-center", style: { background: "#333", color: "#fff" },
       });
-    } else {
+    } catch {
       setIsMailSent(false);
     }
-  }, [geekState?.isMailSent, geekState?.isSuccess]);
+  };
 
-  useEffect(() => {
-    if (geekState?.isProfileUpdated === true && geekState?.isSuccess) {
-      if (updatingProfile === false) {
-        setOpenProfile(false);
-        toast.dismiss();
-        toast.success("Profile updated");
-        window.location.reload();
-      }
-      if (updatingSkills === false) {
-        setOpenSkills(false);
-        toast.dismiss();
-        toast.success("Skills updated");
-        window.location.reload();
-      }
-    }
-  }, [geekState?.isProfileUpdated, geekState?.isSuccess, updatingProfile, updatingSkills]);
 
   useEffect(() => {
     if (geek?._id && geek?.idProof?.isAdhaarVerified === false && geek?.idProof?.status === "Requested") {
@@ -406,7 +393,13 @@ const Dashboard = () => {
   }, [geek?.idProof?.isAdhaarVerified, geek?.idProof?.status, geek?.idProof?.requestId, dispatch, geek?._id]);
 
   const handleDeleteRateCard = async (rateId: string) => {
-    await dispatch(deleteRateCard({ id: geek._id, rateCardId: rateId })).unwrap();
+    try {
+      await dispatch(deleteRateCard({ id: geek._id, rateCardId: rateId })).unwrap();
+      toast.success("Rate card deleted");
+      dispatch(loadGeek());
+    } catch (err) {
+      console.error("Error deleting rate card", err);
+    }
   };
 
   const WEEK_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -456,17 +449,11 @@ const Dashboard = () => {
     } catch (error: Error | unknown) {
       if (error instanceof Error) toast.error(error.message);
     } finally {
+      dispatch(loadGeek());
       setUpdatingAvailability(false);
     }
   };
 
-  useEffect(() => {
-    if (geekState?.isRateCardDeleted === true && geekState?.isSuccess) {
-      toast.dismiss();
-      toast.success("Rate card deleted");
-      window.location.reload();
-    }
-  }, [geekState?.isRateCardDeleted, geekState?.isSuccess]);
 
 
   // ── Display helpers ───────────────────────────────────────────────────────────
@@ -555,6 +542,26 @@ const Dashboard = () => {
 
               {/* Stats row */}
               <div className="flex flex-wrap gap-4 mt-4 text-sm text-gray-600">
+                {geek?.email && (
+                  <span className="flex items-center gap-1.5">
+                    <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    {geek.email}
+                    {geek.isEmailVerified ? (
+                      <BadgeCheck className="w-3.5 h-3.5 text-teal-500 shrink-0" title="Email verified" />
+                    ) : isMailSent ? (
+                      <span className="text-xs text-gray-400 font-medium">Mail sent</span>
+                    ) : (
+                      <button
+                        onClick={handleEmailVerify}
+                        className="text-xs text-teal-600 font-medium hover:underline cursor-pointer"
+                      >
+                        Verify
+                      </button>
+                    )}
+                  </span>
+                )}
                 {geek?.address?.city && (
                   <span className="flex items-center gap-1">
                     <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -844,7 +851,7 @@ const Dashboard = () => {
 
       {/* Address */}
       <Modal open={openAddressForm} onClose={() => setOpenAddressForm(false)} title="Edit Address" subtitle="Update your service location">
-        <AddressForm />
+        <AddressForm openAddressForm={openAddressForm} setOpenAddressForm={setOpenAddressForm} />
       </Modal>
 
       {/* Aadhaar */}
@@ -860,7 +867,7 @@ const Dashboard = () => {
       {/* Rate card */}
       {geek && (
         <Modal open={openRateCard} onClose={() => setOpenRateCard(false)} title="Rate Cards" subtitle="Set your pricing per skill">
-          <RateCardSection geek={geek} />
+          <RateCardSection geek={geek} onClose={() => setOpenRateCard(false)} />
         </Modal>
       )}
 

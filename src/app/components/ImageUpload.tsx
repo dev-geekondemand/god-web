@@ -3,7 +3,7 @@
 import React, { useRef, useState } from "react";
 import Image from "next/image";
 import { useAppDispatch } from "@/lib/hooks";
-import { updateProfileImage } from "@/features/geek/geekSlice";
+import { loadGeek, updateProfileImage } from "@/features/geek/geekSlice";
 import { Camera } from "lucide-react";
 
 interface Props {
@@ -25,7 +25,8 @@ const ProfileImageUpload: React.FC<Props> = ({ imageUrl, geekId }) => {
     reader.onloadend = () => setPreview(reader.result as string);
     reader.readAsDataURL(file);
     try {
-      dispatch(updateProfileImage({ id: geekId, formData }));
+      await dispatch(updateProfileImage({ id: geekId, formData })).unwrap();
+      dispatch(loadGeek());
     } catch (err) {
       console.log(err);
     }

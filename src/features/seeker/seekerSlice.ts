@@ -304,8 +304,8 @@ const userSlice = createSlice({
           state.isError = false;
           state.isSuccess = true;
           state.user = action.payload.user;
+          state.isAuthenticated = true;
           toast.success('Registration successful');
-          window.location.href = '/';
       })
       .addCase(registerUser.rejected, (state, action) => {
           state.isPending = false;
@@ -324,7 +324,6 @@ const userSlice = createSlice({
         state.isSuccess = true;
         state.token = action.payload;
         toast.success('Login with Google successful.');
-        window.location.reload();
       })
       .addCase(loginWithGoogle.rejected, (state, action) => {
         state.isPending = false;
@@ -332,7 +331,6 @@ const userSlice = createSlice({
         state.isSuccess = false;
         state.errorMessage = action.error.message;
         toast.error('Login with Google failed.');
-        window.location.href = '/login/seeker';
       }).addCase(loginWithMS.pending, (state) => {
         state.isPending = true;
         state.isError = false;
@@ -344,14 +342,12 @@ const userSlice = createSlice({
         state.isSuccess = true;
         toast.success('Login with Microsoft successful.');
         state.token = action.payload;
-        window.location.reload();
       }).addCase(loginWithMS.rejected, (state, action) => {
         state.isPending = false;
         state.isError = true;
         state.isSuccess = false;
         state.errorMessage = action.error.message;
         toast.error('Login with Microsoft failed.');
-        window.location.href = '/login/seeker';
       })
       .addCase(loadUser.fulfilled, (state, action) => {
         state.isAuthenticated = action.payload?.fullName ? true : false;
@@ -377,7 +373,6 @@ const userSlice = createSlice({
         state.user = null;
         localStorage.removeItem("userType");
         toast.success("Logged out successfully");
-        window.location.href = "/";
         state.token = "";
         state.isAuthenticated = false;
         state.isError = false;
@@ -415,7 +410,6 @@ const userSlice = createSlice({
         state.isError = false;
         state.token = action.payload;
         toast.success('Login successful.');
-        window.location.reload();
       }).addCase(loginWithOTP.rejected, (state, action) => {
         state.isPending = false;
         state.isError = true;

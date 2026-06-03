@@ -4,11 +4,12 @@
 // const Multiselect = dynamic(() => import('react-widgets/Multiselect'), {
 //   ssr: false,
 // });
-import React, { useEffect, useState,  } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 // import CustomInput from '@/app/components/CustonInput';
 import { useAppDispatch } from '@/lib/hooks';
+import { useRouter } from 'next/navigation';
 import { getCategories } from '@/features/category/categorySlice';
 import { getBrands, getBrandsByCategory } from '@/features/brands/brandsSlice';
 import { useSelector } from 'react-redux';
@@ -57,6 +58,7 @@ const ServiceCreateForm = () => {
     },[])
 
     const dispatch = useAppDispatch();
+    const router = useRouter();
 
   useEffect(() => {
     dispatch(getCategories());
@@ -145,7 +147,7 @@ const ServiceCreateForm = () => {
     if(serviceState?.isError){
         toast.error(serviceState?.message || "Something went wrong");
         if(serviceState?.message === "Not authorized, Geek not logged in"){
-            window.location.href = "/login/geek";
+            router.push("/login/geek");
         }
         formik.resetForm();
     }

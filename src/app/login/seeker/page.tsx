@@ -1,6 +1,5 @@
 "use client"
 import { getLoginOTP, resetIsLoginOTP, } from '@/features/seeker/seekerSlice'
-import Geek from '@/interfaces/Geek'
 import { useAppDispatch } from '@/lib/hooks'
 import { RootState } from '@/lib/store'
 import { url } from '@/utils/url'
@@ -9,12 +8,14 @@ import { LoaderCircle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useSelector } from 'react-redux'
 import * as Yup from 'yup'
 
 const Login = () => {
 
-    const [loading, setLoading] = useState(false); // Generic loading for OTP/Verify
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
     useEffect(() => {
     dispatch(resetIsLoginOTP());
@@ -44,20 +45,20 @@ const Login = () => {
         },
     });
 
-    const seekerState = useSelector((state: RootState) => {return state.seeker});
-    const geekState = useSelector((state: RootState) => {return state.geek?.geek}) as Geek;
+    const seekerState = useSelector((state: RootState) => state.seeker);
+    const geekSliceState = useSelector((state: RootState) => state.geek);
 
     useEffect(()=>{
-        if(seekerState?.user?._id || geekState?._id){
-            window.location.href = "/";
+        if(seekerState?.isAuthenticated || geekSliceState?.isAuthenticated){
+            router.push("/");
         }
-    },[geekState?._id, seekerState?.user?._id])
+    },[seekerState?.isAuthenticated, geekSliceState?.isAuthenticated, router])
     
 
     useEffect(() => {
         if(seekerState?.isLoginOTP && formik.values.phone !== '' && formik.isValid){
             setTimeout(() => {
-              window.location.href = `/verify-otp?phone=${formik?.values?.phone}&context=login`;
+              router.push(`/verify-otp?phone=${formik?.values?.phone}&context=login`);
             },3000)
         }
 
@@ -78,7 +79,7 @@ const Login = () => {
                     <div className='xl:max-w-6xl w-full h-full lg:max-w-5xl md:max-w-3xl sm:max-w-xl mx-auto'>
                         <div className='flex flex-wrap w-full'>
                             <div className='w-full flex flex-col gap-3 items-center justify-center'>
-                                <h2 className='text-4xl font-bold text-white'>Seeker Login</h2>
+                                <h2 className='text-4xl font-bold'>Seeker Login</h2>
                                 <div className='flex gap-2 items-center'>
                                <Link href="/" className='cursor-pointer'>
                         <svg className='w-4 h-4 ' 

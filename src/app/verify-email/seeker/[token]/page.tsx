@@ -1,5 +1,5 @@
 "use client";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, } from "react";
 import { Loader2, CheckCircle, XCircle } from "lucide-react"; // icons
 import { useAppDispatch } from "@/lib/hooks";
@@ -8,9 +8,10 @@ import { RootState } from "@/lib/store";
 import { verifyMail } from "@/features/seeker/seekerSlice";
 
 export default function VerifyEmailPage() {
-  const router = useParams();
-  console.log(router.token);
-  const token = router.token as string;
+  const params = useParams();
+  const router = useRouter();
+  console.log(params.token);
+  const token = params.token as string;
 
   const [isSeekerMailVerified, setIsSeekerMailVerified] = useState(false);
   const [isStatusLoading, setIsStatusLoading] = useState(false);
@@ -31,7 +32,7 @@ export default function VerifyEmailPage() {
   useEffect(() => {
     if(seekerState.isMailVerified === true){
       setTimeout(() => {
-        window.location.href = "/";
+        router.push("/");
       }, 4000);
       setIsSeekerMailVerified(true);
       setIsStatusLoading(false);
@@ -47,7 +48,7 @@ export default function VerifyEmailPage() {
   const handleRedirect = ()=>{
     if(isSeekerMailVerified){
       setTimeout(() => {
-        window.location.href = seekerState?.user?._id ?  `/seeker/${seekerState?.user?._id}` : "/";
+        router.push(seekerState?.user?._id ? `/seeker/${seekerState?.user?._id}` : "/");
       }, 2000);
     }
   }
@@ -94,7 +95,7 @@ export default function VerifyEmailPage() {
             </h2>
             <p className="text-gray-500 mt-2">{seekerState.errorMessage}</p>
             <button
-              onClick={() =>window.location.href = "/"}
+              onClick={() => router.push("/")}
               className="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
             >
               Go back

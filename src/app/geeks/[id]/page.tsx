@@ -38,6 +38,8 @@ const GeekById = () => {
   const id = params.id
   const catId = useSearchParams().get('categoryId')
   const categoryId = catId && catId !== 'undefined' ? catId : null
+  const brandParam = useSearchParams().get('brandId')
+  const urlBrandId = brandParam && brandParam !== 'undefined' ? brandParam : null
 
   const [skills, setSkills] = useState<Category[]>([])
   const [selectedSkill, setSelectedSkill] = useState<Category>()
@@ -93,7 +95,7 @@ const GeekById = () => {
   const handleClick = () => {
     if (!geek?._id) { toast.error('Geek not found'); return }
     if (loggedInGeek?._id === geek._id) { toast.error('You cannot book your own service'); return }
-    if (!loggedInSeeker?._id) { router.push(`/login?redirect=/geeks/${id}`); return }
+    if (!loggedInSeeker?._id) { router.push(`/login/seeker?redirect=/geeks/${id}`); return }
     setSelectedSlot(undefined)
     setShowDialog(true)
   }
@@ -176,9 +178,16 @@ const GeekById = () => {
     return entry?.brands ?? []
   }
 
-  // Reset brand when skill changes
+  // Pre-select brand from URL param once brands are loaded
   useEffect(() => {
-    setSelectedBrand(undefined)
+    if (!urlBrandId || brands.length === 0) return
+    const matched = brands.find(b => b._id === urlBrandId)
+    if (matched) setSelectedBrand(matched)
+  }, [brands, urlBrandId])
+
+  // Reset brand when skill changes, but preserve URL-pre-selected brand
+  useEffect(() => {
+    if (!urlBrandId) setSelectedBrand(undefined)
   }, [selectedSkill])
 
   if (isGeekLoading) {
@@ -283,7 +292,7 @@ const GeekById = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    {geek.address.city}, {geek.address.state}
+                    {geek.address?.line1 && !geek.address?.line2 ? ` ${geek.address?.line1},` : `${geek.address?.line2},`} {geek.address?.city}, {geek.address?.state}
                   </span>
                 )}
                 {geek?.yoe != null && (
@@ -622,6 +631,7 @@ const GeekById = () => {
           skillBrands={getSkillBrands(selectedSkill)}
           selectedBrand={selectedBrand}
           setSelectedBrand={setSelectedBrand}
+          preselectedBrandId={urlBrandId}
         />
       )}
     </section>

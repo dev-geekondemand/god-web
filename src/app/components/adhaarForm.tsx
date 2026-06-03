@@ -6,7 +6,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import CustomInput from "../components/CustonInput";
 import { useAppDispatch } from "@/lib/hooks";
-import { verifyAdhaar } from "@/features/geek/geekSlice";
+import { loadGeek, verifyAdhaar } from "@/features/geek/geekSlice";
 import toast from "react-hot-toast";
 import { ShieldCheck } from "lucide-react";
 
@@ -34,10 +34,10 @@ const AadhaarVerificationForm = ({ status }: AadhaarVerificationFormProps) => {
     toast.dismiss();
     if (status === "Requested") {
       toast.loading("Aadhaar verification in progress...");
-      window.location.reload();
+      dispatch(loadGeek());
     } else if (status === "Verified") {
       toast.success("Aadhaar verification successful!");
-      window.location.reload();
+      dispatch(loadGeek());
     } else if (status === "Failed") {
       toast.error("Last Aadhaar verification failed!");
     }

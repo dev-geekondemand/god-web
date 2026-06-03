@@ -4,6 +4,7 @@ import { useAppDispatch } from '@/lib/hooks'
 import { RootState } from '@/lib/store'
 import { useFormik } from 'formik'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useSelector } from 'react-redux'
@@ -21,9 +22,10 @@ const LoginGeek = () => {
   const [otpPhone, setOtpPhone] = useState<string | null>(null)
   const [isResending, setIsResending] = useState(false)
 
-  useEffect(() => { setIsOTPSent(false) }, [])
+  useEffect(() => { setIsOTPSent(false);  }, [])
 
   const dispatch = useAppDispatch()
+  const router = useRouter()
 
   const validationSchema = useMemo(
     () =>
@@ -54,7 +56,7 @@ const LoginGeek = () => {
 
   useEffect(() => {
     if (geekState?.isAuthenticated) {
-      setTimeout(() => { window.location.href = '/' }, 1000)
+      router.push('/')
     } else if (geekState?.isOTPSent && !isOTPSent) {
       setIsOTPSent(true)
       setOtpPhone(formik.values.phone)

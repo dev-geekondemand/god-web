@@ -14,10 +14,12 @@ const UploadMediaPage = ({
   requestId,
   isUploadedOpen,
   setIsUploadedOpen,
+  onSuccess,
 }: {
   requestId: string;
   isUploadedOpen: boolean;
   setIsUploadedOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onSuccess?: () => void;
 }) => {
   const dispatch = useAppDispatch();
   const { loading, progress, success, error } = useSelector(
@@ -45,6 +47,7 @@ const UploadMediaPage = ({
 
       try {
         await dispatch(uploadMediaThunk({ requestId, formData })).unwrap();
+        onSuccess?.();
       } catch {
         setPreviews([]);
       }

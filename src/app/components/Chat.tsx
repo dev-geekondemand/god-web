@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef, JSX, } from 'react';
+import { useState, useEffect, useRef, JSX } from 'react';
+import { useRouter } from 'next/navigation';
 import ChatMessage from './chat/ChatMessage';
 import ChatInput from './chat/ChatInput';
 
@@ -27,6 +28,7 @@ import { ServiceRequest } from '@/interfaces/ServiceRequest';
 import { Maximize2, Minus } from 'lucide-react';
 
 function Chat({setOpenChat, isExpanded, setIsExpanded}:{setOpenChat: (value: boolean)=>void, isExpanded: boolean, setIsExpanded: (value: boolean)=>void}): JSX.Element {
+	const router = useRouter();
 	const [messages, setMessages] = useState<Array<ChatMessageInterface>>([]);
 	const [options, setOptions] = useState<Array<string>>([]);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -458,7 +460,7 @@ const dispatch = useAppDispatch();
 								<p className="text-gray-700 font-semibold mb-2">Please log in to access the chat.</p>
 								<button
 								onClick={() => {
-									window.location.href = '/login/seeker';
+									router.push('/login/seeker');
 								}}
 								className="px-4 py-2 bg-black text-white rounded-md hover:opacity-90"
 								>

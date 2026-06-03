@@ -25,10 +25,12 @@ const Requests = () => {
 
   const handleAccept = async (id: string) => {
     await dispatch(acceptRequest(id));
+    dispatch(getGeekRequests());
   };
 
   const handleReject = async (id: string) => {
     await dispatch(rejectRequest(id));
+    dispatch(getGeekRequests());
   };
 
   return (

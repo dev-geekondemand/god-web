@@ -7,7 +7,7 @@ import { getLoginOTP, loadUser, loginWithOTP, registerUser } from '@/features/se
 import { useAppDispatch } from '@/lib/hooks';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/lib/store';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { LoaderCircle } from 'lucide-react';
 
@@ -43,6 +43,7 @@ const VerifyOTP = () => {
 
   
 
+  const router = useRouter();
   const [step,] = useState<'register' | 'login'>(context === 'login' ? 'login' : 'register');
 
   const validationSchema = Yup.object({
@@ -52,10 +53,10 @@ const VerifyOTP = () => {
   const formik = useFormik({
     initialValues: { otp: '' },
     validationSchema,
-    onSubmit: () => {
+    onSubmit: async () => {
       setLoading(true);
-      try{
-          const loginPayload = { 
+      try {
+        const loginPayload = {
           phone: mobile ?? '',
           otp: +formik.values.otp,
         };
@@ -66,9 +67,10 @@ const VerifyOTP = () => {
         };
 
         if (step === 'register' && selected === 'Seeker') {
-          dispatch(registerUser({ phone: mobile ?? '', otp: +formik.values.otp, fullName, refCode: refCode ?? '' }));
+          await dispatch(registerUser({ phone: mobile ?? '', otp: +formik.values.otp, fullName, refCode: refCode ?? '' })).unwrap();
+          dispatch(loadUser());
         } else if (step === 'register' && selected === 'Geek') {
-          dispatch(createGeek({
+          await dispatch(createGeek({
             fullName: {
               first: firstName ?? '',
               last: lastName ?? '',
@@ -77,12 +79,12 @@ const VerifyOTP = () => {
             otp: +formik.values.otp,
             primarySkill: category ?? '',
             yoe: Number(yoe),
-            type:"Individual",
+            type: "Individual",
             refCode: refCode ?? '',
-            brandsServiced: brands ? JSON.parse(brands) : []
-          }));
+            brandsServiced: brands ? JSON.parse(brands) : [],
+          })).unwrap();
         } else if (step === 'register' && selected === 'CorporateGeek') {
-          dispatch(createCorporateGeek({
+          await dispatch(createCorporateGeek({
             fullName: {
               first: firstName ?? '',
               last: lastName ?? '',
@@ -95,35 +97,36 @@ const VerifyOTP = () => {
             refCode: refCode ?? '',
             brandsServiced: brands ? JSON.parse(brands) : [],
             GSTIN: gstin ?? undefined,
-          }));
+          })).unwrap();
         } else {
-          dispatch(loginWithOTP(loginPayload));
+          await dispatch(loginWithOTP(loginPayload)).unwrap();
+          dispatch(loadUser());
         }
-      }catch(error){
+      } catch (error) {
         toast.error('An error occurred. Please try again.');
         console.log(error);
-      }finally{
+      } finally {
         setLoading(false);
       }
-
-      setTimeout(() => {
-        dispatch(loadUser());
-      }, 600);
     },
   });
 
   const userState = useSelector((state: RootState) => state.seeker);
-
+  const geekState = useSelector((state: RootState) => state.geek);
 
   useEffect(() => {
-    if (userState.isAuthenticated)  {
-        toast.dismiss();
-        toast.success('Login successful');
-      setTimeout(() => {
-          window.location.href = '/';
-      },1000)
+    if (userState.isAuthenticated) {
+      toast.dismiss();
+      toast.success('Login successful');
+      router.push('/');
     }
-  }, [userState.isAuthenticated]);
+  }, [userState.isAuthenticated, router]);
+
+  useEffect(() => {
+    if (geekState.isAuthenticated) {
+      router.push('/');
+    }
+  }, [geekState.isAuthenticated, router]);
 
 
 

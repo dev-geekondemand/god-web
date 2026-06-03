@@ -98,6 +98,7 @@ const UserProfile = () => {
         })
       );
       setIsEditing(false);
+      dispatch(loadUser());
     },
   });
 

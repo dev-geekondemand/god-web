@@ -40,6 +40,7 @@ const DialogComponent = ({
    skillBrands,
    selectedBrand,
    setSelectedBrand,
+   preselectedBrandId,
   }: {
     seekerId: string,
     showDialog: boolean,
@@ -61,6 +62,7 @@ const DialogComponent = ({
     skillBrands?: Brand[],
     selectedBrand?: Brand,
     setSelectedBrand?: React.Dispatch<React.SetStateAction<Brand | undefined>>,
+    preselectedBrandId?: string | null,
   }) => {
 
   const [open, setOpen] = useState(false)
@@ -120,7 +122,7 @@ const DialogComponent = ({
             </div>
           )}
 
-          {hasBrands && (
+          {hasBrands && !preselectedBrandId && (
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold text-gray-700">
                 Brand <span className="text-red-400">*</span>

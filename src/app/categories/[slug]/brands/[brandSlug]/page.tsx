@@ -195,7 +195,8 @@ const GeeksByCategories = () => {
   };
 
   const handleClick = (geekId: string) => {
-    router.push(`/geeks/${geekId}?categoryId=${resolvedCategoryId}`);
+    const url = `/geeks/${geekId}?categoryId=${resolvedCategoryId}${resolvedBrandId ? `&brandId=${resolvedBrandId}` : ''}`;
+    router.push(url);
   };
 
   // ── Derived state ─────────────────────────────────────────────────────────

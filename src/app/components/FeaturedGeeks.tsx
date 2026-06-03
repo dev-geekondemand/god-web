@@ -1,5 +1,6 @@
 ﻿"use client"
 import React, { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAppDispatch } from '@/lib/hooks';
@@ -25,6 +26,7 @@ const planConfig: Record<string, { label: string; color: string }> = {
 
 const FeaturedGeeks = () => {
     const dispatch = useAppDispatch();
+    const router = useRouter();
 
     useEffect(() => {
         dispatch(searchGeeks({ page: 1, limit: 4 }));
@@ -37,7 +39,7 @@ const FeaturedGeeks = () => {
 
     const handleClick = (id: string) => {
         if (isAuthenticated) {
-            window.location.href = `/geeks/${id}`;
+            router.push(`/geeks/${id}`);
         } else {
             toast.dismiss();
             toast.custom((t) => (

@@ -358,7 +358,11 @@ const initialState: GeekInitialState = {
 const geekSlice = createSlice({
     name: 'geek',
     initialState,
-    reducers: {},
+    reducers: {
+        resetProfileUpdated: (state) => {
+            state.isProfileUpdated = false;
+        },
+    },
     extraReducers: (builder) => {
         builder
         .addCase(getGeeks.pending, (state) => {
@@ -401,7 +405,7 @@ const geekSlice = createSlice({
             state.message = action.error.message;
             toast.error((action.payload as { message: string })?.message|| 'Failed to send OTP.');
         }).addCase(loadGeek.fulfilled, (state, action) => {
-            state.isAuthenticated = true;
+            state.isAuthenticated = !!action.payload?._id;
             state.geek = action.payload;
             state.isError = false;
             state.isSuccess = true;
@@ -427,10 +431,9 @@ const geekSlice = createSlice({
             state.isLoading = false;
             state.isSuccess = true;
             state.isError = false;
-            state.geek = action.payload;
+            state.geek = action.payload?.geek ?? action.payload;
             toast.success('Registration successful.');
             state.isAuthenticated = true;
-            window.location.href = '/';
         }).addCase(createGeek.rejected, (state, action) => {
             state.isLoading = false;
             state.isError = true;
@@ -449,7 +452,6 @@ const geekSlice = createSlice({
             state.geek = action.payload?.geek ?? action.payload;
             state.isAuthenticated = true;
             toast.success('Registration successful.');
-            window.location.href = '/';
         }).addCase(createCorporateGeek.rejected, (state, action) => {
             state.isLoading = false;
             state.isError = true;
@@ -464,10 +466,9 @@ const geekSlice = createSlice({
             state.isLoading = false;
             state.isSuccess = true;
             state.isError = false;
-            state.geek = action.payload;
+            state.geek = action.payload?.geek ?? action.payload;
             toast.success('Geek logged in.');
             state.isAuthenticated = true;
-            window.location.href = '/';
         }).addCase(loginGeek.rejected, (state, action) => {
             state.isLoading = false;
             state.isError = true;
@@ -484,7 +485,6 @@ const geekSlice = createSlice({
             state.isSuccess = true;
             state.isError = false;
             state.isProfileUpdated = true;
-            toast.success('Geek profile updated.');
             state.geek = action.payload;
         })
         .addCase(updateGeekProfile.rejected, (state, action) => {
@@ -565,7 +565,7 @@ const geekSlice = createSlice({
             state.isError = false;
             toast.success('Geek logged out.');
             state.isAuthenticated = false;
-            window.location.href = '/';
+            state.geek = null;
         }).addCase(logoutGeek.rejected, (state, action) => {
             state.isLoading = false;
             state.isError = true;
@@ -597,7 +597,6 @@ const geekSlice = createSlice({
             state.isError = false;
             state.message = action.payload?.message;
             toast.success(action.payload?.message);
-            window.location.reload();
         }).addCase(updateProfileImage.rejected, (state, action) => {
             state.isLoading = false;
             state.isError = true;
@@ -688,5 +687,6 @@ const geekSlice = createSlice({
     }
 })
 
+export const { resetProfileUpdated } = geekSlice.actions
 export default geekSlice.reducer
 

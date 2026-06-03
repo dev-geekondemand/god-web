@@ -73,12 +73,17 @@ const Navbar = () => {
     { id: 2, name: "Contact Us", link: "/contact" },
   ];
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     const userType = localStorage.getItem("userType");
-    if (userType === "seeker") {
-      dispatch(logoutUser());
-    } else {
-      dispatch(logoutGeek());
+    try {
+      if (userType === "seeker") {
+        await dispatch(logoutUser()).unwrap();
+      } else {
+        await dispatch(logoutGeek()).unwrap();
+      }
+      router.push('/');
+    } catch {
+      // error toast already handled in slice
     }
     localStorage.removeItem("userType");
     setOpenModal(false);

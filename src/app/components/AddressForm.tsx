@@ -11,7 +11,7 @@ import CustomInput from './CustonInput';
 import toast from 'react-hot-toast';
 import { LocateFixed } from 'lucide-react';
 
-const AddressForm = () => {
+const AddressForm = ( {openAddressForm, setOpenAddressForm} :{openAddressForm: boolean, setOpenAddressForm: any}) => {
   const dispatch = useAppDispatch();
   const geek = useSelector((state: RootState) => state.geek.geek) as Geek;
   const [loadingLocation, setLoadingLocation] = useState(false);
@@ -35,11 +35,11 @@ const AddressForm = () => {
       pin: Yup.string().required('PIN is required'),
     }),
     onSubmit: (values) => {
-      dispatch(updateAddress({ id: geek?._id, address: values }));
-      setTimeout(() => {
+      dispatch(updateAddress({ id: geek?._id, address: values })).then(() => {
         formik.resetForm();
-        window.location.reload();
-      }, 2000);
+        dispatch(loadGeek());
+        setOpenAddressForm(false);
+      });
     },
   });
 

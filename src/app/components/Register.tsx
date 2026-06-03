@@ -13,7 +13,7 @@ import { url } from '@/utils/url'
 import { getCategories } from '@/features/category/categorySlice'
 import { sendGeekOTP } from '@/features/geek/geekSlice'
 import toast from 'react-hot-toast'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Brand from '@/interfaces/Brand'
 import { getBrandsByCategory } from '@/features/brands/brandsSlice'
 import { Multiselect } from 'react-widgets/cjs'
@@ -45,6 +45,7 @@ const Register = () => {
   const type = query.get('type')
   const [selected, setSelected] = useState<'Seeker' | 'Geek' | ''>('')
   const dispatch = useAppDispatch()
+  const router = useRouter()
 
   const getValidationSchema = (sel: string) =>
     Yup.object({
@@ -111,12 +112,12 @@ const Register = () => {
       const { firstName, lastName, phone, category, yoe } = formik.values
       if (selected === "Seeker") {
         if (firstName && lastName && phone) {
-          window.location.href = `/verify-otp?phone=${phone}&firstName=${firstName}&lastName=${lastName}&refCode=${formik.values.refCode}&context=register&selected=${selected}`
+          router.push(`/verify-otp?phone=${phone}&firstName=${firstName}&lastName=${lastName}&refCode=${formik.values.refCode}&context=register&selected=${selected}`)
         }
       } else {
         if (firstName && lastName && phone && category && yoe !== 0 && formik.values.brands.length > 0) {
           const brands = formik.values.brands.map((b: Brand) => b._id)
-          window.location.href = `/verify-otp?phone=${phone}&firstName=${firstName}&lastName=${lastName}&category=${category}&yoe=${yoe}&refCode=${formik.values.refCode}&brands=${JSON.stringify(brands)}&context=register&selected=${selected}`
+          router.push(`/verify-otp?phone=${phone}&firstName=${firstName}&lastName=${lastName}&category=${category}&yoe=${yoe}&refCode=${formik.values.refCode}&brands=${JSON.stringify(brands)}&context=register&selected=${selected}`)
         }
       }
     }
@@ -130,7 +131,7 @@ const Register = () => {
   useEffect(() => {
     if (seekerState?.isAuthenticated || geekState?.isAuthenticated) {
       toast.error('You are already logged in.')
-      window.location.href = '/'
+      router.push('/')
     }
   }, [seekerState, geekState, selected])
 

@@ -14,16 +14,24 @@ export default function AuthInitializer() {
   const seeker = useSelector((state: RootState) => state.seeker) as UserState;
   const geek = useSelector((state: RootState) => state.geek) as GeekInitialState ;
 
+  // On mount: restore auth state from session cookie after a full page reload
   useEffect(() => {
-    // Only dispatch if not already authenticated
-    if (!seeker.user?.fullName && !seeker.isAuthenticated) {
+    if (!seeker.isAuthenticated) {
       dispatch(loadUser());
     }
-    if (!geek.geek?.fullName && !geek.isAuthenticated) {
+    if (!geek.isAuthenticated) {
       dispatch(loadGeek());
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // After client-side login/register: fetch full geek profile if it's missing
+  useEffect(() => {
+    if (geek.isAuthenticated && !geek.geek?._id) {
+      dispatch(loadGeek());
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [geek.isAuthenticated]);
 
   // Set userType based on who is authenticated
   useEffect(() => {

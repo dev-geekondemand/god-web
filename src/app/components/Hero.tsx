@@ -160,7 +160,7 @@ const handleSearch = (category: string | null) => {
           <div className="grid grid-cols-1 md:grid-cols-2 items-stretch h-full">
             <div className="">
               <div
-                className="wow fadeInUp"
+                className="wow fadeInUp h-full flex flex-col justify-center"
               >
                 <h2 className=" text-gray-600  md:text-3xl text-2xl leading-12 lg:text-4xl font-bold">
                   Service & Repair {" "}
@@ -350,7 +350,7 @@ const handleSearch = (category: string | null) => {
                 </div>
               </div>
             </div>
-            <div className="hidden md:block relative wow fadeInUp">
+            <div className="hidden md:block relative wow fadeInUp h-full strech">
               <Image
                 src={"/assets/main_hero.png"}
                 fill

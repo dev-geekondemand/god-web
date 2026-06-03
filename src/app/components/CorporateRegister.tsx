@@ -12,7 +12,7 @@ import { sendGeekOTP } from "@/features/geek/geekSlice";
 import { Multiselect } from "react-widgets/cjs";
 import "react-widgets/styles.css";
 import toast from "react-hot-toast";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Brand from "@/interfaces/Brand";
 import { Category } from "@/interfaces/Category";
 import PageBanner from "./PageBanner";
@@ -73,6 +73,7 @@ function VerifyBadge({ status, message }: { status: VerifyStatus; message: strin
 
 export default function CorporateRegister() {
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const query = useSearchParams();
 
   const categories = useSelector((state: RootState) => state.category.categories) as Category[];
@@ -147,7 +148,7 @@ export default function CorporateRegister() {
   useEffect(() => {
     if (geekState.isAuthenticated) {
       toast.error("You are already logged in.");
-      window.location.href = "/";
+      router.push("/");
     }
   }, [geekState.isAuthenticated]);
 
@@ -168,7 +169,7 @@ export default function CorporateRegister() {
         context: "register",
         selected: "CorporateGeek",
       });
-      window.location.href = `/verify-otp?${params.toString()}`;
+      router.push(`/verify-otp?${params.toString()}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geekState.isSuccess, geekState.isOTPSent]);

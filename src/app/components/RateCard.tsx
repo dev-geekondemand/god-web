@@ -1,28 +1,40 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useFormik } from "formik";
 import { useAppDispatch } from "@/lib/hooks";
 import Geek, { RateCard } from "@/interfaces/Geek";
 import { Category } from "@/interfaces/Category";
-import { updateRateCard } from "@/features/geek/geekSlice";
+import { loadGeek, updateRateCard } from "@/features/geek/geekSlice";
 import toast from "react-hot-toast";
 import { UISelect } from "./UISelect";
 import CustomInput from "./CustonInput";
-import { useSelector } from "react-redux";
-import { RootState } from "@/lib/store";
 import { Trash2, CreditCard } from "lucide-react";
 
 interface RateCardSectionProps {
   geek: Geek;
+  onClose?: () => void;
 }
 
-const RateCardSection: React.FC<RateCardSectionProps> = ({ geek }) => {
+const RateCardSection: React.FC<RateCardSectionProps> = ({ geek, onClose }) => {
   const dispatch = useAppDispatch();
   const [localRateCards, setLocalRateCards] = useState<RateCard[]>(geek.rateCard || []);
   const [submitting, setSubmitting] = useState(false);
 
   const allSkills: Category[] = [geek.primarySkill, ...(geek.secondarySkills || [])];
+
+  const hasChanges = useMemo(() => {
+    const original = geek.rateCard || [];
+    if (localRateCards.length !== original.length) return true;
+    return localRateCards.some(
+      entry => !original.some(
+        orig => orig.skill?._id === entry.skill?._id && orig.chargeType === entry.chargeType && orig.rate === entry.rate
+      )
+    );
+  }, [localRateCards, geek.rateCard]);
+
+  const isNewEntry = (entry: RateCard) =>
+    !(geek.rateCard || []).some(orig => orig.skill?._id === entry.skill?._id);
 
   const formik = useFormik({
     initialValues: {
@@ -59,30 +71,18 @@ const RateCardSection: React.FC<RateCardSectionProps> = ({ geek }) => {
       setSubmitting(true);
       const newEntries = localRateCards.filter(
         entry => !geek.rateCard?.some(
-          orig => (orig.skill?._id === entry.skill?._id) && orig.chargeType === entry.chargeType
+          orig => orig.skill?._id === entry.skill?._id && orig.chargeType === entry.chargeType
         )
       );
-      if (newEntries.length === 0) {
-        toast.error("No new rate cards to save.");
-        setSubmitting(false);
-        return;
-      }
       await dispatch(updateRateCard({ id: geek._id, data: newEntries })).unwrap();
+      toast.success("Rate card updated successfully");
+      dispatch(loadGeek());
+      onClose?.();
     } catch (err) {
       console.error("Error submitting rate cards", err);
     }
     setSubmitting(false);
   };
-
-  const geekState = useSelector((state: RootState) => state.geek);
-
-  useEffect(() => {
-    if (geekState?.isRateCardUpdated === true && geekState?.isSuccess) {
-      toast.dismiss();
-      toast.success("Rate card updated successfully");
-      window.location.reload();
-    }
-  }, [geekState?.isRateCardUpdated, geekState?.isSuccess]);
 
   return (
     <div className="p-6 flex flex-col gap-5">
@@ -91,14 +91,29 @@ const RateCardSection: React.FC<RateCardSectionProps> = ({ geek }) => {
         <p className="text-sm text-gray-500 mt-0.5">Set your pricing for each skill</p>
       </div>
 
-      {/* Existing entries */}
-      {localRateCards.length > 0 && (
+      {localRateCards.length > 0 ? (
         <div className="flex flex-col gap-2">
           {localRateCards.map(entry => (
-            <div key={entry._id} className="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-3 group">
-              <div>
-                <p className="text-sm font-semibold text-gray-800">{entry.skill?.title}</p>
-                <p className="text-xs text-gray-500 mt-0.5">₹{entry.rate} &middot; {entry.chargeType}</p>
+            <div
+              key={entry._id}
+              className={`flex items-center justify-between rounded-lg px-4 py-3 group transition-colors ${
+                isNewEntry(entry)
+                  ? "border border-teal-300 bg-teal-50/50"
+                  : "border border-gray-200"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold text-gray-800">{entry.skill?.title}</p>
+                    {isNewEntry(entry) && (
+                      <span className="text-[10px] font-semibold text-teal-600 bg-teal-100 px-1.5 py-0.5 rounded-full leading-none">
+                        New
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-0.5">₹{entry.rate} &middot; {entry.chargeType}</p>
+                </div>
               </div>
               <button
                 onClick={() => handleDelete(entry._id)}
@@ -109,19 +124,16 @@ const RateCardSection: React.FC<RateCardSectionProps> = ({ geek }) => {
             </div>
           ))}
         </div>
-      )}
-
-      {localRateCards.length === 0 && (
-        <div className="flex flex-col items-center py-6 text-gray-400">
+      ) : (
+        <div className="flex flex-col items-center py-8 text-gray-400 border border-dashed border-gray-200 rounded-lg">
           <CreditCard className="w-7 h-7 mb-2 opacity-30" />
           <p className="text-sm">No rate cards yet</p>
+          <p className="text-xs text-gray-400 mt-0.5">Add one below to get started</p>
         </div>
       )}
 
-      {/* Divider */}
       <div className="border-t border-gray-100" />
 
-      {/* Add new entry */}
       <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
         <p className="text-sm font-medium text-gray-700">Add a rate card</p>
 
@@ -173,10 +185,11 @@ const RateCardSection: React.FC<RateCardSectionProps> = ({ geek }) => {
 
       <button
         onClick={handleFinalSubmit}
-        disabled={submitting}
-        className="w-full bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold py-2.5 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
+        disabled={!hasChanges || submitting}
+        className="w-full bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold py-2.5 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+        title={!hasChanges ? "No unsaved changes" : undefined}
       >
-        {submitting ? "Saving..." : "Save Rate Cards"}
+        {submitting ? "Saving..." : "Save Changes"}
       </button>
     </div>
   );
