@@ -549,7 +549,7 @@ const Dashboard = () => {
                     </svg>
                     {geek.email}
                     {geek.isEmailVerified ? (
-                      <BadgeCheck className="w-3.5 h-3.5 text-teal-500 shrink-0" title="Email verified" />
+                      <BadgeCheck className="w-3.5 h-3.5 text-teal-500 shrink-0"  />
                     ) : isMailSent ? (
                       <span className="text-xs text-gray-400 font-medium">Mail sent</span>
                     ) : (
