@@ -18,7 +18,7 @@ import { Category } from '@/interfaces/Category';
 import Brand from '@/interfaces/Brand';
 
 interface GeekState {
-  geeks: Geek[]; 
+  geeks: Geek[];
   total: number;
   pages: number;
   page: number;
