@@ -194,7 +194,7 @@ const Providers = () => {
       <div className="grid w-full py-10 grid-cols-12 gap-4 relative max-w-7xl mx-auto px-4">
         {/* ── Filters sidebar ──────────────────────────────────────────── */}
         <div className="lg:col-span-3 col-span-12 lg:sticky lg:top-22 self-start">
-          <div className='bg-white shadow-sm border border-gray-100 rounded-xl overflow-hidden'>
+          <div className='bg-white shadow-sm border border-gray-100 rounded-xl'>
 
             {/* Header */}
             <div className='flex items-center justify-between px-4 py-3 border-b border-gray-100'>
@@ -225,20 +225,15 @@ const Providers = () => {
                 <div className="relative w-full">
                   <div
                     onClick={toggleDropdown}
-                    className="bg-gray-50 border border-gray-200 text-sm text-gray-700 rounded-lg px-3 py-2 cursor-pointer flex justify-between items-center"
+                    className="bg-white border border-gray-300 text-sm text-gray-700 rounded-md px-4 py-2 cursor-pointer"
                   >
-                    <span className={selectedBrand ? 'text-gray-800' : 'text-gray-400'}>
-                      {selectedBrand?.name || 'Any brand'}
-                    </span>
-                    <svg className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} viewBox="0 0 1024 1024" fill="currentColor">
-                      <path d="M903.232 256l56.768 50.432L512 768 64 306.432 120.768 256 512 659.072z" />
-                    </svg>
+                    {selectedBrand?.name || 'Any brand'}
                   </div>
                   {isOpen && (
-                    <div className="absolute z-50 left-0 right-0 bg-white border border-gray-200 rounded-lg mt-1 max-h-44 overflow-y-auto shadow-md custom-scrollbar">
+                    <div className="absolute z-20 left-0 right-0 bg-white border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto custom-scrollbar shadow-sm">
                       <div
                         onClick={() => { setFilters(f => ({ ...f, brandId: '' })); setSelectedBrand(null); setIsOpen(false); }}
-                        className="px-3 py-2 text-sm cursor-pointer text-gray-400 hover:bg-gray-50"
+                        className="px-4 py-2 text-sm cursor-pointer hover:bg-teal-500 hover:text-white"
                       >
                         Any brand
                       </div>
@@ -246,7 +241,7 @@ const Providers = () => {
                         <div
                           key={i}
                           onClick={() => { setFilters(f => ({ ...f, brandId: b._id })); setSelectedBrand(b); setIsOpen(false); }}
-                          className={`px-3 py-2 text-sm cursor-pointer hover:bg-teal-50 hover:text-teal-700 ${selectedBrand?._id === b._id ? 'bg-teal-50 text-teal-700 font-medium' : ''}`}
+                          className="px-4 py-2 text-sm cursor-pointer hover:bg-teal-500 hover:text-white"
                         >
                           {b?.name}
                         </div>
@@ -265,14 +260,14 @@ const Providers = () => {
                     value={filters.city}
                     onChange={handleInputChange}
                     placeholder="City"
-                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
+                    className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
                   />
                   <input
                     name='state'
                     value={filters.state}
                     onChange={handleInputChange}
                     placeholder="State"
-                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
+                    className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
                   />
                 </div>
               </div>
@@ -286,14 +281,14 @@ const Providers = () => {
                     value={filters.name}
                     onChange={handleInputChange}
                     placeholder="Name"
-                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
+                    className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
                   />
                   <input
                     name='area'
                     value={filters.area}
                     onChange={handleInputChange}
                     placeholder="Area"
-                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
+                    className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
                   />
                 </div>
               </div>
@@ -305,7 +300,7 @@ const Providers = () => {
                   name='availableDay'
                   value={filters.availableDay}
                   onChange={handleInputChange}
-                  className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
+                  className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
                 >
                   <option value="">Any day</option>
                   {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(day => (
@@ -321,7 +316,7 @@ const Providers = () => {
                         name='availableFrom'
                         value={filters.availableFrom}
                         onChange={handleInputChange}
-                        className="border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
+                        className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
                       />
                     </div>
                     <div>
@@ -331,7 +326,7 @@ const Providers = () => {
                         name='availableTo'
                         value={filters.availableTo}
                         onChange={handleInputChange}
-                        className="border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
+                        className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
                       />
                     </div>
                   </div>

@@ -48,7 +48,7 @@ const BlogCategoryPage = () => {
                 ]}
             />
 
-            <div className='w-full flex flex-col gap-6 justify-center items-center py-20 px-3'>
+            <div className='w-full flex flex-col gap-6 justify-center items-center py-10 px-3'>
                 {isLoading ? <GlobalSkeleton cards={9} cols={1} lgCols={3} /> : (
                     <>
                         {filteredBlogs && filteredBlogs.length > 0 ? (

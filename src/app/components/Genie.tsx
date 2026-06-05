@@ -49,7 +49,7 @@ const Genie = () => {
 
           {/* Hover Tooltip */}
           <div className="absolute -bottom-2 right-1/2 translate-x-1/2 mb-2  transition bg-black text-white text-xs px-3 py-1 rounded-lg whitespace-nowrap">
-            Chat with Geek Genie ✨
+             Geek Genie ✨
           </div>
         </div>
       )}

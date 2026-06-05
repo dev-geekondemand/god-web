@@ -47,7 +47,7 @@ const Blogs = () => {
     <section className='w-full flex flex-col justify-center items-center bg-gray-50'>
         <PageBanner title="Blogs" crumbs={[{ label: 'Blogs' }]} />
 
-        <div className='w-full flex flex-col gap-6 justify-center items-center py-20 px-3'>
+        <div className='w-full flex flex-col gap-6 justify-center items-center py-10 px-3'>
            {isLoading ? <GlobalSkeleton cards={9} cols={1} lgCols={3} /> : (
             <>
             <div className='grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-x-8 gap-y-16 max-w-7xl'>

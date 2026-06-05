@@ -7,7 +7,7 @@ import InnerBannerAd from "./InnerBannerAd";
 const CtaBannerRow = () => {
   return (
     <section className="w-full px-3 py-12  flex h-full justify-center">
-      <div className="max-w-7xl  w-full grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="max-w-7xl  w-full grid grid-cols-1 sm:grid-cols-3 xxs:grid-cols-1 xs:grid-cols-2 gap-8">
 
         {/* Left CTA – Book a Geek */}
         <Link
@@ -26,7 +26,7 @@ const CtaBannerRow = () => {
           </button>
         </Link>
 
-        <div className="col-span-1  flex flex-col items-center gap-3 w-full h-full">
+        <div className="col-span-1 xs:hidden sm:block flex flex-col items-center gap-3 w-full h-full">
           <InnerBannerAd placement="home" stretch={false} className="md:max-h-[76vh] object-contain" medium_rectangle />
         </div>
 
@@ -36,7 +36,7 @@ const CtaBannerRow = () => {
           className="col-span-1 flex flex-col items-center gap-3 w-full h-full"
         >
           <Image
-            src="/assets/New-Img/become_geek.png"
+            src="/assets/images/become_geek.png"
             alt="Become a Geek"
             width={500}
             height={350}

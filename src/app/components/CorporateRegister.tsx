@@ -585,7 +585,7 @@ export default function CorporateRegister() {
               disabled={formik.isSubmitting || geekState.isLoading}
               className="w-full py-3.5 bg-teal-600 text-white text-sm font-semibold rounded-xl hover:bg-teal-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
             >
-              {geekState.isLoading ? "Sending OTP…" : "Get OTP & Continue →"}
+              {geekState.isLoading ? "Sending OTP…" : "Sign Up →"}
             </button>
           </form>
 

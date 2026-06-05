@@ -161,9 +161,9 @@ const page = () => {
 
     </div>
 
-            <div className='flex flex-col md:flex-row mb-8 bg-white w-full max-w-6xl mx-auto gap-8 items-stretch'>
-          <section className='w-full py-10 flex justify-center border border-gray-500 rounded-md items-center'>
-            <div className='w-full flex flex-col gap-6 px-8 text-center'>
+            <div className='flex flex-col md:flex-row mb-8 px-4 bg-white w-full max-w-6xl mx-auto gap-8 items-stretch'>
+          <section className='w-full py-8 flex justify-center border border-gray-500 rounded-md items-center'>
+            <div className='w-full flex flex-col gap-6 px-6 text-center'>
               <h3 className='h3 text-gray-800'>Our Mission</h3>
               <p className='text-sm text-gray-600 max-w-xl mx-auto leading-6'>
                 To become India's most trusted, AI-powered IT support platform — bringing reliability, transparency, and speed to IT services across consumer and business segments.
@@ -171,8 +171,8 @@ const page = () => {
             </div>
           </section>
 
-          <section className='w-full py-10 flex justify-center border border-gray-500 rounded-md items-center'>
-            <div className='w-full flex flex-col gap-6 px-8 text-center'>
+          <section className='w-full py-8 flex justify-center border border-gray-500 rounded-md items-center'>
+            <div className='w-full flex flex-col gap-6 px-6 text-center'>
               <h3 className='h3 text-gray-800'>Our Vision</h3>
               <p className='text-sm text-gray-600 max-w-xl mx-auto leading-6'>
                 To bridge the gap between skilled IT professionals and today's chaotic tech support market by building a dedicated, subscription-based marketplace powered by Agentic AI.
@@ -201,8 +201,8 @@ const page = () => {
           
           {/* For Seekers */}
           <div className=' px-8 flex flex-col gap-4 h-full'>
-            <h4 className='h4 text-gray-800 flex items-center gap-2'>
-              <span className='text-teal-600 text-lg'>For Seekers</span> (Businesses & Individuals)
+            <h4 className='h4 text-gray-800 flex flex-wrap items-center gap-2'>
+              <span className='text-teal-600 text-nowrap text-lg'>For Seekers</span> (Businesses & Individuals)
             </h4>
             <ul className='flex flex-col gap-3 text-sm text-gray-700 leading-6'>
               <li className='flex items-start gap-2'>
@@ -277,7 +277,7 @@ const page = () => {
       <div className='w-full max-w-7xl mx-auto flex flex-col justify-center items-center gap-8'>
           <div className='flex flex-col gap-4 items-center justify-center'>
               <h3 className="h2">How It Works</h3>
-              <p className="body-2 text-center text-gray-700">Straightforward process designed to make your experience seamless and hassle-free.</p>
+              <p className="body-2 px-1 text-center text-gray-700">Straightforward process designed to make your experience seamless and hassle-free.</p>
           </div>
           <div className='w-full flex h-full flex-col xl:flex-row justify-center items-center gap-7  p-4'>
 
@@ -535,7 +535,7 @@ const page = () => {
               <h4 className='h4 text-gray-600 font-semibold'>AI + Human Expertise = Better, Faster IT Support</h4>
               <p className='body-2 text-gray-600 max-w-4xl mx-auto'>
                 GeekOnDemand goes beyond the traditional marketplace model by integrating AI-powered diagnostics, triage, 
-                and self-help tools that work round-the-clock. Our <b>AI Twin Geek</b> is your always-available virtual technician.
+                and self-help tools that work round-the-clock. Our <b>Geek Genie</b> is your always-available virtual technician.
               </p>
             </div>
 
@@ -562,8 +562,8 @@ const page = () => {
                                 <h4 className='h5 text-gray-700'>{t.name}</h4>
                                 <ul>
                                   {t.list.map((l,i)=>(
-                                    <li key={i+1} className='flex items-center gap-2 text-sm text-gray-500 leading-6'>
-                                      <CircleCheck width={16} className="mt-1 text-teal-600 flex-shrink-0" />
+                                    <li key={i+1} className='flex items-start gap-2 text-sm text-gray-500 leading-6'>
+                                      <CircleCheck width={16} className=" text-teal-600 flex-shrink-0" />
                                       {l}
                                     </li>
                                   ))}

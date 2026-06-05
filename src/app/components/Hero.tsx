@@ -119,7 +119,7 @@ const handleSearch = (category: string | null) => {
 
   
 
-    <section className="relative p-6 bg-white h-[calc(100vh-80px)] overflow-hidden">
+    <section className="relative px-3 sm:px-6 py-2 bg-white  ">
         {hydrated && showPrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="bg-white w-[90%] max-w-md rounded-2xl p-6 shadow-xl animate-fadeIn">
@@ -156,18 +156,18 @@ const handleSearch = (category: string | null) => {
       )}
 
       <div className="h-full">
-        <div className="max-w-7xl mx-auto h-full">
-          <div className="grid grid-cols-1 md:grid-cols-2 items-stretch h-full">
-            <div className="">
+        <div className="w-full max-w-7xl mx-auto h-full">
+          <div className="grid grid-cols-2  mmd:gap-6  items-stretch h-full">
+            <div className="h-full col-span-2 mmd:col-span-1 flex items-center">
               <div
-                className="wow fadeInUp h-full flex flex-col justify-center"
+                className=" fadeInUp h-full w-full flex flex-col justify-center"
               >
-                <h2 className=" text-gray-600  md:text-3xl text-2xl leading-12 lg:text-4xl font-bold">
+                <h2 className="text-gray-600 xxs:text-sm xs:text-base sm:text-2xl md:text-3xl lg:text-4xl leading-tight font-bold">
                   Service & Repair {" "}
                   <span className="text-teal-700" data-type-text="Carpenders">@Home</span>
                 </h2>
-                <p className="my-3 ml-2 font-bold  text-teal-800 md:text-lg tracking-widest  font-mono  sm:text-base text-sm ">IT Tech Support – Anytime, Anywhere.</p>
-                <div className="flex items-center gap-2 sm:gap-4 md:gap-8 w-full md:w-[80%] mb-3 py-2 rounded-lg">
+                <p className="my-1.5 xs:my-2 sm:my-3 ml-1 sm:ml-2 font-bold text-teal-800 xxs:text-[9px] xs:text-[10px] sm:text-xs md:text-sm lg:text-base tracking-wider sm:tracking-widest font-mono">IT Tech Support – Anytime, Anywhere.</p>
+                <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-4 mmd:gap-8 w-full  mb-3 py-2 rounded-lg">
                   {/* Location Input */}
                   <div className="relative w-full">
                     <input
@@ -175,8 +175,8 @@ const handleSearch = (category: string | null) => {
                       placeholder="Location"
                        value={city}
                        onChange={(e) => dispatch(setCity(e.target.value))}
-                      className="w-full lg:px-10 px-4 py-2.5 border border-gray-500 rounded-lg 
-                                font-bold text-black text-center
+                      className="w-full xxs:px-2 xs:px-3 sm:px-4 lg:px-10 xxs:py-1.5 xs:py-2 sm:py-2.5 border border-gray-500 rounded-lg
+                                font-bold text-black text-center xxs:text-xs xs:text-sm
                                 focus:outline-none focus:ring-2 focus:ring-black/10"
                     />
 
@@ -189,10 +189,10 @@ const handleSearch = (category: string | null) => {
                       <button
                         type="button"
                         onClick={() => setOpen(!open)}
-                        className="w-full inline-flex items-center justify-center gap-2
-                                  lg:px-10 md:px-4 py-2.5
+                        className="w-full inline-flex items-center justify-center gap-1 xs:gap-2
+                                  xxs:px-1.5 xs:px-3 md:px-4 lg:px-10 xxs:py-1.5 xs:py-2 sm:py-2.5
                                   border border-gray-500 rounded-lg
-                                  font-bold text-black text-center
+                                  font-bold text-black text-center xxs:text-xs xs:text-sm
                                   focus:outline-none focus:ring-2 focus:ring-black/10"
                       >
                         {selected?.slice(0, 10)}...
@@ -247,14 +247,14 @@ const handleSearch = (category: string | null) => {
                   </button>
                 </div> */}
 
-                <div className="w-full md:w-[80%] flex flex-col gap-2 border p-3 rounded-lg border-gray-600">
-                  <h2 className="text-xl font-medium text-gray-600">What are you looking for?</h2>
+                <div className="w-full  flex flex-col gap-1.5 sm:gap-2 border p-2 sm:p-3 rounded-lg border-gray-600">
+                  <h2 className="xxs:text-[10px] xs:text-xs sm:text-sm mmd:text-base md:text-xl font-medium text-gray-600">What are you looking for?</h2>
                   <div className="flex flex-col w-full gap-2 justify-start">
                     <div className="flex  w-full">
                      
                    {displayCategories?.slice(0,3)?.map((cat,i)=>{
                       return  <Link key={i+10} href={`/categories/${cat.id}/brands`} className="flex flex-col w-full">
-                      <div className="flex flex-col items-center bg-gray-100 p-3 rounded-lg me-2 md:me-4 mb-1 cursor-pointer hover:bg-teal-700 hover:text-white">
+                      <div className="flex flex-col items-center bg-gray-100 xxs:p-1.5 xs:p-2 sm:p-3 rounded-lg xxs:me-1 xs:me-2 md:me-4 mb-1 cursor-pointer hover:bg-teal-700 hover:text-white">
                       <Image 
                         width={40}
                         height={40}
@@ -264,8 +264,8 @@ const handleSearch = (category: string | null) => {
                       />
                     </div>
                     <div className="flex flex-col">
-                      <p className="text-center text-sm font-bold">{cat.title}</p>
-                      <span className="text-center text-xs">{cat.subtitle}</span>
+                      <p className="text-center xxs:text-[8px] xs:text-[10px] sm:text-xs mmd:text-sm font-bold leading-tight">{cat.title}</p>
+                      <span className="text-center xxs:text-[7px] xs:text-[9px] sm:text-xs leading-tight">{cat.subtitle}</span>
                     </div>
                     </Link>
                    })}
@@ -274,7 +274,7 @@ const handleSearch = (category: string | null) => {
                     <div className="flex w-full">
                     {displayCategories?.slice(3,6)?.map((cat,i)=>{
                       return  <Link key={i+100} href={`/categories/${cat.id}/brands`} className="flex flex-col w-full">
-                      <div className="flex flex-col items-center bg-gray-100 p-3 rounded-lg me-2 md:me-4 mb-1 cursor-pointer hover:bg-teal-700 hover:text-white">
+                      <div className="flex flex-col items-center bg-gray-100 xxs:p-1.5 xs:p-2 sm:p-3 rounded-lg xxs:me-1 xs:me-2 md:me-4 mb-1 cursor-pointer hover:bg-teal-700 hover:text-white">
                       <Image 
                         width={40}
                         height={40}
@@ -284,8 +284,8 @@ const handleSearch = (category: string | null) => {
                       />
                     </div>
                     <div className="flex flex-col">
-                      <p className="text-center text-sm font-bold">{cat.title}</p>
-                      <span className="text-center text-xs">{cat.subtitle}</span>
+                      <p className="text-center xxs:text-[8px] xs:text-[10px] sm:text-xs mmd:text-sm font-bold leading-tight">{cat.title}</p>
+                      <span className="text-center xxs:text-[7px] xs:text-[9px] sm:text-xs leading-tight">{cat.subtitle}</span>
                     </div>
                     </Link>
                    })}
@@ -303,62 +303,108 @@ const handleSearch = (category: string | null) => {
                 
                 
 
-                <div className="flex items-center flex-wrap mt-3">
-                  <div className="flex items-center mr-4 mt-2">
-                  <Image
-                      width={40}
-                      height={40}
-                      decoding="async"
-                      src="/assets/icons/success-01.svg"
-                      alt="icon"
-                    />
-                    <div className="ms-2">
-                      <h6 className="font-bold mb-1">350+ Geeks</h6>
-                      <p className="text-sm text-gray-600">(Tech Support engineer)</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center mr-4 mt-2">
-                    <Image
-                      width={40}
-                      height={40}
-                      decoding="async"
-                      src="/assets/icons/success-02.svg"
-                      alt="icon"
-                      style={{ height: 'auto' }}
-                    />
-                    <div className="ms-2">
-                      <h6 className="font-bold mb-1">200+</h6>
-                      <p className="text-sm text-gray-600">Services Completed</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center mr-4 mt-2">
-                  <Image
-                      width={40}
-                      height={40}
-                      decoding="async"
-                      src="/assets/icons/success-03.svg"
-                      alt="icon"
-                      style={{ height: 'auto' }}
-                    />
-                    <div className="ms-2">
-                      <h6 className="font-bold mb-1">200+</h6>
-                      <p className="text-sm text-gray-600">Happy Clients</p>
-                    </div>
-                  </div>
-                </div>
+                
               </div>
             </div>
-            <div className="hidden md:block relative wow fadeInUp h-full strech">
-              <Image
+            <div className="col-span-0 mmd:col-span-1 relative wow fadeInUp h-full mmd:min-h-[380px]">
+                <Image
                 src={"/assets/main_hero.png"}
                 fill
                 alt="banner image"
                 className="object-contain"
               />
+              {/* <div className="flex items-center flex-wrap mt-2 xs:mt-3">
+                  <div className="flex items-center mr-3 xs:mr-4 mt-2">
+                  <Image
+                      width={30}
+                      height={30}
+                      decoding="async"
+                      src="/assets/icons/success-01.svg"
+                      alt="icon"
+                    />
+                    <div className="ms-1.5 xs:ms-2">
+                      <h6 className="font-bold xxs:text-xs xs:text-sm lg:text-base">350+ Geeks</h6>
+                      <p className="xxs:text-[9px] xs:text-xs lg:text-sm text-gray-600">(Tech Support engineer)</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center mr-3 xs:mr-4 mt-2">
+                    <Image
+                      width={30}
+                      height={30}
+                      decoding="async"
+                      src="/assets/icons/success-02.svg"
+                      alt="icon"
+                      style={{ height: 'auto' }}
+                    />
+                    <div className="ms-1.5 xs:ms-2">
+                      <h6 className="font-bold xxs:text-xs xs:text-sm lg:text-base">200+</h6>
+                      <p className="xxs:text-[9px] xs:text-xs lg:text-sm text-gray-600">Services Completed</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center mr-3 xs:mr-4 mt-2">
+                  <Image
+                      width={30}
+                      height={30}
+                      decoding="async"
+                      src="/assets/icons/success-03.svg"
+                      alt="icon"
+                      style={{ height: 'auto' }}
+                    />
+                    <div className="ms-1.5 xs:ms-2">
+                      <h6 className="font-bold xxs:text-xs xs:text-sm lg:text-base mb-1">200+</h6>
+                      <p className="xxs:text-[9px] xs:text-xs lg:text-sm text-gray-600">Happy Clients</p>
+                    </div>
+                  </div>
+                </div> */}
             </div>
           </div>
+          <div className="flex items-center  mt-2 xs:mt-3">
+                  <div className="flex items-center mr-3 xs:mr-4 mt-2">
+                  <Image
+                      width={30}
+                      height={30}
+                      decoding="async"
+                      src="/assets/icons/success-01.svg"
+                      alt="icon"
+                    />
+                    <div className=" xs:ms-2">
+                      <h6 className="font-bold xxs:text-xs xs:text-sm lg:text-base">350+ Geeks</h6>
+                      <p className="xxs:text-[9px] xs:text-xs lg:text-xs text-gray-600">(Tech Support engineer)</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center mr-3 xs:mr-4 mt-2">
+                    <Image
+                      width={30}
+                      height={30}
+                      decoding="async"
+                      src="/assets/icons/success-02.svg"
+                      alt="icon"
+                      style={{ height: 'auto' }}
+                    />
+                    <div className="ms-1.5 xs:ms-2">
+                      <h6 className="font-bold xxs:text-xs xs:text-sm lg:text-base">200+</h6>
+                      <p className="xxs:text-[9px] xs:text-xs lg:text-sm text-gray-600">Services Completed</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center mr-3 xs:mr-4 mt-2">
+                  <Image
+                      width={30}
+                      height={30}
+                      decoding="async"
+                      src="/assets/icons/success-03.svg"
+                      alt="icon"
+                      style={{ height: 'auto' }}
+                    />
+                    <div className="ms-1.5 xs:ms-2">
+                      <h6 className="font-bold xxs:text-xs xs:text-sm lg:text-base mb-1">200+</h6>
+                      <p className="xxs:text-[9px] xs:text-xs lg:text-sm text-gray-600">Happy Clients</p>
+                    </div>
+                  </div>
+                </div>
         </div>
 
        

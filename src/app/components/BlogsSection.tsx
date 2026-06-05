@@ -44,23 +44,24 @@ const BlogsSection = () => {
         </div>
 
         {/* Carousel + Ad — side by side, ad stretches to carousel height */}
-        <div className='flex flex-col lg:flex-row gap-6 items-stretch w-full'>
+        <div className='flex flex-col  gap-6 items-stretch  w-full'>
 
           {/* Carousel + View All */}
-          <div className='flex flex-col items-center flex-1 min-w-0'>
+          <div className='grid grid-cols-4 gap-6 items-center  min-w-0'>
             {isLoading
               ? <GlobalSkeleton cards={3} cols={1} lgCols={3} />
               : (
-                <Carousel
+                <div className="w-full h-full flex items-center px-6 col-span-3 ">
+                  <Carousel
                   opts={{ align: "start" }}
-                  className="w-full py-8 px-6 relative"
+                  className="w-full h-full relative"
                 >
-                  <CarouselContent className="-ml-3">
+                  <CarouselContent  className="h-full w-full">
                     {blogs.map((blog, index) => (
-                      <CarouselItem key={index} className="pl-3 basis-full sm:basis-1/2 lg:basis-1/3">
-                        <Card className='bg-white border border-gray-100 shadow-sm rounded-xl overflow-hidden h-full'>
+                      <CarouselItem key={index} className="basis-full sm:basis-1/2 lg:basis-1/3">
+                        <Card className='bg-white border border-gray-100 shadow-sm rounded-xl p-0   h-full'>
                           <CardContent className="flex flex-col group gap-0 p-0 items-start justify-start h-full">
-                            <div className='w-full h-[180px] relative overflow-hidden'>
+                            <div className='w-full min-h-[180px] relative overflow-hidden rounded-t-lg'>
                               <Image
                                
                                 src={blog?.coverImage?.url || "/assets/images/blog.png"}
@@ -71,11 +72,33 @@ const BlogsSection = () => {
                               />
                             </div>
 
-                            <div className='flex gap-4 text-gray-500 text-xs items-center px-4 pt-3'>
-                              <p>{blog.author}</p>
-                              <ul className='list-disc'>
-                                <li>{new Date(blog?.createdAt).toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" })}</li>
-                              </ul>
+                            <div className='flex flex-col gap-2 px-4 pt-3'>
+                              {/* Category */}
+                              {blog.categories && blog.categories.length > 0 && (
+                                <div className='flex flex-wrap gap-1.5'>
+                                  {blog.categories.slice(0, 1).map((cat, i) => {
+                                    const name = typeof cat === 'string' ? cat : cat.name;
+                                    const slug = typeof cat === 'string' ? cat : cat.slug;
+                                    return (
+                                      <Link
+                                        key={i}
+                                        href={`/blogs?category=${slug || name}`}
+                                        className="text-[10px] font-semibold uppercase tracking-wide text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full hover:bg-teal-100 transition-colors"
+                                      >
+                                        {name}
+                                      </Link>
+                                    );
+                                  })}
+                                </div>
+                              )}
+
+                              {/* Author & Date */}
+                              <div className='flex gap-4 text-gray-500 text-xs items-center'>
+                                <p>{blog.author}</p>
+                                <ul className='list-disc'>
+                                  <li>{new Date(blog?.createdAt).toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" })}</li>
+                                </ul>
+                              </div>
                             </div>
 
                             <div className='flex flex-col gap-2 px-4 py-3 flex-1'>
@@ -86,6 +109,23 @@ const BlogsSection = () => {
                                 {blog.title}
                               </Link>
                               <p className="text-xs leading-5 text-gray-500 line-clamp-3">{blog.summary}</p>
+
+                              {/* Tags */}
+                              {blog.tags && blog.tags.length > 0 && (
+                                <div className='flex flex-wrap gap-1.5 '>
+                                  {blog.tags.slice(0, 2).map((tag, i) => {
+                                    const name = typeof tag === 'string' ? tag : tag.name;
+                                    return (
+                                      <p
+                                        key={i}
+                                        className="text-[10px] text-gray-500 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded-full hover:bg-gray-200 transition-colors"
+                                      >
+                                        #{name}
+                                      </p>
+                                    );
+                                  })}
+                                </div>
+                              )}
                             </div>
                           </CardContent>
                         </Card>
@@ -95,8 +135,17 @@ const BlogsSection = () => {
                   <CarouselPrevious className='cursor-pointer -left-1 hover:bg-teal-500 hover:text-white' />
                   <CarouselNext className='cursor-pointer -right-1 hover:bg-teal-500 hover:text-white' />
                 </Carousel>
+                </div>
               )}
 
+                <div className="col-span-1">
+                <InnerBannerAd placement="home" className="hidden md:block" medium_rectangle />
+
+                </div>
+
+            
+          </div>
+          <div className="flex w-full justify-center items-center">
             <Link
               href='/blogs'
               className="mt-2 flex items-center gap-2 w-fit px-6 py-2.5 bg-gray-900 hover:bg-gray-700 transition-colors duration-200 text-sm text-white rounded-lg"
@@ -112,13 +161,7 @@ const BlogsSection = () => {
               </svg>
             </Link>
           </div>
-
-          {/* Ad — inside the carousel container, same height via flex stretch */}
-          <aside className='w-full lg:w-1/4 flex flex-col'>
-            <div className='flex-1 overflow-hidden '>
-              <InnerBannerAd placement="home" medium_rectangle stretch />
-            </div>
-          </aside>
+          
 
         </div>
       </div>

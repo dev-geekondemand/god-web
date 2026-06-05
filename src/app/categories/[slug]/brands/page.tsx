@@ -67,7 +67,7 @@ const Brands = () => {
         <section className='w-full flex flex-col justify-center items-center'>
             <PageBanner title={category?.name || 'Brands'} crumbs={[{ label: category?.name || 'Brands' }]} />
 
-            <div className='w-full flex justify-center items-center px-3 py-20'>
+            <div className='w-full flex justify-center items-center px-3 py-10'>
                 <div className='w-full flex justify-center items-center max-w-7xl mx-auto'>
                     {isLoading
                         ? <GlobalSkeleton cards={15} cols={3} lgCols={5} />

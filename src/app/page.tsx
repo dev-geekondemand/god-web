@@ -65,23 +65,22 @@ export default function Home() {
         )}
 
         {/* Tech Support in 3 Simple Steps */}
-        <section className='pt-8 max-w-7xl mx-auto grid grid-cols-12 p-3 w-full  justify-center gap-8 items-start'>
+        <section className='xxs:pt-4 xs:pt-6 sm:pt-8 max-w-7xl mx-auto grid grid-cols-12 xxs:p-2 xs:p-3 w-full justify-center gap-4 xs:gap-6 sm:gap-8 items-start'>
           <div className='col-span-4 h-full hidden lg:flex justify-center items-center'>
             <InnerBannerAd placement="home" medium_rectangle  />
-
           </div>
-          <div className='max-w-5xl h-full col-span-12 lg:col-span-8 w-full flex flex-col justify-center items-center py-12 sm:px-10 px-4 bg-amber-800/10 relative rounded-3xl'>
-            
-            <div className='flex flex-col text-white max-w-2xl items-center justify-center w-full mx-auto gap-3'>
-              <h1 className="text-4xl font-bold text-center text-gray-600">
+          <div className='max-w-5xl h-full col-span-12 lg:col-span-8 w-full flex flex-col justify-center items-center xxs:py-6 xs:py-8 sm:py-8 xxs:px-3 xs:px-4 sm:px-3 bg-amber-800/10 relative rounded-3xl'>
+
+            <div className='flex flex-col text-white max-w-2xl items-center justify-center w-full mx-auto gap-2 xs:gap-3'>
+              <h1 className="xxs:text-xl xs:text-2xl sm:text-3xl mmd:text-4xl font-bold text-center text-gray-600">
                 Tech Support in <span className='text-teal-700'>3 Simple Steps</span>
               </h1>
-              <p className="text-xs font-medium text-gray-700 text-center">
+              <p className="xxs:text-[10px] xs:text-xs font-medium text-gray-700 text-center">
                 From booking to resolution, getting expert IT Tech support has never been easier.
               </p>
             </div>
 
-            <div className='flex lg:flex-row flex-col mt-12 gap-6 justify-center items-between w-full'>
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-10 w-full px-3'>
 
               <div className='flex w-full text-center text-black gap-3 justify-center items-center bg-white rounded-2xl py-6'>
                 <div className='flex flex-col items-center justify-center text-center w-full'>
@@ -89,7 +88,7 @@ export default function Home() {
                     <Image src={"/assets/images/search.jpeg"} className='mb-4 w-[80%] rounded-lg' alt='Work-01' width={200} height={70} />
                   </div>
                   <h4 className="text-xs font-bold">1. Search for Geeks.</h4>
-                  <p className='text-xs max-w-[220px] font-medium'>
+                  <p className='text-[12px] max-w-[220px] font-medium'>
                     Search for IT Tech Support Geeks near your location that best fit your needs.
                   </p>
                 </div>
