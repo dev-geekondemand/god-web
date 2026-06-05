@@ -51,14 +51,14 @@ const BlogsSection = () => {
             {isLoading
               ? <GlobalSkeleton cards={3} cols={1} lgCols={3} />
               : (
-                <div className="w-full h-full flex items-center px-6 col-span-3 ">
+                <div className="w-full h-full flex items-center px-6 col-span-4 lg:col-span-3 ">
                   <Carousel
                   opts={{ align: "start" }}
                   className="w-full h-full relative"
                 >
                   <CarouselContent  className="h-full w-full">
                     {blogs.map((blog, index) => (
-                      <CarouselItem key={index} className="basis-full sm:basis-1/2 lg:basis-1/3">
+                      <CarouselItem key={index} className="basis-full sm:basis-1/2 lg:basis-1/2 xl:basis-1/3">
                         <Card className='bg-white border border-gray-100 shadow-sm rounded-xl p-0   h-full'>
                           <CardContent className="flex flex-col group gap-0 p-0 items-start justify-start h-full">
                             <div className='w-full min-h-[180px] relative overflow-hidden rounded-t-lg'>
@@ -138,8 +138,8 @@ const BlogsSection = () => {
                 </div>
               )}
 
-                <div className="col-span-1">
-                <InnerBannerAd placement="home" className="hidden md:block" medium_rectangle />
+                <div className="lg:col-span-1 col-span-0">
+                <InnerBannerAd placement="home" className="hidden lg:block object-cover" medium_rectangle />
 
                 </div>
 
