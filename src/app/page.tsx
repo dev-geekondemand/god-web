@@ -18,6 +18,7 @@ import { getBrands } from '@/features/brands/brandsSlice.ts';
 import GlobalSkeleton from './components/Sekeletn.tsx';
 import CtaBannerRow from './components/CtaBannerRow.tsx';
 import InnerBannerAd from './components/InnerBannerAd.tsx';
+import FAQSection from './components/FAQSection.tsx';
 
 
 
@@ -72,9 +73,9 @@ export default function Home() {
           <div className='max-w-5xl h-full col-span-12 lg:col-span-8 w-full flex flex-col justify-center items-center xxs:py-6 xs:py-8 sm:py-8 xxs:px-3 xs:px-4 sm:px-3 bg-amber-800/10 relative rounded-3xl'>
 
             <div className='flex flex-col text-white max-w-2xl items-center justify-center w-full mx-auto gap-2 xs:gap-3'>
-              <h1 className="xxs:text-xl xs:text-2xl sm:text-3xl mmd:text-4xl font-bold text-center text-gray-600">
-                Tech Support in <span className='text-teal-700'>3 Simple Steps</span>
-              </h1>
+              <h2 className="xxs:text-xl xs:text-2xl sm:text-3xl mmd:text-4xl font-bold text-center text-gray-600">
+                How GeekOnDemand Works — Book IT Support in <span className='text-teal-700'>3 Easy Steps</span>
+              </h2>
               <p className="xxs:text-[10px] xs:text-xs font-medium text-gray-700 text-center">
                 From booking to resolution, getting expert IT Tech support has never been easier.
               </p>
@@ -85,11 +86,11 @@ export default function Home() {
               <div className='flex w-full text-center text-black gap-3 justify-center items-center bg-white rounded-2xl py-6'>
                 <div className='flex flex-col items-center justify-center text-center w-full'>
                   <div className='h-[50%] w-full flex items-center justify-center'>
-                    <Image src={"/assets/images/search.jpeg"} className='mb-4 w-[80%] rounded-lg' alt='Work-01' width={200} height={70} />
+                    <Image src={"/assets/images/search.jpeg"} className='mb-4 w-[80%] rounded-lg' alt='Finding a verified IT support Geek near you' width={200} height={70} />
                   </div>
-                  <h4 className="text-xs font-bold">1. Search for Geeks.</h4>
+                  <h4 className="text-xs font-bold">1. Find a Verified IT Expert Near You</h4>
                   <p className='text-[12px] max-w-[220px] font-medium'>
-                    Search for IT Tech Support Geeks near your location that best fit your needs.
+                    Browse verified Geeks by service type, location, and star ratings. Find the right expert for your laptop, printer, router or software issue.
                   </p>
                 </div>
               </div>
@@ -97,11 +98,11 @@ export default function Home() {
               <div className='flex w-full text-black gap-3 justify-center items-center bg-white rounded-2xl py-6'>
                 <div className='flex flex-col items-center justify-center text-center w-full'>
                  <div className='h-[50%] w-full flex items-center justify-center'>
-                    <Image src={"/assets/images/book.jpeg"} className='mb-4 w-[80%] rounded-lg' alt='Work-02' width={200} height={70} />
+                    <Image src={"/assets/images/book.jpeg"} className='mb-4 w-[80%] rounded-lg' alt='Booking a Geek for doorstep IT support' width={200} height={70} />
                   </div>
-                  <h4 className="text-xs font-bold">2. Getting Booked & Job done.</h4>
+                  <h4 className="text-xs font-bold">2. Book Your Geek &amp; Get the Job Done</h4>
                   <p className='text-xs max-w-[220px] font-medium'>
-                    Once you find a Geek that best fits your needs, get booked and get your job done.
+                    Confirm your booking in seconds. Your Geek arrives at your home or office and resolves the issue on the spot — no waiting, no jargon.
                   </p>
                 </div>
               </div>
@@ -109,11 +110,11 @@ export default function Home() {
               <div className='flex w-full text-center text-black gap-3 justify-center items-center bg-white rounded-2xl py-6'>
                 <div className='flex flex-col items-center justify-center text-center w-full'>
                   <div className='h-[50%] w-full flex items-center justify-center'>
-                    <Image src={"/assets/images/rate.jpeg"} className='mb-4 w-[80%] rounded-lg' alt='Work-03' width={200} height={70} />
+                    <Image src={"/assets/images/rate.jpeg"} className='mb-4 w-[80%] rounded-lg' alt='Rating and reviewing Geek service' width={200} height={70} />
                   </div>
-                  <h4 className="text-xs font-bold">3. Rate and Review the service.</h4>
+                  <h4 className="text-xs font-bold">3. Rate Your Geek &amp; Help Others Choose</h4>
                   <p className='text-xs max-w-[220px] font-medium'>
-                    After your job is complete, you can rate and review the Geeks according to your experience so that others can know about them.
+                    Share your experience. Your rating keeps our Geek community accountable and helps other Seekers make confident decisions.
                   </p>
                 </div>
               </div>
@@ -124,8 +125,12 @@ export default function Home() {
 
         {/* Brands Served */}
         <section className='dark:text-gray-200 w-full max-w-7xl mx-auto mt-10'>
-          <div className='flex flex-col gap-5 max-w-7xl mb-12 relative justify-center items-center mx-auto'>
-            <h1 className='h2'>Brands Served by our Geeks</h1>
+          <div className='flex flex-col gap-2 max-w-7xl mb-8 relative justify-center items-center mx-auto'>
+            <h2 className='h2'>Our Geeks Support These Leading Device Brands</h2>
+            <p className="text-xs text-gray-600 text-center max-w-2xl">HP, Dell, Lenovo, Canon, Epson, D-Link, TP-Link, Quick Heal and more — certified support at your doorstep.</p>
+            <span className="mt-1 inline-block text-xs font-semibold text-teal-700 border border-teal-300 bg-teal-50 px-3 py-1 rounded-full">
+              Official Quick Heal Service Partner
+            </span>
           </div>
           {brands?.length > 0 ? (
             <Marquee className='bg-gray-100 dark:bg-gray-900'>
@@ -138,7 +143,7 @@ export default function Home() {
                     height={80}
                     className='object-contain'
                     src={brand?.image?.url ? brand?.image?.url : "/assets/images/plc.webp"}
-                    alt="brand image"
+                    alt={`${brand?.name || 'Brand'} logo`}
                   />
                 ))}
               </div>
@@ -149,6 +154,14 @@ export default function Home() {
             </div>
           )}
         </section>
+
+        {/* Brands text block — indexable by Google, complements logo carousel */}
+        <div className='max-w-5xl mx-auto px-4 py-6 text-center'>
+          <p className='text-xs text-gray-500 leading-relaxed'>
+            <span className='font-semibold text-gray-700'>Brands We Repair &amp; Support:</span>{' '}
+            HP, Dell, Lenovo, Acer, ASUS, Apple MacBook, Canon, Epson, Brother, D-Link, TP-Link, Netgear, Quick Heal, Kaspersky, Microsoft, Samsung, and more — doorstep service in Hyderabad.
+          </p>
+        </div>
 
         <div className='max-w-6xl mx-auto my-5'>
           <InnerBannerAd placement="home" wide_banner />
@@ -171,6 +184,9 @@ export default function Home() {
 
           </div>
       </div>
+
+      {/* FAQ */}
+      {/* <FAQSection /> */}
 
       {/* Blogs */}
       <BlogsSection />

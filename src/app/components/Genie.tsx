@@ -33,7 +33,7 @@ const Genie = () => {
     <>
       {/* Floating Genie Button */}
       {!isOpen && (
-        <div className="fixed bottom-25 right-6  z-50 group floating">
+        <div className="fixed bottom-25 lg:right-16 right-6  z-50 group floating">
           <button
             onClick={handleClick}
             className="rounded-full flex items-center justify-center"
@@ -48,8 +48,8 @@ const Genie = () => {
           </button>
 
           {/* Hover Tooltip */}
-          <div className="absolute -bottom-2 right-1/2 translate-x-1/2 mb-2  transition bg-black text-white text-xs px-3 py-1 rounded-lg whitespace-nowrap">
-             Geek Genie ✨
+          <div className="absolute -bottom-2 right-1/2 translate-x-1/2 mb-2  transition flex justify-center bg-black text-white text-xs px-3 py-1 rounded-lg whitespace-nowrap">
+            GeekGenie <span className="hidden lg:block">— Your AI IT Assistant ✨</span>
           </div>
         </div>
       )}

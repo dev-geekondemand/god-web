@@ -19,8 +19,8 @@ const Reviews = () => {
     <section className='flex justify-center w-full pt-12'>
       <div className='max-w-7xl w-full flex flex-col justify-center items-center rounded-md'>
         <div className='flex flex-col max-w-2xl items-center justify-center w-full mx-auto gap-3'>
-          <h1 className="h3 text-center">Voices of Our <span className='colored'>Seekers</span></h1>
-          <p className="body-2 text-gray-700 text-center">Real stories from people who found quick, reliable IT tech Support with GeekOnDemand.</p>
+          <h2 className="h3 text-center">What Our Customers Say About <span className='colored'>GeekOnDemand</span></h2>
+          <p className="body-2 text-gray-700 text-center">Hundreds of homeowners, freelancers, and MSMEs in Hyderabad trust GeekOnDemand for fast, reliable IT support.</p>
         </div>
 
         <Carousel

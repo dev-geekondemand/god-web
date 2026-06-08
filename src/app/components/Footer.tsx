@@ -27,7 +27,7 @@ const Footer = () => {
               url: "/categories/682af36fcd7ba362b7afbb2c"
             },
             {
-              text: "Email - Service & Repair",
+              text: "Email Setup & Troubleshooting",
               url: "/categories/682af32fcd7ba362b7afbb1e/brands"
             },
             {
@@ -158,14 +158,13 @@ const Footer = () => {
 
                 <div className='md:ml-4 mt-6 w-full md:col-span-4 col-span-12 flex flex-col gap-4'>
                 <div className='w-full mb-3 px-5 py-4 bg-gray-50 shadow rounded-md  flex flex-col gap-4'>
-                    <h3 className="font-semibold text-xl">Sign Up for NewsLetter</h3>
+                    <h3 className="font-semibold text-xl">Get IT Tips &amp; GoD Updates</h3>
                     <input value={email} onChange={onEmailChange} type="text" placeholder='Enter your Email' className='w-full bg-white text-sm font-normal text-gray-700 outline-none border border-gray-300 px-4 py-3 rounded-sm' />
-                <button 
-                    onClick={()=>{handleNewsLetter()}} 
+                <button
+                    onClick={()=>{handleNewsLetter()}}
                     className="flex justify-center  w-full text-nowrap cursor-pointer gap-1 px-8 py-1.5 bg-teal-700 text-base text-white rounded-md"
                     >
-                        Subscribe
-                        
+                        Subscribe →
                     </button>
                     {error && <div className='text-sm text-red-500'>{error}</div>}
                 </div>
@@ -202,8 +201,9 @@ const Footer = () => {
                 ))}
                 </ul>
 
+            <p className="mt-4 text-xs text-gray-500">Serving Hyderabad &nbsp;&middot;&nbsp; geekondemand.in</p>
         </div>
-      
+
     </footer>
   )
 }

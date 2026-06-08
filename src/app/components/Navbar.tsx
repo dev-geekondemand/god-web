@@ -92,7 +92,7 @@ const Navbar = () => {
 
   const isLoggedIn = isAuthenticated || isGeekAuthenticated;
   const displayName = user?.fullName?.first || geek?.fullName?.first || '';
-  const ctaLabel = isGeekAuthenticated ? 'Become a Seeker' : isAuthenticated ? 'Become a Geek' : 'Get Started';
+  const ctaLabel = isGeekAuthenticated ? 'Become a Seeker' : isAuthenticated ? 'Earn as a Geek' : 'Book a Geek';
   const handleCta = () => {
     if (!isLoggedIn) {
       router.push('/register?type=geek');

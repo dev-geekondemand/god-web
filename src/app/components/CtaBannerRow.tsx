@@ -14,13 +14,14 @@ const CtaBannerRow = () => {
           href="/categories"
           className="col-span-1 flex flex-col items-center gap-3 w-full h-full"
         >
-          <Image
-            src="/assets/New-Img/book_geek.png"
-            alt="Book a Geek"
-            width={500}
-            height={350}
-            className="w-full flex-1  object-cover rounded-lg"
-          />
+          <div className="relative w-full flex-1 min-h-[200px] rounded-lg overflow-hidden">
+            <Image
+              src="/assets/New-Img/book_geek.png"
+              alt="Book a verified Geek for doorstep IT support in Hyderabad"
+              fill
+              className="object-contain sm:object-fill w-full rounded-lg"
+            />
+          </div>
           <button className="text-sm bg-teal-700 rounded-xl text-white py-2 px-6 hover:bg-teal-800">
             Book a Geek
           </button>
@@ -33,15 +34,16 @@ const CtaBannerRow = () => {
         {/* Right CTA – Become a Geek */}
         <Link
           href="/register?type=geek"
-          className="col-span-1 flex flex-col items-center gap-3 w-full h-full"
+          className="col-span-1 flex flex-col items-center gap-3 w-full  h-full"
         >
+          <div className="relative w-full flex-1 min-h-[200px] rounded-lg overflow-hidden">
           <Image
-            src="/assets/images/become_geek.png"
-            alt="Become a Geek"
-            width={500}
-            height={350}
-            className="w-full flex-1  object-cover rounded-lg"
+            src="/assets/New-Img/become_geek.png"
+            alt="Earn as a freelance IT expert with GeekOnDemand"
+            fill
+            className="object-contain sm:object-fill rounded-lg w-full"
           />
+          </div>
           <button className="text-sm bg-teal-700 rounded-xl text-white py-2 px-8 hover:bg-teal-800">
             Become a Geek
           </button>

@@ -60,9 +60,9 @@ const FeaturedGeeks = () => {
                 <div className='flex flex-col gap-5 w-full'>
                     <div className='py-3 sm:py-5 flex flex-col items-center gap-2 sm:gap-3'>
                         <span className='text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-teal-600'>Expert Network</span>
-                        <h1 className='text-xl sm:text-2xl md:text-3xl font-bold text-center'>Top Geeks, <span className='text-teal-700'>Trusted by Many</span></h1>
+                        <h2 className='text-xl sm:text-2xl md:text-3xl font-bold text-center'>Meet Our <span className='text-teal-700'>Top-Rated IT Support Experts</span></h2>
                         <div className='w-8 sm:w-10 h-0.5 bg-teal-500 rounded-full' />
-                        <p className="text-xs sm:text-sm text-gray-700 text-center max-w-2xl mx-auto">Meet our most sought-after IT experts, delivering reliable support every day.</p>
+                        <p className="text-xs sm:text-sm text-gray-700 text-center max-w-2xl mx-auto">Verified, background-checked IT professionals ready to help at your home or office.</p>
                     </div>
 
                     {isLoading || !geeks ? (

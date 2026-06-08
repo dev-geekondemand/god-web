@@ -23,8 +23,8 @@ const HeroSectionTen = () => {
   const displayCategories = [
     {
       id: slicedCategories[0]?.slug || slicedCategories[0]?._id,
-      title:"Laptops & Desktop",
-      subtitle:"Service & Repair",
+      title:"Laptop & Desktop",
+      subtitle:"Repair",
       image:"/cat-icons/Laptops.png"
     },
     {
@@ -48,13 +48,13 @@ const HeroSectionTen = () => {
     {
       id: slicedCategories[4]?.slug || slicedCategories[4]?._id,
       title:"Software",
-      subtitle:"Install & Update",
+      subtitle:"Installation & Support",
       image:"/cat-icons/Software.png",
     },
     {
       id: slicedCategories[5]?.slug || slicedCategories[5]?._id,
       title:"Antivirus",
-      subtitle:"Install & Update",
+      subtitle:"Setup & Protection",
       image:"/cat-icons/Antivirus.png",
     },
 
@@ -119,7 +119,7 @@ const handleSearch = (category: string | null) => {
 
   
 
-    <section className="relative px-3 sm:px-6 py-2 bg-white  ">
+    <section className="relative px-3 sm:px-6 py-3 bg-white  flex flex-col ">
         {hydrated && showPrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="bg-white w-[90%] max-w-md rounded-2xl p-6 shadow-xl animate-fadeIn">
@@ -162,12 +162,12 @@ const handleSearch = (category: string | null) => {
               <div
                 className=" fadeInUp h-full w-full flex flex-col justify-center"
               >
-                <h2 className="text-gray-600 xxs:text-sm xs:text-base sm:text-2xl md:text-3xl lg:text-4xl leading-tight font-bold">
-                  Service & Repair {" "}
-                  <span className="text-teal-700" data-type-text="Carpenders">@Home</span>
-                </h2>
-                <p className="my-1.5 xs:my-2 sm:my-3 ml-1 sm:ml-2 font-bold text-teal-800 xxs:text-[9px] xs:text-[10px] sm:text-xs md:text-sm lg:text-base tracking-wider sm:tracking-widest font-mono">IT Tech Support – Anytime, Anywhere.</p>
-                <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-4 mmd:gap-8 w-full  mb-3 py-2 rounded-lg">
+                <h1 className="text-gray-600 xxs:text-lg xs:text-xl  md:text-2xl mmd:text-xl lg:text-2xl xl:text-3xl leading-tight font-bold">
+                  Doorstep IT Tech Support &amp; Device Repair {" "}
+                  <span className="text-teal-700">— At Your Home</span>
+                </h1>
+                <p className="my-1 xs:my-2 sm:my-1 ml-1 sm:ml-2 font-bold text-teal-800 xxs:text-[12px] xs:text-[12px] sm:text-xs md:text-sm xl:text-base font-mono tracking-wide">Book a verified Geek for laptop, printer, router or software support — same day, at your doorstep.</p>
+                <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-4 mmd:gap-8 w-full  mb-2 py-2 rounded-lg">
                   {/* Location Input */}
                   <div className="relative w-full">
                     <input
@@ -248,7 +248,8 @@ const handleSearch = (category: string | null) => {
                 </div> */}
 
                 <div className="w-full  flex flex-col gap-1.5 sm:gap-2 border p-2 sm:p-3 rounded-lg border-gray-600">
-                  <h2 className="xxs:text-[10px] xs:text-xs sm:text-sm mmd:text-base md:text-xl font-medium text-gray-600">What are you looking for?</h2>
+                  <h2 className="xxs:text-[10px] xs:text-xs block mmd:hidden xl:block  sm:text-sm mmd:text-base md:text-xl font-medium text-gray-600">Book IT Support by Service Category</h2>
+                  <p className="xxs:text-[8px] xs:text-[9px] block mmd:hidden xl:block sm:text-xs text-gray-500">From laptop screen replacement to antivirus setup — our Geeks handle it all, at your doorstep.</p>
                   <div className="flex flex-col w-full gap-2 justify-start">
                     <div className="flex  w-full">
                      
@@ -260,7 +261,7 @@ const handleSearch = (category: string | null) => {
                         height={40}
                         decoding="async"
                         src={cat.image}
-                        alt="icon"
+                        alt={`${cat.title} service in Hyderabad`}
                       />
                     </div>
                     <div className="flex flex-col">
@@ -280,7 +281,7 @@ const handleSearch = (category: string | null) => {
                         height={40}
                         decoding="async"
                         src={cat.image}
-                        alt="icon"
+                        alt={`${cat.title} service in Hyderabad`}
                       />
                     </div>
                     <div className="flex flex-col">
@@ -310,7 +311,7 @@ const handleSearch = (category: string | null) => {
                 <Image
                 src={"/assets/main_hero.png"}
                 fill
-                alt="banner image"
+                alt="Geek providing doorstep IT support at home in Hyderabad"
                 className="object-contain"
               />
               {/* <div className="flex items-center flex-wrap mt-2 xs:mt-3">
@@ -370,8 +371,9 @@ const handleSearch = (category: string | null) => {
                       alt="icon"
                     />
                     <div className=" xs:ms-2">
-                      <h6 className="font-bold xxs:text-xs xs:text-sm lg:text-base">350+ Geeks</h6>
-                      <p className="xxs:text-[9px] xs:text-xs lg:text-xs text-gray-600">(Tech Support engineer)</p>
+                      <h6 className="font-bold xxs:text-xs xs:text-sm lg:text-base">380+ </h6>
+                      <p className="xxs:text-[9px] xs:text-xs lg:text-sm text-gray-600">Verified Geeks</p>
+
                     </div>
                   </div>
 
@@ -385,8 +387,8 @@ const handleSearch = (category: string | null) => {
                       style={{ height: 'auto' }}
                     />
                     <div className="ms-1.5 xs:ms-2">
-                      <h6 className="font-bold xxs:text-xs xs:text-sm lg:text-base">200+</h6>
-                      <p className="xxs:text-[9px] xs:text-xs lg:text-sm text-gray-600">Services Completed</p>
+                      <h6 className="font-bold xxs:text-xs xs:text-sm lg:text-base">1,000+</h6>
+                      <p className="xxs:text-[9px] xs:text-xs lg:text-sm text-gray-600">Seekers Registered</p>
                     </div>
                   </div>
 
@@ -400,8 +402,8 @@ const handleSearch = (category: string | null) => {
                       style={{ height: 'auto' }}
                     />
                     <div className="ms-1.5 xs:ms-2">
-                      <h6 className="font-bold xxs:text-xs xs:text-sm lg:text-base mb-1">200+</h6>
-                      <p className="xxs:text-[9px] xs:text-xs lg:text-sm text-gray-600">Happy Clients</p>
+                      <h6 className="font-bold xxs:text-xs xs:text-sm lg:text-base">Live in Hyderabad</h6>
+                      <p className="xxs:text-[9px] xs:text-xs lg:text-sm text-gray-600">App on Android &amp; iOS</p>
                     </div>
                   </div>
                 </div>

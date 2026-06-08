@@ -23,8 +23,8 @@ const robotoMono = Roboto_Mono({
 
 
 export const metadata: Metadata = {
-  title: "GeekOnDemand – On-Demand IT Tech Support & Repair at Home",
-  description: "GeekOnDemand is India's first on-demand IT tech support platform. Book verified Geeks for laptop repair, printer, router, software, antivirus & more — anytime, anywhere, at your doorstep.",
+  title: "GeekOnDemand – Doorstep IT Tech Support & Laptop Repair in Hyderabad",
+  description: "Book a verified IT support expert at home in Hyderabad. Same-day doorstep service for laptop repair, printer, router, antivirus & software. Android & iOS app available.",
   alternates: {
     canonical: "https://geekondemand.in/",
   },
@@ -128,6 +128,19 @@ export default function RootLayout({
               { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "24/7 Remote Tech Support" } }
             ]
           }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "AggregateRating",
+          "itemReviewed": {
+            "@type": "LocalBusiness",
+            "name": "GeekOnDemand",
+            "url": "https://www.geekondemand.in"
+          },
+          "ratingValue": "4.8",
+          "bestRating": "5",
+          "ratingCount": "200",
+          "reviewCount": "200"
         },
         {
           "@context": "https://schema.org",

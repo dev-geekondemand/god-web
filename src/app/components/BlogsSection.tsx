@@ -39,8 +39,8 @@ const BlogsSection = () => {
 
         {/* Heading — full width, above the carousel+sidebar row */}
         <div className='flex flex-col items-center justify-center w-full max-w-2xl mx-auto gap-3'>
-          <h1 className="h3 text-center">Insights &amp; <span className='text-teal-700'>Updates</span></h1>
-          <p className="body-2 text-gray-600 text-center">Stay informed with useful guides, trends, and expert advice.</p>
+          <h2 className="h3 text-center">IT Support Tips, Guides &amp; <span className='text-teal-700'>Tech Trends</span></h2>
+          <p className="body-2 text-gray-600 text-center">Expert articles on laptop repair, home networking, cybersecurity, and smart device maintenance — for home users and MSMEs.</p>
         </div>
 
         {/* Carousel + Ad — side by side, ad stretches to carousel height */}
@@ -150,7 +150,7 @@ const BlogsSection = () => {
               href='/blogs'
               className="mt-2 flex items-center gap-2 w-fit px-6 py-2.5 bg-gray-900 hover:bg-gray-700 transition-colors duration-200 text-sm text-white rounded-lg"
             >
-              View All
+              Read All Articles
               <svg height="12" strokeLinejoin="round" viewBox="0 0 16 16" width="12">
                 <path
                   fillRule="evenodd"

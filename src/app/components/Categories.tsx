@@ -53,15 +53,15 @@ const Categories = () => {
        <div className='flex w-full'>
         <div className='flex flex-col gap-5 w-full'>
             <div className='py-5 flex flex-col gap-4'>
-                <h1 className='h2 text-center text-gray-600'>One Platform. <span className='text-teal-700'>All IT Tech Needs.</span></h1>
-                <p className="text-xs font-bold text-gray-700 text-center max-w-2xl mx-auto">From laptop repairs to cloud solutions — find the right geek for every tech challenge.</p>
+                <h2 className='h2 text-center text-gray-600'>One Platform for All Your <span className='text-teal-700'>IT Tech Support Needs in Hyderabad</span></h2>
+                <p className="text-xs font-bold text-gray-700 text-center max-w-2xl mx-auto">Laptop repair, printer setup, router troubleshooting, antivirus, software support — all from verified IT experts near you.</p>
 
             </div>
             {isCatLoading ? <GlobalSkeleton cards={8} cols={2} lgCols={4} /> : <div className='grid lg:grid-cols-4 xl:grid-cols-5 md:grid-cols-3 grid-cols-2 md:gap-9 gap-3'>
             {displayCategories?.map((c) => (
                 <div  className="border border-white bg-white group relative shadow-sm hover:border min-h-[160px] hover:border-teal-500 transition transform duration-200 cursor-pointer rounded-lg flex py-2 px-4" key={c._id}>
                     <div className="flex flex-col items-center w-full">
-                        <Image className='mb-4 mt-3' src={c.smallBanner?.url} alt='Category Image' width={50} height={50} />
+                        <Image className='mb-4 mt-3' src={c.smallBanner?.url} alt={`${c.title} service in Hyderabad`} width={50} height={50} />
                         {/* <Image src={c.Banner} alt='Category Banner' width={60} height={40} /> */}
                         <p className='text-xs text-center font-bold text-gray-800'>{c.title}</p>
                        
