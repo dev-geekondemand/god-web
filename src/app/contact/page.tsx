@@ -195,7 +195,7 @@ const Contact = () => {
     </div>
 
     <div className='w-full h-76'>
-      <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d7613.062809198951!2d78.45031897684623!3d17.43426165883295!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sus!4v1742643646617!5m2!1sen!2sus" width={'100%'} height={"100%"}   loading="lazy" ></iframe>
+      <iframe src="https://maps.google.com/maps?q=Geekondemand+Office,+Greenland%27s+Tourism+Plaza,+Begumpet,+Hyderabad,+Telangana+500016&output=embed&z=17" width={'100%'} height={"100%"} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
     </div>
     </section>
   )

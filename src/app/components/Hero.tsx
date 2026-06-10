@@ -119,7 +119,7 @@ const handleSearch = (category: string | null) => {
 
   
 
-    <section className="relative px-3 sm:px-6 py-3 bg-white  flex flex-col ">
+    <section className="relative px-3 sm:px-6 py-3 min-h-[calc(100vh-64px)] bg-white  flex flex-col ">
         {hydrated && showPrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="bg-white w-[90%] max-w-md rounded-2xl p-6 shadow-xl animate-fadeIn">

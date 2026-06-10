@@ -95,11 +95,11 @@ const Navbar = () => {
   const ctaLabel = isGeekAuthenticated ? 'Become a Seeker' : isAuthenticated ? 'Earn as a Geek' : 'Book a Geek';
   const handleCta = () => {
     if (!isLoggedIn) {
-      router.push('/register?type=geek');
+      router.push('/register?type=seeker');
     } else if (isGeekAuthenticated) {
       toast.error('Please logout first to register as a Seeker.', { position: 'top-center' });
     } else {
-      toast.error('Please logout first to register as a Geek.', { position: 'top-center' });
+      router.push('/register?type=geek');
     }
   };
 

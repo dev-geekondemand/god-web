@@ -91,7 +91,7 @@ const slug = params.slug?.toString() || '';
 
   return (
     <section className='w-full flex flex-col justify-center items-center'>
-            <div className='w-full relative py-10 bg-teal-500/10 rounded-br-[60%]' >
+            <div className='w-full relative py-3 bg-teal-500/10 rounded-br-[60%]' >
                 <div className='w-full   relative flex justify-center items-center py-4  text-center'>
                     <div className='xl:max-w-6xl w-full h-full lg:max-w-5xl md:max-w-3xl sm:max-w-xl mx-auto'>
                         <div className='flex flex-wrap w-full'>
@@ -137,7 +137,7 @@ const slug = params.slug?.toString() || '';
                         <div className='max-w-7xl  mx-auto w-full flex flex-col items-center justify-center'>
                             <div className='w-full grid grid-cols-12 gap-8'>
 
-                                <div className='flex md:col-span-8 col-span-12 flex-col gap-5 h-fit bg-white rounded-lg px-5 py-8'>
+                                <div className='flex md:col-span-8 col-span-12 flex-col gap-5 h-fit bg-white rounded-lg px-5 py-0'>
 
                                     <div className='w-full flex flex-col gap-6'>
                                       <h2 className="h2">{blog?.title}</h2>
