@@ -6,7 +6,7 @@ import Chat from "./Chat";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import toast from "react-hot-toast";
-import CustomToast from "./CustomToast";
+import CustomToast, { showCustomToast } from "./CustomToast";
 
 const Genie = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -18,14 +18,11 @@ const Genie = () => {
       setIsOpen(true);
     }else{
       toast.dismiss();
-      toast.custom((t) => (
-        <CustomToast
-          t={t}
-          title="Not Logged in as a Seeker."
-          message="Login as a Seeker to start a conversation."
-          avatar="/assets/logo-big.webp"
-        />
-      ));
+      
+      showCustomToast(
+        { title: "Not Logged in as a Seeker.", message: "Login as a Seeker to start a conversation.", type: "warning", avatar: "/assets/logo-big.webp" },
+        { position: "top-center" }
+      );
     }
   }
 

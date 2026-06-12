@@ -22,6 +22,7 @@ const UserProfile = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [sendingVerification, setSendingVerification] = useState(false);
 
 
   const handleImageChange = async (file: File) => {
@@ -85,20 +86,24 @@ const UserProfile = () => {
               .matches(/^\d{10}$/, "Phone number must be 10 digits")
       ),
     }),
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       if (!formik.dirty) {
         toast.error("No changes made.", { position: "top-center" });
         return;
       }
-      dispatch(
-        updateUserProfile({
-          fullName: { first: values.firstName, last: values.lastName },
-          email: values.email,
-          phone: values.phone,
-        })
-      );
-      setIsEditing(false);
-      dispatch(loadUser());
+      try {
+        await dispatch(
+          updateUserProfile({
+            fullName: { first: values.firstName, last: values.lastName },
+            email: values.email,
+            phone: values.phone,
+          })
+        ).unwrap();
+        setIsEditing(false);
+        dispatch(loadUser());
+      } catch {
+        // error toast handled in slice
+      }
     },
   });
 
@@ -171,10 +176,20 @@ const UserProfile = () => {
                 </span>
               ) : (
                 <button
-                  onClick={() => dispatch(sendVerificationMail(user?._id || ""))}
-                  className="text-xs text-teal-600 hover:text-teal-700 font-medium underline underline-offset-2"
+                  disabled={sendingVerification}
+                  onClick={async () => {
+                    setSendingVerification(true);
+                    try {
+                      await dispatch(sendVerificationMail(user?._id || "")).unwrap();
+                    } catch {
+                      // error toast handled in slice
+                    } finally {
+                      setSendingVerification(false);
+                    }
+                  }}
+                  className="text-xs text-teal-600 hover:text-teal-700 font-medium underline underline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Verify email
+                  {sendingVerification ? "Sending…" : "Verify email"}
                 </button>
               )}
             </div>

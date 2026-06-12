@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAppDispatch } from "@/lib/hooks";
 import { fetchUserLocation, setCity, setShowPrompt } from "../../features/locationSlice";
-import CustomToast from "./CustomToast";
+import CustomToast, { showCustomToast } from "./CustomToast";
 import toast from "react-hot-toast";
 
 const HeroSectionTen = () => {
@@ -98,14 +98,10 @@ const handleSearch = (category: string | null) => {
  if(category){
   router.push(`/categories/${category}/brands`);
  }else{
-    toast.custom((t) => (
-        <CustomToast
-          t={t}
-          title="Category not selected."
-          message="Please select a category."
-          avatar="/assets/logo-big.webp"
-        />
-      ));
+    showCustomToast(
+      { title: "Category not selected.", message: "Please select a category to search.", type: "error", avatar: "/assets/logo-big.webp" },
+      { position: "top-center" }
+    );
  }
 }
 
@@ -119,7 +115,7 @@ const handleSearch = (category: string | null) => {
 
   
 
-    <section className="relative px-3 sm:px-6 py-3 min-h-[calc(100vh-64px)] bg-white  flex flex-col ">
+    <section className="relative px-3 sm:px-6 py-3  bg-white  flex flex-col ">
         {hydrated && showPrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="bg-white w-[90%] max-w-md rounded-2xl p-6 shadow-xl animate-fadeIn">

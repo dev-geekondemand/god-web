@@ -40,6 +40,13 @@ const PLAN_CONFIG: Record<string, { label: string; color: string }> = {
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
+const TIME_SLOTS = [
+  { label: '6AM–12PM',  from: '06:00', to: '12:00' },
+  { label: '12PM–5PM',  from: '12:00', to: '17:00' },
+  { label: '5PM–9PM',   from: '17:00', to: '21:00' },
+  { label: '9PM–12AM',  from: '21:00', to: '23:59' },
+];
+
 const GeeksByCategories = () => {
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
@@ -260,28 +267,29 @@ const GeeksByCategories = () => {
           </select>
 
           {filters.availableDay && (
-            <>
-              <div className="flex items-center gap-1">
-                <span className="text-xs text-gray-400">From</span>
-                <input
-                  type='time'
-                  name='availableFrom'
-                  value={filters.availableFrom}
-                  onChange={handleInputChange}
-                  className="border border-gray-200 rounded-lg px-2 py-2 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-teal-500"
-                />
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="text-xs text-gray-400">To</span>
-                <input
-                  type='time'
-                  name='availableTo'
-                  value={filters.availableTo}
-                  onChange={handleInputChange}
-                  className="border border-gray-200 rounded-lg px-2 py-2 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-teal-500"
-                />
-              </div>
-            </>
+            <div className="flex flex-wrap gap-1.5">
+              {TIME_SLOTS.map(slot => {
+                const isActive = filters.availableFrom === slot.from && filters.availableTo === slot.to;
+                return (
+                  <button
+                    key={slot.label}
+                    type="button"
+                    onClick={() => setFilters(prev => ({
+                      ...prev,
+                      availableFrom: isActive ? '' : slot.from,
+                      availableTo:   isActive ? '' : slot.to,
+                    }))}
+                    className={`text-xs px-3 py-2 rounded-lg border font-medium transition ${
+                      isActive
+                        ? 'bg-teal-600 text-white border-teal-600'
+                        : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-teal-400 hover:text-teal-600'
+                    }`}
+                  >
+                    {slot.label}
+                  </button>
+                );
+              })}
+            </div>
           )}
 
           <div className="flex gap-2 ml-auto">

@@ -23,6 +23,7 @@ import { useAppDispatch } from '@/lib/hooks';
 import { ServiceRequest } from '@/interfaces/ServiceRequest';
 import toast from 'react-hot-toast';
 import { getSeekerRequests } from '@/features/request/requestSlice';
+import CustomToast, { showCustomToast } from './CustomToast';
 
 const NotifBadge = ({ count }: { count: number }) =>
   count > 0 ? (
@@ -67,10 +68,10 @@ const Navbar = () => {
 
   const navlinks = [
     { id: 1, name: "Home", link: "/" },
-    { id: 5, name: "Blogs", link: "/blogs" },
-    { id: 4, name: "Geeks", link: "/geeks" },
+    { id: 2, name: "Geeks", link: "/geeks" },
     { id: 3, name: "About Us", link: "/about" },
-    { id: 2, name: "Contact Us", link: "/contact" },
+    { id: 4, name: "Blogs", link: "/blogs" },
+    { id: 5, name: "Contact Us", link: "/contact" },
   ];
 
   const handleLogout = async () => {
@@ -97,7 +98,18 @@ const Navbar = () => {
     if (!isLoggedIn) {
       router.push('/register?type=seeker');
     } else if (isGeekAuthenticated) {
-      toast.error('Please logout first to register as a Seeker.', { position: 'top-center' });
+      toast.dismiss();
+            showCustomToast(
+              { title: "Logged in as a Geek.", message: "Please logout first to register as a Seeker.", type: "warning", avatar: "/assets/logo-big.webp" },
+              { position: "top-center" }
+            )
+      toast.custom('Please logout first to book a Geek.', { position: 'top-center' });
+    } else if (isAuthenticated) {
+      toast.dismiss();
+            showCustomToast(
+              { title: "Logged in as a Seeker.", message: "Please logout first to register as a Geek.", type: "warning", avatar: "/assets/logo-big.webp" },
+              { position: "top-center" }
+            );
     } else {
       router.push('/register?type=geek');
     }

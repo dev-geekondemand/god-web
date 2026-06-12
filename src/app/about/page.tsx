@@ -70,7 +70,7 @@ const page = () => {
       list:[
         "	Automatically identifies issues across hardware, software, and networks.",
         "Troubleshoots and resolves common problems in real-time.",
-        "Routes complex cases directly to the right GeekOnDemand tech professional for quick escalation."
+        "Routes complex cases to the right tech professional for fast escalation."
 
       ]
     },
@@ -81,8 +81,9 @@ const page = () => {
       content:"Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nobis voluptatibus soluta sint tenetur obcaecati expedita in iure culpa adipisci voluptas quibusdam, saepe et accusamus facere officiis non error quia eligendi?",
       role:"Small Buisness Owner",
       list:[
-          "	Access help through chat, voice, or video — anytime you need it.",
-          "	Get instant resolution from GeekOnDemand IT services that combine AI insights with human expertise."
+          "Access help through chat, voice, or video — anytime you need it.",
+          "Get instant resolution combining AI-powered insights with human expertise.",
+          "Choose how you connect — the right expert is always available."
           ]
 
     },
@@ -362,8 +363,7 @@ const page = () => {
                 <ul className='flex flex-col gap-1 mt-1'>
                 <li className='flex items-start gap-2'><CircleCheck className='text-gray-950 mt-1' size={12} />Better pricing for customers</li>
                 <li className='flex items-start gap-2'><CircleCheck className='text-gray-950 mt-1' size={12} />Higher income for Geeks</li>
-                <li className='flex items-start gap-2'><CircleCheck className='text-gray-950 mt-1' size={12} />Stronger trust and long-term relationships</li>
-                <li className='flex items-start gap-2'><CircleCheck className='text-gray-950 mt-1' size={12} />Stronger trust and long-term relationships</li>
+                <li className='flex items-start gap-2'><CircleCheck className='text-gray-950 mt-1' size={12} />Stronger client engagement and lasting relationships</li>
                 </ul>
 
               </AccordionContent>
@@ -371,8 +371,8 @@ const page = () => {
             <AccordionItem value="item-3" className='border-b-0'>
               <AccordionTrigger className='text-base bg-gray-100 rounded-lg px-3 mb-1'>End-to-End Tech Support Under One Roof</AccordionTrigger>
               <AccordionContent className='bg-white px-3 text-gray-700'>
-              Hardware, software, networking, cybersecurity, servers, cloud, email, OS, antivirus, Wi-Fi, CCTV, routers, printers — everything.
-              <span className='font-bold'>   One Platform. One trusted Expert.</span>
+              Hardware, software, networking,  servers, email, OS, antivirus, Wi-Fi, CCTV, routers, printers — everything.
+              <span className='font-bold'>   One Platform. One Skilled Expert.</span>
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-4" className='border-b-0'>
@@ -389,14 +389,13 @@ const page = () => {
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-6" className='border-b-0'>
-              <AccordionTrigger className='text-base bg-gray-100 rounded-lg px-3 mb-1'>Faster Response & Real-Time Tracking</AccordionTrigger>
+              <AccordionTrigger className='text-base bg-gray-100 rounded-lg px-3 mb-1'>Swift Service, Every Step of the Way</AccordionTrigger>
               <AccordionContent className='bg-white px-3 text-gray-700'>
               From booking to completion:
               <ul className='flex flex-col gap-1 mt-1'>
-                <li className='flex items-start gap-2'><CircleCheck className='text-gray-950 mt-1' size={12} />Instant Geek assignment</li>
-                <li className='flex items-start gap-2'><CircleCheck className='text-gray-950 mt-1' size={12} />Live status tracking</li>
-                <li className='flex items-start gap-2'><CircleCheck className='text-gray-950 mt-1' size={12} />Service quality monitoring</li>
-                <li className='flex items-start gap-2'><CircleCheck className='text-gray-950 mt-1' size={12} />Quick escalation and resolution</li>
+                <li className='flex items-start gap-2'><CircleCheck className='text-gray-950 mt-1' size={12} />A verified Geek is assigned to your request instantly.</li>
+                <li className='flex items-start gap-2'><CircleCheck className='text-gray-950 mt-1' size={12} />Every service is monitored to ensure quality work.</li>
+                <li className='flex items-start gap-2'><CircleCheck className='text-gray-950 mt-1' size={12} />Concerns are escalated and resolved without delay.</li>
                 </ul>
               </AccordionContent>
             </AccordionItem>
@@ -543,41 +542,29 @@ const page = () => {
                 opts={{
                     align: "start",
                 }}
-                className="w-full  px-5 "
+                className="w-full mt-4 px-10"
                 >
                 <CarouselContent>
                     {Testimonials.map((t,index) => (
-                    <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/2 sm:basis-1/1 mx-2 my-1">
-                        <Card className=' border-none shadow-none py-8 bg-transparent  '>
-                            <CardContent className="flex bg-white relative shadow rounded-md py-5 flex-col group gap-2 items-start justify-start">
-                                {/* <div className='   rounded-full mb-1'>
-                                <Image src={t.image} alt='Testimonial Image' className='rounded-full absolute -top-8 left-1/2' width={90} height={90} />
-                                </div> */}
-
-
-                             
-                              
-
-                            <div className='flex flex-col gap-2 h-[280px] md:h-[150px] px-3'>
-                                <h4 className='h5 text-gray-700'>{t.name}</h4>
-                                <ul>
+                    <CarouselItem key={index} className="basis-full md:basis-1/2">
+                        <Card className='border-none shadow-none py-4 bg-transparent'>
+                            <CardContent className="flex bg-white shadow rounded-md p-5 flex-col gap-3 items-start justify-start">
+                            <h4 className='h5 text-gray-700 leading-snug'>{t.name}</h4>
+                            <ul className='flex flex-col gap-1.5'>
                                   {t.list.map((l,i)=>(
                                     <li key={i+1} className='flex items-start gap-2 text-sm text-gray-500 leading-6'>
-                                      <CircleCheck width={16} className=" text-teal-600 flex-shrink-0" />
-                                      {l}
+                                      <CircleCheck width={16} className="text-teal-600 flex-shrink-0 mt-0.5" />
+                                      <span>{l}</span>
                                     </li>
                                   ))}
                                 </ul>
-                            </div>
-
-                            
                             </CardContent>
                         </Card>
                     </CarouselItem>
                     ))}
                 </CarouselContent>
-                <CarouselPrevious className='cursor-pointer -left-3 hover:bg-teal-500 hover:text-white'/>
-                <CarouselNext className='cursor-pointer -right-0 hover:bg-teal-500 hover:text-white' />
+                <CarouselPrevious className='cursor-pointer left-0 hover:bg-teal-500 hover:text-white'/>
+                <CarouselNext className='cursor-pointer right-0 hover:bg-teal-500 hover:text-white' />
             </Carousel>
 
       </div>  
@@ -599,7 +586,7 @@ const page = () => {
               We are just getting started. Our focus is on continuously improving the GeekOnDemand platform, adding AI-driven features, expanding our network of IT service providers in Hyderabad and across India, and creating more IT career opportunities for talented professionals.
             </p>
             <p className='body-2 text-gray-600 max-w-5xl'>
-              <b>Our promise:</b> Whether you need cybersecurity services in India, cloud solutions in Hyderabad, or 24/7 remote IT support, <b>GeekOnDemand</b> will always be your trusted partner.
+              <b>Our promise:</b> Every customer deserves quick, reliable IT support without the hassle. That is exactly what <b>GeekOnDemand</b> is built to deliver — Door step service every single time.
             </p>
           </div>
 

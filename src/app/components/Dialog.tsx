@@ -88,13 +88,13 @@ const DialogComponent = ({
 
   return (
     <Dialog open={showDialog} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[440px]">
+      <DialogContent className="sm:max-w-[440px] flex flex-col max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{titleDesc}</DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-5 py-1">
+        <div className="flex flex-col gap-5 py-1 overflow-y-auto pr-1">
 
           {skills && skills.length > 0 && (
             <div className="flex flex-col gap-2">

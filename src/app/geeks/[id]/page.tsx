@@ -95,7 +95,15 @@ const GeekById = () => {
   const handleClick = () => {
     if (!geek?._id) { toast.error('Geek not found'); return }
     if (loggedInGeek?._id === geek._id) { toast.error('You cannot book your own service'); return }
-    if (!loggedInSeeker?._id) { router.push(`/login/seeker?redirect=/geeks/${id}`); return }
+    if (!loggedInSeeker?._id) {
+      const params = new URLSearchParams()
+      if (categoryId) params.set('categoryId', categoryId)
+      if (urlBrandId) params.set('brandId', urlBrandId)
+      const query = params.toString()
+      const redirectTo = `/geeks/${id}${query ? `?${query}` : ''}`
+      router.push(`/login/seeker?redirect=${encodeURIComponent(redirectTo)}`)
+      return
+    }
     setSelectedSlot(undefined)
     setShowDialog(true)
   }

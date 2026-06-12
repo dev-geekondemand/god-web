@@ -80,7 +80,7 @@ const Blogs = () => {
             </div>
 
             {totalPages > 1 && (
-                <div className='flex items-center gap-2 mt-4'>
+                <div className='flex items-center gap-2 my-4'>
                     <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}

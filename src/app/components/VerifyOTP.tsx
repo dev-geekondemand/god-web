@@ -26,6 +26,7 @@ const VerifyOTP = () => {
   const yoe = searchParams.get('yoe');
   const selected = searchParams.get('selected');
   const context = searchParams.get('context');
+  const redirectTo = searchParams.get('redirect') || '/';
   const refCode = searchParams.get('refCode');
   const brands = searchParams.get('brands');
   const companyName = searchParams.get('companyName');
@@ -118,15 +119,15 @@ const VerifyOTP = () => {
     if (userState.isAuthenticated) {
       toast.dismiss();
       toast.success('Login successful');
-      router.push('/');
+      router.push(redirectTo);
     }
-  }, [userState.isAuthenticated, router]);
+  }, [userState.isAuthenticated, router, redirectTo]);
 
   useEffect(() => {
     if (geekState.isAuthenticated) {
-      router.push('/');
+      router.push(redirectTo);
     }
-  }, [geekState.isAuthenticated, router]);
+  }, [geekState.isAuthenticated, router, redirectTo]);
 
 
 

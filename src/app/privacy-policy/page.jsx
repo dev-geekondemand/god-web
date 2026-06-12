@@ -28,7 +28,7 @@ const PrivacyPolicy = () => {
     </div>
 
     <section className='space-y-3'>
-        <h2 className="text-2xl font-semibold text-gray-700">I. Data Collection</h2>
+        <h2 className="text-2xl font-semibold text-gray-700">1. Data Collection</h2>
         <p className="text-gray-600">
         We collect personal information to enhance your experience with our Website and services. The types of personal information we collect include:
         </p>
@@ -40,7 +40,7 @@ const PrivacyPolicy = () => {
     </section>
 
     <section className='space-y-3'>
-        <h2 className="text-2xl font-semibold text-gray-700">II. Use of Information</h2>
+        <h2 className="text-2xl font-semibold text-gray-700">2. Use of Information</h2>
         <p className="text-gray-600">
         We use the collected data for the following purposes:
         </p>
@@ -53,7 +53,7 @@ const PrivacyPolicy = () => {
     </section>
 
     <section className='space-y-3'>
-        <h2 className="text-2xl font-semibold text-gray-700">III. Data Sharing</h2>
+        <h2 className="text-2xl font-semibold text-gray-700">3. Data Sharing</h2>
         <p className="text-gray-600">
         We may share your personal information with third parties for the following reasons:
         </p>
@@ -65,28 +65,28 @@ const PrivacyPolicy = () => {
     </section>
 
     <section className='space-y-3'>
-        <h2 className="text-2xl font-semibold text-gray-700">IV. Data Retention</h2>
+        <h2 className="text-2xl font-semibold text-gray-700">4. Data Retention</h2>
         <p className="text-gray-600">
         We retain your personal data for as long as it is necessary for the purpose of fulfilling our services or as required by law.
         </p>
     </section>
 
     <section className='space-y-3'>
-        <h2 className="text-2xl font-semibold text-gray-700">V. Security</h2>
+        <h2 className="text-2xl font-semibold text-gray-700">5. Security</h2>
         <p className="text-gray-600">
         We implement various security measures to protect your personal information, including encryption and secure storage. You are also responsible for keeping your account information secure.
         </p>
     </section>
 
     <section className='space-y-3'>
-        <h2 className="text-2xl font-semibold text-gray-700">VI. Children's Privacy</h2>
+        <h2 className="text-2xl font-semibold text-gray-700">6. Children's Privacy</h2>
         <p className="text-gray-600">
         The Website is not intended for use by children under the age of 18, and we do not knowingly collect personal information from children.
         </p>
     </section>
 
     <section className='space-y-3'>
-        <h2 className="text-2xl font-semibold text-gray-700">VII. Contact Information</h2>
+        <h2 className="text-2xl font-semibold text-gray-700">7. Contact Information</h2>
         <p className="text-gray-600">
         If you have any questions or concerns regarding this Privacy Policy, please contact us at{' '}
         <a href="mailto:hello@geekondemand.in" className="text-blue-600 underline">

@@ -105,10 +105,8 @@ const LoginGeek = () => {
       <div className='py-20 w-full flex items-center justify-center px-3'>
         <div className='w-sm mx-auto flex flex-col items-center gap-8 justify-center'>
 
-          <div className='w-full flex items-center justify-between'>
-            <Link href="/login/seeker" className='text-sm text-teal-600 underline underline-offset-2 hover:text-teal-700'>
-              Login as Seeker?
-            </Link>
+          <div className='w-full flex items-center justify-center gap-4'>
+                        <p className='cursor-pointer text-gray-800 '>Don&apos;t have an account yet?</p>
             <Link href="/register?type=geek" className='text-sm text-teal-600 underline underline-offset-2 hover:text-teal-700'>
               Sign Up
             </Link>

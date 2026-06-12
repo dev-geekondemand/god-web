@@ -31,6 +31,13 @@ const PLAN_CONFIG: Record<string, { label: string; color: string }> = {
   Advance:      { label: 'Advance',      color: 'text-teal-700 border-teal-200 bg-teal-50' },
 };
 
+const TIME_SLOTS = [
+  { label: '6AM–12PM',  from: '06:00', to: '12:00' },
+  { label: '12PM–5PM',  from: '12:00', to: '17:00' },
+  { label: '5PM–9PM',   from: '17:00', to: '21:00' },
+  { label: '9PM–12AM',  from: '21:00', to: '23:59' },
+];
+
 const Providers = () => {
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
@@ -308,27 +315,28 @@ const Providers = () => {
                   ))}
                 </select>
                 {filters.availableDay && (
-                  <div className="grid grid-cols-2 gap-2 mt-2">
-                    <div>
-                      <label className='text-xs text-gray-400 block mb-1'>From</label>
-                      <input
-                        type='time'
-                        name='availableFrom'
-                        value={filters.availableFrom}
-                        onChange={handleInputChange}
-                        className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
-                      />
-                    </div>
-                    <div>
-                      <label className='text-xs text-gray-400 block mb-1'>To</label>
-                      <input
-                        type='time'
-                        name='availableTo'
-                        value={filters.availableTo}
-                        onChange={handleInputChange}
-                        className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-teal-500 w-full"
-                      />
-                    </div>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {TIME_SLOTS.map(slot => {
+                      const isActive = filters.availableFrom === slot.from && filters.availableTo === slot.to;
+                      return (
+                        <button
+                          key={slot.label}
+                          type="button"
+                          onClick={() => setFilters(prev => ({
+                            ...prev,
+                            availableFrom: isActive ? '' : slot.from,
+                            availableTo:   isActive ? '' : slot.to,
+                          }))}
+                          className={`text-xs px-3 py-1.5 rounded-full border font-medium transition ${
+                            isActive
+                              ? 'bg-teal-600 text-white border-teal-600'
+                              : 'bg-white text-gray-600 border-gray-300 hover:border-teal-400 hover:text-teal-600'
+                          }`}
+                        >
+                          {slot.label}
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>

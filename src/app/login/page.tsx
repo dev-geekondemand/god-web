@@ -16,7 +16,7 @@ const Models = () => {
             <h3 className='text-xl font-bold mb-4'>Login as a Seeker</h3>
           </div>
           <div className='flex flex-col items-center justify-center'>
-            <Image width={180} height={150} className="rounded-lg" src="/assets/gifs/seeker-login.gif" alt="Seeker Login" />
+            <Image width={180} height={150} className="rounded-lg" src="/assets/images/login-seeker.png" alt="Seeker Login" />
           </div>
         </Link>
 
@@ -28,7 +28,7 @@ const Models = () => {
             <h3 className='text-xl font-bold mb-4'>Login as a Geek</h3>
           </div>
           <div className='flex flex-col items-center justify-center'>
-            <Image width={180} height={150} className="rounded-lg" src="/assets/gifs/geek-login.gif" alt="Geek Login" />
+            <Image width={180} height={150} className="rounded-lg" src="/assets/images/geek-login.png" alt="Geek Login" />
           </div>
         </Link>
       </div>

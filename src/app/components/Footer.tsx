@@ -12,23 +12,23 @@ const Footer = () => {
           links: [
             {
               text: "Laptops - Service & Repair",
-              url: "/categories/682af19ccd7ba362b7afbb02/brands"
+              url: "/categories/laptops-desktop-service-and-repair/brands"
             },
             {
               text: "Printer - Service & Repair",
-              url: "/categories/682af362cd7ba362b7afbb28/brands"
+              url: "/categories/printer-service-and-repair/brands"
             },
             {
               text: "Scanner - Service & Repair",
-              url: "/categories/682af380cd7ba362b7afbb30/brands"
+              url: "/categories/scanner-service-and-repair/brands"
             },
             {
-              text: "Router - Service & Repair",
-              url: "/categories/682af36fcd7ba362b7afbb2c"
+              text: "Router - Setup & Troubleshooting",
+              url: "/categories/router-setup-and-troubleshooting/brands"
             },
             {
-              text: "Email Setup & Troubleshooting",
-              url: "/categories/682af32fcd7ba362b7afbb1e/brands"
+              text: "Email - Service & Repair",
+              url: "/categories/email-service-and-repair/brands"
             },
             {
               text: "View All Categories",
