@@ -126,7 +126,7 @@ export default function Home() {
         {/* Brands Served */}
         <section className='dark:text-gray-200 w-full max-w-7xl mx-auto mt-10'>
           <div className='flex flex-col gap-2 max-w-7xl mb-8 relative justify-center items-center mx-auto'>
-            <h2 className='h2'>Our Geeks Support These Leading Device Brands</h2>
+            <h2 className='h2 px-2 text-center'>Our Geeks Support These Leading Device Brands</h2>
             <p className="text-xs text-gray-600 text-center max-w-2xl">HP, Dell, Lenovo, Canon, Epson, D-Link, TP-Link, Quick Heal and more — certified support at your doorstep.</p>
             <span className="mt-1 inline-block text-xs font-semibold text-teal-700 border border-teal-300 bg-teal-50 px-3 py-1 rounded-full">
               Official Quick Heal Service Partner

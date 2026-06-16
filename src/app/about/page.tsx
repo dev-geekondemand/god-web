@@ -280,60 +280,48 @@ const page = () => {
               <h3 className="h2">How It Works</h3>
               <p className="body-2 px-1 text-center text-gray-700">Straightforward process designed to make your experience seamless and hassle-free.</p>
           </div>
-          <div className='w-full flex h-full flex-col xl:flex-row justify-center items-center gap-7  p-4'>
+          <div className='w-full flex flex-col mmd:flex-row justify-center items-stretch gap-7 p-4'>
 
-              <div className='bg-white h-full px-4 py-6 rounded-lg flex flex-col items-center gap-4 relative '>
+              <div className='bg-white w-full lg:flex-1 px-4 py-6 rounded-lg flex flex-col items-center gap-4 relative'>
                 <div className='w-20 h-20 rounded-lg flex items-center justify-center bg-teal-100/70'>
                 <UserSearch width={40} height={40} className='text-teal-500' />
 
                 </div>
-                  <div className='flex flex-col md:w-sm items-center gap-2'>
+                  <div className='flex flex-col items-center gap-2 w-full max-w-sm'>
                       <h4 className="h5">1. Search and Browse</h4>
-                      <p className="text-sm md:h-18 text-center px-3 leading-6 text-gray-500">
+                      <p className="text-sm text-center px-3 leading-6 text-gray-500">
                         Customers can browse or search for specific Services or Geeks using categories, filters, or search bars.
                       </p>
 
                   </div>
-
-                  {/* <div className='absolute -top-3 -left-2 text-6xl font-bold border-teal-200'>
-                      01
-                  </div> */}
               </div>
 
-              <div className='bg-white h-full px-4 py-6 rounded-lg flex flex-col items-center gap-4 relative '>
+              <div className='bg-white w-full lg:flex-1 px-4 py-6 rounded-lg flex flex-col items-center gap-4 relative'>
                 <div className='w-20 h-20 rounded-lg flex items-center justify-center bg-teal-100/70'>
                 <MousePointer width={40} height={40} className='text-teal-600' />
                 </div>
-                  <div className='flex flex-col md:w-sm items-center gap-2'>
+                  <div className='flex flex-col items-center gap-2 w-full max-w-sm'>
                       <h4 className="h5">2. Book Service</h4>
-                      <p className="text-sm md:h-18 text-center leading-6 px-3 text-gray-500">
+                      <p className="text-sm text-center leading-6 px-3 text-gray-500">
                       Register with us in a few simple steps. Hire and work directly with Tech Support Geeks.
                       </p>
 
                   </div>
-
-                  {/* <div className='absolute -top-3 -left-2 text-6xl font-bold border-teal-200'>
-                      02
-                  </div> */}
               </div>
 
 
-              <div className='bg-white h-full px-4 py-6 rounded-lg flex flex-col items-center gap-4 relative '>
+              <div className='bg-white w-full lg:flex-1 px-4 py-6 rounded-lg flex flex-col items-center gap-4 relative'>
                 <div className='w-20 h-20 rounded-lg flex items-center justify-center bg-teal-100/70'>
                 <Sparkle width={40} height={40} className='text-teal-600' />
 
                 </div>
-                  <div className='flex flex-col md:w-sm items-center gap-2'>
+                  <div className='flex flex-col items-center gap-2 w-full max-w-sm'>
                       <h4 className="h5">3. Solve Problems</h4>
-                      <p className="text-sm md:h-18 px-3 text-center leading-6 text-gray-500">
+                      <p className="text-sm px-3 text-center leading-6 text-gray-500">
                       Choose the best quotation from expert Geeks and collaborate with them across diverse IT support categories.
                       </p>
 
                   </div>
-
-                  {/* <div className='absolute -top-3 -left-2 text-6xl font-bold border-teal-200'>
-                      03
-                  </div> */}
               </div>
 
               
@@ -546,9 +534,9 @@ const page = () => {
                 >
                 <CarouselContent>
                     {Testimonials.map((t,index) => (
-                    <CarouselItem key={index} className="basis-full md:basis-1/2">
-                        <Card className='border-none shadow-none py-4 bg-transparent'>
-                            <CardContent className="flex bg-white shadow rounded-md p-5 flex-col gap-3 items-start justify-start">
+                    <CarouselItem key={index} className="basis-full md:basis-1/2 h-full">
+                        <Card className='border-none shadow-none py-4 bg-transparent h-full'>
+                            <CardContent className="flex bg-white shadow rounded-md p-5 flex-col gap-3 items-start justify-start md:h-[300px] lg:h-[230px] overflow-hidden">
                             <h4 className='h5 text-gray-700 leading-snug'>{t.name}</h4>
                             <ul className='flex flex-col gap-1.5'>
                                   {t.list.map((l,i)=>(

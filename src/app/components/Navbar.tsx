@@ -126,7 +126,7 @@ const Navbar = () => {
           </Link>
 
           {/* Center: navlinks (desktop) */}
-          <nav className="hidden lg:flex items-center gap-8 text-sm">
+          <nav className="hidden lg:flex items-center gap-8 text-sm px-3">
             {navlinks.map((navlink) => (
               <Link
                 key={navlink.id}

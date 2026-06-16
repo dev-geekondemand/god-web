@@ -61,7 +61,7 @@ const Reviews = () => {
           >
             <button
               onClick={() => setSelected(null)}
-              className="absolute top-3 right-3 z-10 bg-black/50 hover:bg-black/80 text-white rounded-full p-1.5 transition"
+              className="absolute hover:cursor-pointer top-3 right-3 z-10 bg-black/50 hover:bg-black/80 text-white rounded-full p-1.5 transition"
               aria-label="Close"
             >
               <X size={20} />
