@@ -50,7 +50,7 @@ const HeroSectionTen = () => {
     {
       id: slicedCategories[4]?.slug || slicedCategories[2]?._id,
       title:"Email",
-      subtitle:"Service & Repair",
+      subtitle:"Service & Repair", 
       image:"/cat-icons/email.png",
     },
    
