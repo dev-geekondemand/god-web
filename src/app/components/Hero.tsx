@@ -42,13 +42,13 @@ const HeroSectionTen = () => {
       image:"/cat-icons/Router.png",
     },
      {
-      id: slicedCategories[4]?.slug || slicedCategories[4]?._id,
+      id: slicedCategories[3]?.slug || slicedCategories[4]?._id,
       title:"Software",
       subtitle:"Installation & Support",
       image:"/cat-icons/Software.png",
     },
     {
-      id: slicedCategories[3]?.slug || slicedCategories[2]?._id,
+      id: slicedCategories[4]?.slug || slicedCategories[2]?._id,
       title:"Email",
       subtitle:"Service & Repair",
       image:"/cat-icons/email.png",
