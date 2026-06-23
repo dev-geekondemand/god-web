@@ -22,7 +22,6 @@ interface RequestProps {
 const statusBadge = (status: string) => {
   const styles: Record<string, string> = {
     Pending: "bg-amber-100 text-amber-700 border border-amber-200",
-    Matched: "bg-teal-100 text-teal-700 border border-teal-200",
     Accepted: "bg-green-100 text-green-700 border border-green-200",
     Completed: "bg-green-100 text-green-700 border border-green-200",
     Rejected: "bg-red-100 text-red-700 border border-red-200",
@@ -34,7 +33,7 @@ const statusBadge = (status: string) => {
 
 const cardAccent = (status: string) => {
   if (status === "Pending") return "border-l-amber-400";
-  if (status === "Accepted" || status === "Matched") return "border-l-teal-400";
+  if (status === "Accepted" ) return "border-l-teal-400";
   if (status === "Completed") return "border-l-green-400";
   return "border-l-red-400";
 };

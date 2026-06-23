@@ -47,7 +47,7 @@ const cardAccentColor: Record<string, string> = {
   Cancelled: "border-l-red-400",
 };
 
-const TABS = ["All", "Pending", "Matched", "Accepted", "Completed", "Rejected"];
+const TABS = ["All", "Pending", "Accepted", "Completed", "Rejected"];
 
 const Requests = () => {
   const id = useSelector((state: RootState) => state.seeker?.user?._id);

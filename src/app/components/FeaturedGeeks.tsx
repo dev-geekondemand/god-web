@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import React, { useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image';
@@ -82,7 +82,7 @@ const FeaturedGeeks = () => {
 
                         <div
                             ref={scrollRef}
-                            className='flex-1 min-w-0 flex overflow-x-auto hide-scrollbar snap-x snap-mandatory border-t border-l border-gray-200'
+                            className='flex-1 min-w-0 flex overflow-x-auto custom-scrollbar snap-x snap-mandatory border-t border-l border-gray-200'
                         >
                             {geeks?.map((geek) => {
                                 const plan = planConfig[geek.subscriptionPlan] ?? null;

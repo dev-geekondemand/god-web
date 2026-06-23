@@ -20,6 +20,8 @@ const HeroSectionTen = () => {
 
   const categories = useSelector((state: RootState) => state.category?.categories || []) as Category[];
   const slicedCategories = categories.slice(0,6);
+  console.log(slicedCategories);
+  
   const displayCategories = [
     {
       id: slicedCategories[0]?.slug || slicedCategories[0]?._id,
@@ -34,23 +36,24 @@ const HeroSectionTen = () => {
       image:"/cat-icons/Printer.png",
     },
     {
-      id: slicedCategories[3]?.slug || slicedCategories[3]?._id,
+      id: slicedCategories[2]?.slug || slicedCategories[3]?._id,
       title:"Router",
       subtitle:"Service & Repair",
       image:"/cat-icons/Router.png",
     },
-    {
-      id: slicedCategories[2]?.slug || slicedCategories[2]?._id,
-      title:"Scanner",
-      subtitle:"Service & Repair",
-      image:"/cat-icons/Scanner.png",
-    },
-    {
+     {
       id: slicedCategories[4]?.slug || slicedCategories[4]?._id,
       title:"Software",
       subtitle:"Installation & Support",
       image:"/cat-icons/Software.png",
     },
+    {
+      id: slicedCategories[3]?.slug || slicedCategories[2]?._id,
+      title:"Email",
+      subtitle:"Service & Repair",
+      image:"/cat-icons/email.png",
+    },
+   
     {
       id: slicedCategories[5]?.slug || slicedCategories[5]?._id,
       title:"Antivirus",
@@ -250,8 +253,8 @@ const handleSearch = (category: string | null) => {
                     <div className="flex  w-full">
                      
                    {displayCategories?.slice(0,3)?.map((cat,i)=>{
-                      return  <Link key={i+10} href={`/categories/${cat.id}/brands`} className="flex flex-col w-full">
-                      <div className="flex flex-col items-center bg-gray-100 xxs:p-1.5 xs:p-2 sm:p-3 rounded-lg xxs:me-1 xs:me-2 md:me-4 mb-1 cursor-pointer hover:bg-teal-700 hover:text-white">
+                      return  <Link key={i+10} href={`/categories/${cat.id}/brands`} className="flex flex-col w-full h-full">
+                      <div className="flex flex-col items-center bg-gray-100 xxs:p-1.5 xs:p-2 sm:p-1 rounded-lg xxs:me-1 xs:me-2 md:me-4 mb-1 cursor-pointer hover:bg-teal-700 hover:text-white">
                       <Image 
                         width={40}
                         height={40}
@@ -271,13 +274,14 @@ const handleSearch = (category: string | null) => {
                     <div className="flex w-full">
                     {displayCategories?.slice(3,6)?.map((cat,i)=>{
                       return  <Link key={i+100} href={`/categories/${cat.id}/brands`} className="flex flex-col w-full">
-                      <div className="flex flex-col items-center bg-gray-100 xxs:p-1.5 xs:p-2 sm:p-3 rounded-lg xxs:me-1 xs:me-2 md:me-4 mb-1 cursor-pointer hover:bg-teal-700 hover:text-white">
+                      <div className="flex flex-col h-full items-center bg-gray-100 xxs:p-1.5 xs:p-2 sm:p-1 rounded-lg xxs:me-1 xs:me-2 md:me-4 mb-1 cursor-pointer hover:bg-teal-700 hover:text-white">
                       <Image 
                         width={40}
                         height={40}
                         decoding="async"
                         src={cat.image}
                         alt={`${cat.title} service in Hyderabad`}
+                        className="h-full object-contain"
                       />
                     </div>
                     <div className="flex flex-col">
