@@ -702,6 +702,43 @@ const Dashboard = () => {
 
             {/* Right sidebar */}
             <div className="flex flex-col gap-5">
+              {/* Identity Verification — always first */}
+              <Card>
+                <SectionTitle action={
+                  !geek?.idProof?.isAdhaarVerified && (
+                    <button
+                      onClick={() => setOpenAdhaarForm(true)}
+                      className={`text-xs ${isCorporate ? "text-indigo-600" : "text-teal-600"} hover:underline cursor-pointer flex items-center gap-1`}
+                    >
+                      <Pencil className="w-3 h-3" /> Verify
+                    </button>
+                  )
+                }>
+                  Identity Verification
+                </SectionTitle>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-400 uppercase tracking-wide">Aadhaar</span>
+                  {geek?.idProof?.isAdhaarVerified ? (
+                    <span className="flex items-center gap-1 text-xs text-green-600 font-medium">
+                      <BadgeCheck className="w-3.5 h-3.5" /> Verified
+                    </span>
+                  ) : geek?.idProof?.status === "Requested" ? (
+                    <span className="text-xs text-amber-600 font-medium">Pending review</span>
+                  ) : geek?.idProof?.status === "Rejected" ? (
+                    <span className="flex items-center gap-1 text-xs text-red-500 font-medium">
+                      <OctagonX className="w-3.5 h-3.5" /> Rejected
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => setOpenAdhaarForm(true)}
+                      className={`text-xs ${isCorporate ? "text-indigo-600" : "text-teal-600"} font-medium hover:underline cursor-pointer`}
+                    >
+                      Not verified
+                    </button>
+                  )}
+                </div>
+              </Card>
+
               {isCorporate && (
                 <Card>
                   <SectionTitle action={
@@ -718,7 +755,6 @@ const Dashboard = () => {
                         <p className="font-mono text-xs text-gray-700 flex items-center gap-1.5">
                           <Building2 className="w-3 h-3 text-indigo-400 shrink-0" />
                           {geek.GSTIN.slice(0, 2)}{"·".repeat(9)}{geek.GSTIN.slice(-4)}
-                          <span className="text-green-500 text-xs">✓</span>
                         </p>
                       ) : (
                         <p className="text-xs text-gray-400 italic">Not added</p>

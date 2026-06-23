@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import CustomInput from '../components/CustonInput';
 import Image from 'next/image';
+import { ShieldCheck } from 'lucide-react';
 import { useAppDispatch } from '@/lib/hooks';
 import { searchGeeks } from '@/features/geek/geekSlice';
 import { RootState } from '@/lib/store';
@@ -402,6 +403,13 @@ const Providers = () => {
                                       {plan.label}
                                     </span>
                                   )}
+                                </div>
+                              )}
+                              {geek.isAdhaarVerified && (
+                                <div className='absolute top-2 right-2'>
+                                  <span className='inline-flex items-center gap-0.5 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-green-600 text-white shadow'>
+                                    <ShieldCheck className="w-2.5 h-2.5" /> ID Verified
+                                  </span>
                                 </div>
                               )}
                             </div>
