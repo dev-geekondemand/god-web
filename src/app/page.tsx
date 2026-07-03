@@ -88,7 +88,7 @@ export default function Home() {
                   <div className='h-[50%] w-full flex items-center justify-center'>
                     <Image src={"/assets/images/search.jpeg"} className='mb-4 w-[80%] rounded-lg' alt='Finding a verified IT support Geek near you' width={200} height={70} />
                   </div>
-                  <h4 className="text-xs font-bold">1. Find a Verified IT Expert Near You</h4>
+                  <h3 className="text-xs font-bold">1. Find a Verified IT Expert Near You</h3>
                   <p className='text-[12px] max-w-[220px] font-medium'>
                     Browse verified Geeks by service type, location, and star ratings. Find the right expert for your laptop, printer, router or software issue.
                   </p>
@@ -100,7 +100,7 @@ export default function Home() {
                  <div className='h-[50%] w-full flex items-center justify-center'>
                     <Image src={"/assets/images/book.jpeg"} className='mb-4 w-[80%] rounded-lg' alt='Booking a Geek for doorstep IT support' width={200} height={70} />
                   </div>
-                  <h4 className="text-xs font-bold">2. Book Your Geek &amp; Get the Job Done</h4>
+                  <h3 className="text-xs font-bold">2. Book Your Geek &amp; Get the Job Done</h3>
                   <p className='text-xs max-w-[220px] font-medium'>
                     Confirm your booking in seconds. Your Geek arrives at your home or office and resolves the issue on the spot — no waiting, no jargon.
                   </p>
@@ -112,7 +112,7 @@ export default function Home() {
                   <div className='h-[50%] w-full flex items-center justify-center'>
                     <Image src={"/assets/images/rate.jpeg"} className='mb-4 w-[80%] rounded-lg' alt='Rating and reviewing Geek service' width={200} height={70} />
                   </div>
-                  <h4 className="text-xs font-bold">3. Rate Your Geek &amp; Help Others Choose</h4>
+                  <h3 className="text-xs font-bold">3. Rate Your Geek &amp; Help Others Choose</h3>
                   <p className='text-xs max-w-[220px] font-medium'>
                     Share your experience. Your rating keeps our Geek community accountable and helps other Seekers make confident decisions.
                   </p>

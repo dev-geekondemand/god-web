@@ -14,12 +14,15 @@ export default function AuthInitializer() {
   const seeker = useSelector((state: RootState) => state.seeker) as UserState;
   const geek = useSelector((state: RootState) => state.geek) as GeekInitialState ;
 
-  // On mount: restore auth state from session cookie after a full page reload
+  // On mount: restore auth state from session cookie after a full page reload.
+  // Only call the API if localStorage indicates a prior session exists, to
+  // avoid 403 console errors for unauthenticated visitors.
   useEffect(() => {
-    if (!seeker.isAuthenticated) {
+    const userType = localStorage.getItem("userType");
+    if (!seeker.isAuthenticated && userType === "seeker") {
       dispatch(loadUser());
     }
-    if (!geek.isAuthenticated) {
+    if (!geek.isAuthenticated && userType === "geek") {
       dispatch(loadGeek());
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -28,7 +28,7 @@ const CtaBannerRow = () => {
         </Link>
 
         <div className="col-span-1 xs:hidden sm:block flex flex-col items-center gap-3 w-full h-full">
-          <InnerBannerAd placement="home" stretch={false} className="md:max-h-[76vh] object-contain" medium_rectangle />
+          <InnerBannerAd placement="home" stretch={false} className="md:max-h-[76vh] object-contain" medium_rectangle priority />
         </div>
 
         {/* Right CTA – Become a Geek */}

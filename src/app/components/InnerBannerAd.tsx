@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import { useAppDispatch } from "@/lib/hooks";
 import { getInnerAds, Ad } from "@/features/banners/bannersSlice";
+import { url } from "@/utils/url";
 
 export const AD_SIZES: Record<string, { width: number; height: number; label: string }> = {
   wide_banner:      { width: 2000, height: 400,  label: "Wide Banner (2000×400)" },
@@ -23,6 +24,7 @@ interface Props {
   medium_rectangle?: boolean;
   className?: string;
   stretch?: boolean;
+  priority?: boolean;
 }
 
 type SizeKey = keyof typeof AD_SIZES;
@@ -36,21 +38,21 @@ function matchesSize(ad: Ad, sizeKey: SizeKey) {
   );
 }
 
-function AdSlot({ ad, sizeKey, className, stretch }: { ad: Ad; sizeKey: SizeKey; className: string; stretch?: boolean }) {
+function AdSlot({ ad, sizeKey, className, stretch, priority }: { ad: Ad; sizeKey: SizeKey; className: string; stretch?: boolean; priority?: boolean }) {
   const { width: w, height: h } = AD_SIZES[sizeKey];
   const imgUrl = ad.image?.url || PLACEHOLDER_SRC;
-  const link = ad.link;
+  const link = ad.link ? `${url}ad/${ad._id}/click` : undefined;
 
   const banner = stretch ? (
     <div className={`relative w-full h-full overflow-hidden bg-gray-100 ${className}`}>
-      <Image src={imgUrl} alt="Advertisement" fill className="object-cover" sizes="100vw" />
+      <Image src={imgUrl} alt="Advertisement" fill priority={priority} className="object-cover" sizes="100vw" />
     </div>
   ) : (
     <div
       className={`relative w-full overflow-hidden bg-gray-100 ${className}`}
       style={{ aspectRatio: `${w}/${h}` }}
     >
-      <Image src={imgUrl} alt="Advertisement" width={w} height={h} className="object-cover w-full h-full" />
+      <Image src={imgUrl} alt="Advertisement" width={w} height={h} priority={priority} className="object-cover w-full h-full" />
     </div>
   );
 
@@ -67,7 +69,7 @@ function AdSlot({ ad, sizeKey, className, stretch }: { ad: Ad; sizeKey: SizeKey;
   );
 }
 
-const InnerBannerAd = ({ placement, wide_banner, medium_rectangle, className = "", stretch }: Props) => {
+const InnerBannerAd = ({ placement, wide_banner, medium_rectangle, className = "", stretch, priority }: Props) => {
   const dispatch = useAppDispatch();
   const innerAds = useSelector((state: RootState) => state.banners?.innerAds) as Ad[];
 
@@ -90,7 +92,7 @@ const InnerBannerAd = ({ placement, wide_banner, medium_rectangle, className = "
         placementAds
           .filter((ad) => matchesSize(ad, sizeKey))
           .map((ad) => (
-            <AdSlot key={ad._id} ad={ad} sizeKey={sizeKey} className={className} stretch={stretch} />
+            <AdSlot key={ad._id} ad={ad} sizeKey={sizeKey} className={className} stretch={stretch} priority={priority} />
           ))
       )}
     </section>

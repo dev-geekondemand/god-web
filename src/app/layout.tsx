@@ -45,10 +45,10 @@ export default function RootLayout({
       >
         <Script
       src="https://www.googletagmanager.com/gtag/js?id=G-0RR8QZQ3CZ"
-      strategy="afterInteractive"
+      strategy="lazyOnload"
     />
 
-    <Script id="google-analytics" strategy="afterInteractive">
+    <Script id="google-analytics" strategy="lazyOnload">
       {`
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
@@ -168,15 +168,15 @@ export default function RootLayout({
         {/* <div className="hidden lg:flex sticky top-16 z-40 w-full bg-teal-700 text-white items-center justify-center py-2 text-sm font-semibold tracking-wide shadow-sm">
           Service &amp; Repair @ Home &nbsp;&bull;&nbsp; IT Tech Support – Anytime, Anywhere
         </div> */}
-        <div className="w-full h-full min-h-screen relative">
-          
+        <main className="w-full h-full min-h-screen relative">
+
         {children}
 
         <div className="absolute bottom-10 right-10">
           <GlobalLoader />
           <ScrollToTopButton />
         </div>
-        </div> 
+        </main>
         <Footer />
         </ReduxProvider>
       </body>

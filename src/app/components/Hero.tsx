@@ -227,7 +227,7 @@ const handleSearch = (category: string | null) => {
                         </div>
                       )}
                   </div>
-                  <button className="flex flex-col items-center bg-teal-600 py-2 px-3 rounded-md" onClick={()=>{handleSearch(category)}}><Search size={20} className="text-white"/></button>
+                  <button aria-label="Search" className="flex flex-col items-center bg-teal-600 py-2 px-3 rounded-md" onClick={()=>{handleSearch(category)}}><Search size={20} className="text-white"/></button>
                 </div>
 
 
@@ -295,7 +295,7 @@ const handleSearch = (category: string | null) => {
                   </div>
 
                   <div className="mt-1 flex justify-center">
-                    <Link href="/categories" className="text-sm font-medium bg-teal-600 px-4 py-2 text-white rounded-lg hover:underline">
+                    <Link href="/categories" className="text-sm font-medium bg-teal-700 px-4 py-2 text-white rounded-lg hover:underline">
                       View all categories &rarr;
                     </Link>
                   </div>
@@ -311,6 +311,7 @@ const handleSearch = (category: string | null) => {
                 <Image
                 src={"/assets/main_hero.png"}
                 fill
+                priority
                 alt="Geek providing doorstep IT support at home in Hyderabad"
                 className="object-contain"
               />
@@ -371,7 +372,7 @@ const handleSearch = (category: string | null) => {
                       alt="icon"
                     />
                     <div className=" xs:ms-2">
-                      <h6 className="font-bold xxs:text-xs xs:text-sm lg:text-base">380+ </h6>
+                      <h3 className="font-bold xxs:text-xs xs:text-sm lg:text-base">380+ </h3>
                       <p className="xxs:text-[9px] xs:text-xs lg:text-sm text-gray-600">Verified Geeks</p>
 
                     </div>
@@ -387,7 +388,7 @@ const handleSearch = (category: string | null) => {
                       style={{ height: 'auto' }}
                     />
                     <div className="ms-1.5 xs:ms-2">
-                      <h6 className="font-bold xxs:text-xs xs:text-sm lg:text-base">1,000+</h6>
+                      <h3 className="font-bold xxs:text-xs xs:text-sm lg:text-base">1,000+</h3>
                       <p className="xxs:text-[9px] xs:text-xs lg:text-sm text-gray-600">Seekers Registered</p>
                     </div>
                   </div>
@@ -402,7 +403,7 @@ const handleSearch = (category: string | null) => {
                       style={{ height: 'auto' }}
                     />
                     <div className="ms-1.5 xs:ms-2">
-                      <h6 className="font-bold xxs:text-xs xs:text-sm lg:text-base">Live in Hyderabad</h6>
+                      <h3 className="font-bold xxs:text-xs xs:text-sm lg:text-base">Live in Hyderabad</h3>
                       <p className="xxs:text-[9px] xs:text-xs lg:text-sm text-gray-600">App on Android &amp; iOS</p>
                     </div>
                   </div>

@@ -288,6 +288,7 @@ const Navbar = () => {
           </Link>
           <button
             onClick={() => setSidebarOpen(false)}
+            aria-label="Close menu"
             className="p-1 rounded-md text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

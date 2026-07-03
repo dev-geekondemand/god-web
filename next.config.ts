@@ -5,7 +5,10 @@ const nextConfig: NextConfig = {
     root: __dirname,
   },
   images: {
-    formats: ['image/avif', 'image/webp'],
+    // Azure Blob Storage resolves to a NAT64 IPv6 address (64:ff9b::/96) on this
+    // network, which Next.js's SSRF guard treats as a private IP and blocks.
+    // Setting unoptimized bypasses /_next/image so images load directly from Azure.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
