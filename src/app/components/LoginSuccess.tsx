@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppDispatch } from '@/lib/hooks';
+import { loadUser } from '@/features/seeker/seekerSlice';
 import toast from 'react-hot-toast';
 
 const LoginSuccess = () => {
@@ -12,9 +13,17 @@ const LoginSuccess = () => {
 
   useEffect(() => {
     if (token) {
-        
-      router.push('/'); 
-    }else{
+      dispatch(loadUser())
+        .unwrap()
+        .then(() => {
+          localStorage.setItem('userType', 'seeker');
+          router.push('/');
+        })
+        .catch(() => {
+          router.push('/login');
+          toast.error('Login Failed');
+        });
+    } else {
       router.push('/login');
       toast.error('Login Failed');
     }
