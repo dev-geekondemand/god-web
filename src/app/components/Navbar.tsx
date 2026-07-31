@@ -2,14 +2,14 @@
 
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import CustomButton from './CustomButton';
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
 import { logoutUser, UserState } from '@/features/seeker/seekerSlice';
 import CustomModel from './CustomModal';
 import { GeekInitialState, logoutGeek } from '@/features/geek/geekSlice';
-import { Bell, UserRound, ChevronDown, LayoutDashboard, CreditCard, ClipboardList, LogOut } from 'lucide-react';
+import { Bell, UserRound, ChevronDown, LayoutDashboard, CreditCard, ClipboardList, LogOut, ArrowRight } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +24,10 @@ import { ServiceRequest } from '@/interfaces/ServiceRequest';
 import toast from 'react-hot-toast';
 import { getSeekerRequests } from '@/features/request/requestSlice';
 import CustomToast, { showCustomToast } from './CustomToast';
+import { getCategoryPages } from '@/features/categoryPage/categoryPageSlice';
+import { CategoryPageData } from '@/utils/categoryPage';
+
+const SERVICES_DROPDOWN_LIMIT = 6;
 
 const NotifBadge = ({ count }: { count: number }) =>
   count > 0 ? (
@@ -35,6 +39,17 @@ const NotifBadge = ({ count }: { count: number }) =>
 const Navbar = () => {
   const [openModal, setOpenModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
+  const [servicesOpen, setServicesOpen] = useState(false);
+  const servicesCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const openServices = () => {
+    if (servicesCloseTimer.current) clearTimeout(servicesCloseTimer.current);
+    setServicesOpen(true);
+  };
+  const closeServices = () => {
+    servicesCloseTimer.current = setTimeout(() => setServicesOpen(false), 150);
+  };
 
   const dispatch = useAppDispatch();
   const pathname = usePathname();
@@ -45,6 +60,7 @@ const Navbar = () => {
   const isGeekAuthenticated = geekState?.isAuthenticated;
   const geek = geekState?.geek;
   const seekerRequests = useSelector((state: RootState) => state.request.requests) as ServiceRequest[];
+  const categoryPages = useSelector((state: RootState) => state.categoryPage?.pages) as CategoryPageData[];
 
   // Seeker: requests with activity in the last 24 h
   // Pending -> no responseAt yet, use createdAt; Accepted -> use responseAt
@@ -66,12 +82,20 @@ const Navbar = () => {
     }
   }, [dispatch, isAuthenticated]);
 
+  useEffect(() => {
+    dispatch(getCategoryPages());
+  }, [dispatch]);
+
+  const publishedCategoryPages = (categoryPages ?? []).filter((page) => page.isPublished);
+  const servicesDropdownPages = publishedCategoryPages.slice(0, SERVICES_DROPDOWN_LIMIT);
+
   const navlinks = [
     { id: 1, name: "Home", link: "/" },
-    { id: 2, name: "Geeks", link: "/geeks" },
-    { id: 3, name: "About Us", link: "/about" },
-    { id: 4, name: "Blogs", link: "/blogs" },
-    { id: 5, name: "Contact Us", link: "/contact" },
+    { id: 2, name: "Services", isDropdown: true as const },
+    { id: 3, name: "Geeks", link: "/geeks" },
+    { id: 4, name: "About Us", link: "/about" },
+    { id: 5, name: "Blogs", link: "/blogs" },
+    { id: 6, name: "Contact Us", link: "/contact" },
   ];
 
   const handleLogout = async () => {
@@ -127,19 +151,91 @@ const Navbar = () => {
 
           {/* Center: navlinks (desktop) */}
           <nav className="hidden lg:flex items-center gap-8 text-sm px-3">
-            {navlinks.map((navlink) => (
-              <Link
-                key={navlink.id}
-                href={navlink.link}
-                className={`text-nowrap transition-colors ${
-                  pathname === navlink.link
-                    ? 'text-teal-600 font-semibold'
-                    : 'text-gray-700 font-medium hover:text-teal-600'
-                }`}
-              >
-                {navlink.name}
-              </Link>
-            ))}
+            {navlinks.map((navlink) =>
+              navlink.isDropdown ? (
+                <div
+                  key={navlink.id}
+                  className="relative"
+                  onMouseEnter={openServices}
+                  onMouseLeave={closeServices}
+                >
+                  <button
+                    className="group flex items-center gap-1 text-nowrap font-medium text-gray-700 hover:text-teal-600 transition-colors focus:outline-none cursor-pointer"
+                    onClick={() => setServicesOpen((prev) => !prev)}
+                  >
+                    {navlink.name}
+                    <ChevronDown
+                      className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${
+                        servicesOpen ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+
+                  {servicesOpen && (
+                    <div className="absolute left-1/2 -translate-x-1/2 top-full pt-3 z-50">
+                      <div className="w-[560px] bg-white rounded-2xl border border-gray-100 shadow-xl p-4">
+                        {servicesDropdownPages.length === 0 ? (
+                          <p className="px-2 py-6 text-center text-sm text-gray-400">No services available</p>
+                        ) : (
+                          <div className="grid grid-cols-2 gap-1.5">
+                            {servicesDropdownPages.map((page) => (
+                              <Link
+                                key={page._id}
+                                href={`/category-pages/${page.slug}`}
+                                onClick={() => setServicesOpen(false)}
+                                className="group/item flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50 transition-colors"
+                              >
+                                <div className="relative w-10 h-10 rounded-lg bg-teal-50 overflow-hidden shrink-0 flex items-center justify-center">
+                                  {page.hero?.image?.url ? (
+                                    <Image
+                                      src={page.hero.image.url}
+                                      alt={page.hero.alt || page.hero.title}
+                                      fill
+                                      sizes="40px"
+                                      className="object-cover"
+                                    />
+                                  ) : (
+                                    <span className="text-teal-600 font-semibold text-sm">
+                                      {(page.hero?.title || page.category?.title || '?').charAt(0).toUpperCase()}
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-sm font-medium text-gray-700 group-hover/item:text-teal-700 truncate transition-colors">
+                                  {page.hero?.title || page.category?.title}
+                                </span>
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="mt-3 pt-3 border-t border-gray-100">
+                          <Link
+                            href="/category-pages"
+                            onClick={() => setServicesOpen(false)}
+                            className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl bg-teal-50 text-teal-700 font-semibold text-sm hover:bg-teal-100 transition-colors"
+                          >
+                            Show All Services
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  key={navlink.id}
+                  href={navlink.link!}
+                  className={`text-nowrap transition-colors ${
+                    pathname === navlink.link
+                      ? 'text-teal-600 font-semibold'
+                      : 'text-gray-700 font-medium hover:text-teal-600'
+                  }`}
+                >
+                  {navlink.name}
+                </Link>
+              )
+            )}
           </nav>
 
           {/* Right: auth (desktop) */}
@@ -300,20 +396,81 @@ const Navbar = () => {
         <div className="flex flex-col p-4 gap-1 text-sm overflow-y-auto h-[calc(100%-65px)]">
           {/* Nav links */}
           <div className="flex flex-col gap-0.5">
-            {navlinks.map((nav) => (
-              <Link
-                key={nav.id}
-                href={nav.link}
-                onClick={() => setSidebarOpen(false)}
-                className={`px-3 py-2.5 rounded-lg transition-colors ${
-                  pathname === nav.link
-                    ? 'text-teal-600 font-semibold bg-teal-50'
-                    : 'text-gray-700 font-medium hover:bg-gray-50'
-                }`}
-              >
-                {nav.name}
-              </Link>
-            ))}
+            {navlinks.map((nav) =>
+              nav.isDropdown ? (
+                <div key={nav.id} className="flex flex-col">
+                  <button
+                    onClick={() => setMobileServicesOpen((prev) => !prev)}
+                    className="flex items-center justify-between px-3 py-2.5 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                  >
+                    {nav.name}
+                    <ChevronDown
+                      className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
+                        mobileServicesOpen ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                  {mobileServicesOpen && (
+                    <div className="flex flex-col gap-2 pl-2 pr-1 mt-1 pb-2">
+                      {servicesDropdownPages.length === 0 ? (
+                        <p className="px-3 py-2 text-xs text-gray-400">No services available</p>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {servicesDropdownPages.map((page) => (
+                            <Link
+                              key={page._id}
+                              href={`/category-pages/${page.slug}`}
+                              onClick={() => setSidebarOpen(false)}
+                              className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                            >
+                              <div className="relative w-8 h-8 rounded-md bg-teal-50 overflow-hidden shrink-0 flex items-center justify-center">
+                                {page.hero?.image?.url ? (
+                                  <Image
+                                    src={page.hero.image.url}
+                                    alt={page.hero.alt || page.hero.title}
+                                    fill
+                                    sizes="32px"
+                                    className="object-cover"
+                                  />
+                                ) : (
+                                  <span className="text-teal-600 font-semibold text-xs">
+                                    {(page.hero?.title || page.category?.title || '?').charAt(0).toUpperCase()}
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-xs text-gray-600 truncate">
+                                {page.hero?.title || page.category?.title}
+                              </span>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                      <Link
+                        href="/category-pages"
+                        onClick={() => setSidebarOpen(false)}
+                        className="flex items-center justify-center gap-1.5 py-2 rounded-lg bg-teal-50 text-teal-700 text-sm font-semibold hover:bg-teal-100 transition-colors"
+                      >
+                        Show All Services
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  key={nav.id}
+                  href={nav.link!}
+                  onClick={() => setSidebarOpen(false)}
+                  className={`px-3 py-2.5 rounded-lg transition-colors ${
+                    pathname === nav.link
+                      ? 'text-teal-600 font-semibold bg-teal-50'
+                      : 'text-gray-700 font-medium hover:bg-gray-50'
+                  }`}
+                >
+                  {nav.name}
+                </Link>
+              )
+            )}
           </div>
 
           <div className="border-t mt-3 pt-3 flex flex-col gap-0.5">

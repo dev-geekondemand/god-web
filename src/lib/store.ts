@@ -12,6 +12,7 @@ import enquirySlice from '../features/enquiry/enquirySlice';
 import locationReducer from '../features/locationSlice.ts';
 import bannersReducer from '../features/banners/bannersSlice';
 import subscriptionReducer from '../features/subscription/subscriptionSlice';
+import categoryPageReducer from '../features/categoryPage/categoryPageSlice';
 
 export const makeStore = () =>
   configureStore({
@@ -29,6 +30,7 @@ export const makeStore = () =>
       location: locationReducer,
       banners: bannersReducer,
       subscription: subscriptionReducer,
+      categoryPage: categoryPageReducer,
     },
   });
 

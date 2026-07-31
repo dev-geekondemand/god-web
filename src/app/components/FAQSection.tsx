@@ -3,7 +3,20 @@
 import { useState } from "react";
 import Script from "next/script";
 
-const faqs = [
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+interface FAQSectionProps {
+  faqs?: FAQItem[];
+  heading?: string;
+  highlightedWord?: string;
+  subtitle?: string;
+  schemaId?: string;
+}
+
+const defaultFaqs: FAQItem[] = [
   {
     question: "How quickly can a Geek arrive at my home in Hyderabad?",
     answer:
@@ -31,28 +44,34 @@ const faqs = [
   },
 ];
 
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((faq) => ({
-    "@type": "Question",
-    name: faq.question,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: faq.answer,
-    },
-  })),
-};
-
-const FAQSection = () => {
+const FAQSection = ({
+  faqs = defaultFaqs,
+  heading = "Frequently Asked",
+  highlightedWord = "Questions",
+  subtitle = "Everything you need to know about IT support at home in Hyderabad.",
+  schemaId = "faq-schema",
+}: FAQSectionProps) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggle = (i: number) => setOpenIndex(openIndex === i ? null : i);
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  };
+
   return (
     <>
       <Script
-        id="faq-schema"
+        id={schemaId}
         type="application/ld+json"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
@@ -62,10 +81,10 @@ const FAQSection = () => {
         <div className="max-w-4xl mx-auto flex flex-col gap-10">
           <div className="flex flex-col items-center gap-3 text-center">
             <h2 className="h3">
-              Frequently Asked <span className="colored">Questions</span>
+              {heading} <span className="colored">{highlightedWord}</span>
             </h2>
             <p className="body-2 text-gray-600 max-w-xl">
-              Everything you need to know about IT support at home in Hyderabad.
+              {subtitle}
             </p>
           </div>
 
