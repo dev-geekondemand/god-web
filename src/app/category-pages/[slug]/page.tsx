@@ -34,7 +34,7 @@ export const Reviews = () => {
   const [selected, setSelected] = useState<number | null>(null)
 
   return (
-    <section className='flex justify-center w-full pt-12'>
+    <section className='flex justify-center w-full pt-6'>
       <div className='max-w-7xl w-full flex flex-col justify-center items-center rounded-md'>
         <div className='flex flex-col max-w-2xl items-start justify-start w-full mx-auto gap-1'>
           <h2 className="text-sm uppercase font-bold text-teal-700 text-center">Customer Proof</h2>
@@ -191,11 +191,11 @@ const CategoryLandingPage = () => {
       />
 
       <main className="w-full">
-        <CategoryPageHero hero={page.hero} />
+        <CategoryPageHero hero={page.hero} categorySlug={page.category?.slug} />
         <ProblemsSection problems={page.problems} categoryTitle={page.category?.title} />
         <HowItWorksSection />
         <WhyChooseUsSection />
-        <div className="max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 px-6 py-12 mx-auto">
+        <div className="max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 px-3 sm:px-6 mx-auto">
           <Reviews />
           
           {page.faqs?.length > 0 && (
@@ -206,7 +206,7 @@ const CategoryLandingPage = () => {
           />
         )}
         </div>
-        <OtherCategoryPagesSection currentSlug={page.slug} />
+        <OtherCategoryPagesSection currentSlug={page.slug}  />
       </main>
     </>
   );

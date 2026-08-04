@@ -55,7 +55,7 @@ const Blogs = () => {
                 <Link href={`/blogs/${blog?.slug}`} key={index} className='bg-white border-none p-0 shadow rounded-md'>
                     <div className="flex flex-col group gap-2 items-start justify-start h-fit">
                         <div className='w-full h-[240px] relative rounded-t-md overflow-hidden'>
-                        <Image fill src={blog?.coverImage?.url} alt='Blog Image' className='object-cover rounded-t-md group-hover:scale-110 transition transform duration-500' sizes="(max-width: 768px) 100vw, 400px" />
+                        <Image fill src={blog?.coverImage?.url} alt={blog?.coverImage?.alt || blog?.title || 'Blog Image'} className='object-cover rounded-t-md group-hover:scale-110 transition transform duration-500' sizes="(max-width: 768px) 100vw, 400px" />
                         </div>
                        <div className='px-5 py-4 flex flex-col gap-3 h-full w-full justify-end'>
 

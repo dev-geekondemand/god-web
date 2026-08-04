@@ -185,23 +185,23 @@ const Navbar = () => {
                                 onClick={() => setServicesOpen(false)}
                                 className="group/item flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50 transition-colors"
                               >
-                                <div className="relative w-10 h-10 rounded-lg bg-teal-50 overflow-hidden shrink-0 flex items-center justify-center">
-                                  {page.hero?.image?.url ? (
+                                <div className="relative w-8 h-6 rounded-lg bg-teal-50 overflow-hidden shrink-0 flex items-center justify-center">
+                                  {page.category?.smallBanner?.url ? (
                                     <Image
-                                      src={page.hero.image.url}
-                                      alt={page.hero.alt || page.hero.title}
+                                      src={page.category.smallBanner.url}
+                                      alt={page.category.title}
                                       fill
-                                      sizes="40px"
-                                      className="object-cover"
+                                      sizes="30px"
+                                      className="object-contain"
                                     />
                                   ) : (
                                     <span className="text-teal-600 font-semibold text-sm">
-                                      {(page.hero?.title || page.category?.title || '?').charAt(0).toUpperCase()}
+                                      {(page.category?.title || '?').charAt(0).toUpperCase()}
                                     </span>
                                   )}
                                 </div>
                                 <span className="text-sm font-medium text-gray-700 group-hover/item:text-teal-700 truncate transition-colors">
-                                  {page.hero?.title || page.category?.title}
+                                  {page.category?.title}
                                 </span>
                               </Link>
                             ))}
@@ -424,22 +424,22 @@ const Navbar = () => {
                               className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors"
                             >
                               <div className="relative w-8 h-8 rounded-md bg-teal-50 overflow-hidden shrink-0 flex items-center justify-center">
-                                {page.hero?.image?.url ? (
+                                {page.category?.smallBanner?.url ? (
                                   <Image
-                                    src={page.hero.image.url}
-                                    alt={page.hero.alt || page.hero.title}
+                                    src={page.category.smallBanner.url}
+                                    alt={page.category.title}
                                     fill
                                     sizes="32px"
                                     className="object-cover"
                                   />
                                 ) : (
                                   <span className="text-teal-600 font-semibold text-xs">
-                                    {(page.hero?.title || page.category?.title || '?').charAt(0).toUpperCase()}
+                                    {(page.category?.title || '?').charAt(0).toUpperCase()}
                                   </span>
                                 )}
                               </div>
                               <span className="text-xs text-gray-600 truncate">
-                                {page.hero?.title || page.category?.title}
+                                {page.category?.title}
                               </span>
                             </Link>
                           ))}

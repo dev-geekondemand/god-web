@@ -62,13 +62,13 @@ const CategoryPagesListing = () => {
                   </div>
 
                   <div className="flex flex-col gap-2 px-5 py-5">
-                    {page.hero?.badge && (
+                    {/* {page.hero?.badge && (
                       <span className="self-start bg-teal-50 text-teal-700 text-xs font-semibold uppercase tracking-wide px-3 py-1 rounded-full">
                         {page.hero.badge}
                       </span>
-                    )}
+                    )} */}
                     <h2 className="text-lg font-semibold text-gray-800 group-hover:text-teal-600 transition-colors">
-                      {page.hero?.title}
+                      {page?.category?.title || page.hero?.title || "Untitled"}
                     </h2>
                     {page.hero?.subtitle && (
                       <p className="text-sm text-gray-600 line-clamp-2">{page.hero.subtitle}</p>

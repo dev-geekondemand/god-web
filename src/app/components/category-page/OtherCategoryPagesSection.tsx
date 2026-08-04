@@ -8,9 +8,10 @@ import { CategoryPageData } from "@/utils/categoryPage";
 interface Props {
   currentSlug: string;
   limit?: number;
+
 }
 
-const OtherCategoryPagesSection = ({ currentSlug, limit = 5 }: Props) => {
+const OtherCategoryPagesSection = ({ currentSlug, limit = 5,  }: Props) => {
   const [pages, setPages] = useState<CategoryPageData[]>([]);
 
   useEffect(() => {
@@ -30,36 +31,38 @@ const OtherCategoryPagesSection = ({ currentSlug, limit = 5 }: Props) => {
     };
   }, [currentSlug, limit]);
 
+  console.log("OtherCategoryPagesSection pages:", pages);
+
   if (!pages.length) return null;
 
   return (
-    <section className="py-12 px-6 bg-white border-t border-gray-100">
-      <div className="max-w-7xl mx-auto">
+    <section className="sm:py-8 sm:px-6 px-3 py-4 w-full bg-white border-t border-gray-100">
+      <div className="max-w-7xl mx-auto w-full">
          <div className="flex flex-col items-center mb-6">
           <div className="flex items-center gap-8">
             <div className="w-10 h-0.5 bg-yellow-500 rounded-full" />
-          <span className="text-sm font-bold uppercase tracking-wide text-teal-800">
-            RELATED IT SERVICES
+          <span className="text-xl md:text-2xl font-bold  tracking-wide text-teal-800">
+            Related IT Services
           </span>
             <div className="w-10 h-0.5 bg-yellow-500 rounded-full" />
 
           </div>
           
         </div>
-        <div className="flex flex-nowrap overflow-scroll custom-scrollbar justify-center gap-4">
+        <div className="flex w-full flex-wrap overflow-x-scroll custom-scrollbar justify-center gap-4">
           {pages.map((page) => (
             <Link
               href={`/category-pages/${page.slug}`}
               key={page._id}
-              className="flex items-center gap-3 bg-gray-50 hover:bg-teal-50 rounded-full px-5 py-3 border border-gray-200 hover:border-teal-300 transition-colors"
+              className="flex w-fit items-center  gap-3 bg-gray-50 hover:bg-teal-50 rounded-xl sm:px-5 sm:py-3 px-2 py-1.5 border border-gray-200 hover:border-teal-300 transition-colors"
             >
-              {page.hero?.image?.url ? (
+              {page.category?.smallBanner?.url ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={page.hero.image.url} alt="" className="w-6 h-6 object-contain rounded-full" />
+                <img src={page?.category?.smallBanner?.url} alt="" className="w-8 h-6 object-contain rounded-full" />
               ) : (
-                <div className="w-6 h-6 rounded-full bg-teal-50" />
+                <div className="w-8 h-6 rounded-full bg-teal-50" />
               )}
-              <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">
+              <span className="text-xs sm:text-sm font-semibold text-gray-700 whitespace-nowrap">
                 {page.hero?.badge}
               </span>
             </Link>

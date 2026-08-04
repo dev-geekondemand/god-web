@@ -63,9 +63,9 @@ const BlogsSection = () => {
                           <CardContent className="flex flex-col group gap-0 p-0 items-start justify-start h-full">
                             <div className='w-full min-h-[180px] relative overflow-hidden rounded-t-lg'>
                               <Image
-                               
+
                                 src={blog?.coverImage?.url || "/assets/images/blog.png"}
-                                alt='Blog Image'
+                                alt={blog?.coverImage?.alt || blog?.title || 'Blog Image'}
                                 className='object-cover group-hover:scale-105 transition-transform duration-500'
                                 fill
                                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"

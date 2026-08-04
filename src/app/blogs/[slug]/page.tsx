@@ -176,7 +176,7 @@ const slug = params.slug?.toString() || '';
                                     </div>
 
                                     <div className='w-full  relative'>
-                                        <Image src={blog?.coverImage?.url ? blog?.coverImage?.url : "/assets/images/blog.png"} width={800} height={800} className='rounded-lg' alt="Blog Image" />
+                                        <Image src={blog?.coverImage?.url ? blog?.coverImage?.url : "/assets/images/blog.png"} width={800} height={800} className='rounded-lg' alt={blog?.coverImage?.alt || blog?.title || "Blog Image"} />
                                     </div>
 
                                    <BlogContent html={blog?.description ? blog?.description?.toString() : ""} />

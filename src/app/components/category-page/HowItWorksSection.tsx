@@ -30,19 +30,19 @@ const steps = [
 
 const HowItWorksSection = () => {
   return (
-    <section className="py-14 px-6 bg-gray-50">
+    <section className="py-8 px-6 bg-gray-50">
       <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col items-center gap-2 mb-12">
+        <div className="flex flex-col items-center gap-2 mb-8">
           <div className="flex items-center gap-8">
             <div className="w-10 h-0.5 bg-yellow-500 rounded-full" />
-          <span className="text-sm font-bold uppercase tracking-wide text-teal-800">
-            How it works
+          <span className="text-xl sm:text-3xl font-bold  tracking-wide text-teal-800">
+           Simple steps. Smart solution.
           </span>
             <div className="w-10 h-0.5 bg-yellow-500 rounded-full" />
 
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-800">
-            Simple steps. Smart solution.
+          <h2 className=" font-bold text-center text-gray-800">
+            
           </h2>
         </div>
 

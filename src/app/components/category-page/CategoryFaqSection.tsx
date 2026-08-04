@@ -37,7 +37,7 @@ const CategoryFaqSection = ({
   };
 
   return (
-    <section className="w-full pt-12">
+    <section className="w-full pt-8 sm:pt-12">
       <Script
         id={schemaId}
         type="application/ld+json"
@@ -54,12 +54,7 @@ const CategoryFaqSection = ({
         </div>
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
           {heading}
-          {categoryTitle ? (
-            <span className="text-gray-500 font-medium">
-              {" "}
-              
-            </span>
-          ) : null}
+          
         </h2>
       </div>
 
@@ -77,7 +72,7 @@ const CategoryFaqSection = ({
                 aria-expanded={isOpen}
               >
                 <span
-                  className={`text-base lg:text-sm font-semibold leading-snug ${
+                  className={`text-xs sm:text-sm font-semibold leading-snug ${
                     isOpen ? "text-teal-800" : "text-gray-800 group-hover:text-teal-700"
                   }`}
                 >
@@ -99,7 +94,7 @@ const CategoryFaqSection = ({
                 style={{ display: "grid" }}
               >
                 <div className="overflow-hidden">
-                  <p className="text-sm text-gray-600 leading-relaxed border-l-2 border-teal-500 pl-3">
+                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed border-l-2 border-teal-500 pl-3">
                     {faq.answer}
                   </p>
                 </div>

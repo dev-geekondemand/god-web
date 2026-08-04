@@ -16,7 +16,7 @@ export interface CategoryPageFaq {
 
 export interface CategoryPageData {
   _id: string;
-  category: { _id: string; title: string; slug: string };
+  category: { _id: string; title: string; slug: string,smallBanner?: { public_id: string; url: string; }, };
   slug: string;
   isPublished: boolean;
   hero: {

@@ -20,6 +20,7 @@ interface Blog {
   coverImage: {
     public_id: string;
     url: string;
+    alt?: string;
   };
   createdAt: string;
   updatedAt: string;

@@ -4,6 +4,7 @@ import { CategoryPageData } from "@/utils/categoryPage";
 
 interface Props {
   hero: CategoryPageData["hero"];
+  categorySlug?: string;
 }
 
 const trustBadges = [
@@ -13,13 +14,13 @@ const trustBadges = [
   { icon: ShieldCheck, label: "Genuine Parts" },
 ];
 
-const CategoryPageHero = ({ hero }: Props) => {
+const CategoryPageHero = ({ hero, categorySlug }: Props) => {
   return (
-    <section className="bg-white text-black py-2 md:py-10 px-4 sm:px-6">
+    <section className="bg-white text-black py-2 md:py-6 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto grid md:grid-cols-7 gap-10 md:gap-14 items-start">
         <div className="flex flex-col col-span-3 gap-3 text-start md:text-left">
           {hero.badge && (
-            <span className="self-center md:self-start bg-amber-400 text-teal-900 text-xs font-bold uppercase tracking-wide px-3 py-1.5 rounded-full w-fit">
+            <span className="self-start md:self-start bg-amber-400 text-teal-900 text-xs font-bold uppercase tracking-wide px-3 py-1.5 rounded-full w-fit">
               {hero.badge}
             </span>
           )}
@@ -35,7 +36,7 @@ const CategoryPageHero = ({ hero }: Props) => {
           )}
           <div className="flex flex-wrap gap-3 justify-center md:justify-start mt-1">
             <Link
-              href="/categories"
+              href={categorySlug ? `/categories/${categorySlug}/brands` : "/categories"}
               className="bg-teal-800 flex justify-center items-center gap-2 text-white text-sm font-semibold px-8 py-3 rounded-lg hover:bg-teal-900 transition-colors"
             >
               <CalendarDays className="w-5 h-5" />
@@ -74,7 +75,7 @@ const CategoryPageHero = ({ hero }: Props) => {
         </div>
 
         <div className="w-full col-span-4 flex flex-col items-center gap-2">
-          <div className="w-full flex justify-center items-center">
+          <div className="relative w-full flex justify-center items-center">
             {hero.image?.url && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -83,14 +84,14 @@ const CategoryPageHero = ({ hero }: Props) => {
               className="w-full  aspect-[2/1] rounded-xl object-cover"
             />
           )}
-          </div>
-          <div className="w-full -mx-20 max-w-md grid grid-cols-2 sm:grid-cols-4 gap-2 bg-teal-800 rounded-xl px-3 py-3">
-            {trustBadges.map(({ icon: Icon, label }) => (
-              <div key={label} className="flex flex-col items-center gap-1 text-center">
-                <Icon className="w-5 h-5 text-amber-400" />
-                <span className="text-[11px] leading-tight text-teal-50">{label}</span>
-              </div>
-            ))}
+            <div className="absolute bottom-[-40px] left-1/2 -translate-x-1/2 w-[92%] sm:w-[85%] max-w-md grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2 bg-teal-800/95 rounded-lg sm:rounded-xl px-2 sm:px-3 py-2 sm:py-3 shadow-lg">
+              {trustBadges.map(({ icon: Icon, label }) => (
+                <div key={label} className="flex flex-col items-center gap-1 text-center">
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
+                  <span className="text-[9px] sm:text-[11px] leading-tight text-teal-50">{label}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

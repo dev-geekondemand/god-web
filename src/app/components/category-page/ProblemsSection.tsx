@@ -9,20 +9,20 @@ const ProblemsSection = ({ problems, categoryTitle }: Props) => {
   if (!problems?.length) return null;
 
   return (
-    <section className="py-14 px-6 bg-white">
+    <section className="py-8 px-6 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col items-center gap-2 mb-10">
           <div className="flex items-center gap-16">
             <div className="w-12 h-0.5 bg-yellow-500 rounded-full" />
-          <span className="text-sm font-bold uppercase tracking-wide text-teal-800">
+          <span className="text-xl sm:text-2xl font-bold uppercase tracking-wide text-teal-800">
             Common Issues
           </span>
             <div className="w-12 h-0.5 bg-teal-500 rounded-full" />
 
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-center text-gray-900">
+          {/* <h2 className="text-xl sm:text-2xl font-bold text-center text-gray-900">
             Problems We Fix
-          </h2>
+          </h2> */}
           {/* {categoryTitle && (
             <p className="text-center text-gray-500 text-sm max-w-xl">
               Common {categoryTitle.toLowerCase()} issues our verified Geeks resolve at your doorstep.

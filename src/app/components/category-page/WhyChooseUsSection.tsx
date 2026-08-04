@@ -36,7 +36,7 @@ const points = [
 const WhyChooseUsSection = () => {
   return (
     <section className="">
-      <div className="max-w-7xl bg-teal-800 mx-auto  py-5 px-6 md:px-12 rounded-3xl">
+      <div className="max-w-7xl bg-teal-800 mx-auto  py-6 px-6 md:px-12 rounded-3xl">
         <div className="flex flex-col items-center gap-0 mb-3">
           <span className="text-xs font-bold uppercase tracking-widest text-white">
             Why GeekOnDemand
