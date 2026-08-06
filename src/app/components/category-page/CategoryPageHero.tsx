@@ -16,7 +16,7 @@ const trustBadges = [
 
 const CategoryPageHero = ({ hero, categorySlug }: Props) => {
   return (
-    <section className="bg-white text-black py-2 md:py-6 px-4 sm:px-6">
+    <section className="bg-white text-black py-2 md:py-6 px-4 sm:px-6 mb-6 sm:mb-3">
       <div className="max-w-7xl mx-auto grid md:grid-cols-7 gap-10 md:gap-14 items-start">
         <div className="flex flex-col col-span-3 gap-3 text-start md:text-left">
           {hero.badge && (
@@ -34,7 +34,7 @@ const CategoryPageHero = ({ hero, categorySlug }: Props) => {
           {hero.subtitle && (
             <p className="text-sm sm:text-base text-gray-800 max-w-xl">{hero.subtitle}</p>
           )}
-          <div className="flex flex-wrap gap-3 justify-center md:justify-start mt-1">
+          <div className="flex flex-wrap gap-3 justify-start md:justify-start mt-1">
             <Link
               href={categorySlug ? `/categories/${categorySlug}/brands` : "/categories"}
               className="bg-teal-800 flex justify-center items-center gap-2 text-white text-sm font-semibold px-8 py-3 rounded-lg hover:bg-teal-900 transition-colors"
@@ -52,7 +52,7 @@ const CategoryPageHero = ({ hero, categorySlug }: Props) => {
               </div>
               
               <div className="flex flex-col items-start gap-1">
-                <span className="text-xl text-yellow-500 font-bold">380+</span>
+                <span className="text-xl text-yellow-500 font-bold">430+</span>
                 <span className="text-xs font-semibold text-gray-800">Verified Geeks</span>
               </div>
                 
@@ -84,18 +84,11 @@ const CategoryPageHero = ({ hero, categorySlug }: Props) => {
               className="w-full  aspect-[2/1] rounded-xl object-cover"
             />
           )}
-            <div className="absolute bottom-[-40px] left-1/2 -translate-x-1/2 w-[92%] sm:w-[85%] max-w-md grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2 bg-teal-800/95 rounded-lg sm:rounded-xl px-2 sm:px-3 py-2 sm:py-3 shadow-lg">
-              {trustBadges.map(({ icon: Icon, label }) => (
-                <div key={label} className="flex flex-col items-center gap-1 text-center">
-                  <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
-                  <span className="text-[9px] sm:text-[11px] leading-tight text-teal-50">{label}</span>
-                </div>
-              ))}
+            <div className="absolute bottom-[-40px] left-1/2 -translate-x-1/2 w-[92%] sm:w-[85%] max-w-sm gap-1.5 sm:gap-2 bg-teal-800/95 rounded-lg sm:rounded-xl px-2 sm:px-3 py-2 sm:py-3 shadow-lg">
+              <p className=" w-full text-center flex justify-center items-center text-white text-base sm:text-lg font-bold">Just Geek IT!</p>
             </div>
           </div>
-          <p className="mt-12 text-sm sm:text-base font-semibold text-teal-800 italic">
-            Just Geek IT!
-          </p>
+
         </div>
       </div>
     </section>
