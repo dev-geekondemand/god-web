@@ -15,7 +15,7 @@ const ProblemsSection = ({ problems, categoryTitle }: Props) => {
           <div className="flex items-center gap-16">
             <div className="w-12 h-0.5 bg-yellow-500 rounded-full" />
           <span className="text-xl sm:text-2xl font-bold uppercase tracking-wide text-teal-800">
-            Common Issues
+            Popular IT Support Services
           </span>
             <div className="w-12 h-0.5 bg-teal-500 rounded-full" />
 

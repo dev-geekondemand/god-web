@@ -93,6 +93,9 @@ const CategoryPageHero = ({ hero, categorySlug }: Props) => {
               ))}
             </div>
           </div>
+          <p className="mt-12 text-sm sm:text-base font-semibold text-teal-800 italic">
+            Just Geek IT!
+          </p>
         </div>
       </div>
     </section>
