@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux';
 import { logoutUser, UserState } from '@/features/seeker/seekerSlice';
 import CustomModel from './CustomModal';
 import { GeekInitialState, logoutGeek } from '@/features/geek/geekSlice';
-import { Bell, UserRound, ChevronDown, LayoutDashboard, CreditCard, ClipboardList, LogOut, ArrowRight } from 'lucide-react';
+import { Bell, UserRound, ChevronDown, LayoutDashboard, CreditCard, ClipboardList, LogOut, ArrowRight, LifeBuoy } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -117,6 +117,9 @@ const Navbar = () => {
 
   const isLoggedIn = isAuthenticated || isGeekAuthenticated;
   const displayName = user?.fullName?.first || geek?.fullName?.first || '';
+  const supportUrl = `${process.env.NEXT_PUBLIC_SUPPORT_URL || 'http://localhost:3002'}/tickets?role=${
+    isGeekAuthenticated ? 'geek' : 'seeker'
+  }`;
   const ctaLabel = isGeekAuthenticated ? 'Become a Seeker' : isAuthenticated ? 'Earn as a Geek' : 'Book a Geek';
   const handleCta = () => {
     if (!isLoggedIn) {
@@ -327,6 +330,14 @@ const Navbar = () => {
                     </DropdownMenuItem>
                   )}
 
+                  <DropdownMenuItem
+                    className="cursor-pointer rounded-lg px-2.5 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 focus:bg-teal-50 focus:text-teal-700 gap-2.5 transition-colors"
+                    onClick={() => { window.location.href = supportUrl; }}
+                  >
+                    <LifeBuoy className="w-4 h-4" />
+                    Contact &amp; Support
+                  </DropdownMenuItem>
+
                   <DropdownMenuSeparator className="my-1" />
                   <DropdownMenuItem
                     className="cursor-pointer rounded-lg px-2.5 py-2 text-sm text-red-500 hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600 gap-2.5 transition-colors"
@@ -535,6 +546,15 @@ const Navbar = () => {
                     <NotifBadge count={seekerUnread} />
                   </Link>
                 )}
+
+                <a
+                  href={supportUrl}
+                  onClick={() => setSidebarOpen(false)}
+                  className="px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
+                >
+                  <LifeBuoy className="w-4 h-4" />
+                  Contact &amp; Support
+                </a>
 
                 <div className="mt-1 px-1">
                   <CustomModel

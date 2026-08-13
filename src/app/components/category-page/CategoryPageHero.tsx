@@ -24,7 +24,7 @@ const CategoryPageHero = ({ hero, categorySlug }: Props) => {
               {hero.badge}
             </span>
           )}
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold leading-tight whitespace-pre-line">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight whitespace-pre-line">
             {hero.title.split("\n").map((line, i) => (
               <span key={i} className={i === 0 ? "block text-black" : "block text-teal-900"}>
                 {line}
@@ -74,8 +74,8 @@ const CategoryPageHero = ({ hero, categorySlug }: Props) => {
           </div>
         </div>
 
-        <div className="w-full col-span-4 flex flex-col items-center gap-2">
-          <div className="relative w-full flex justify-center items-center">
+        <div className="w-full col-span-4 h-full flex flex-col items-center gap-2">
+          <div className="relative w-full h-full flex flex-col justify-center  items-center">
             {hero.image?.url && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -84,8 +84,8 @@ const CategoryPageHero = ({ hero, categorySlug }: Props) => {
               className="w-full  aspect-[2/1] rounded-xl object-cover"
             />
           )}
-            <div className="absolute bottom-[-40px] left-1/2 -translate-x-1/2 w-[92%] sm:w-[85%] max-w-sm gap-1.5 sm:gap-2 bg-teal-800/95 rounded-lg sm:rounded-xl px-2 sm:px-3 py-2 sm:py-3 shadow-lg">
-              <p className=" w-full text-center flex justify-center items-center text-white text-base sm:text-lg font-bold">Just Geek IT!</p>
+            <div className="w-[92%] sm:w-[85%]  max-w-sm gap-1.5 sm:gap-2 bg-teal-800/95 rounded-lg sm:rounded-xl px-2 sm:px-3 py-2 sm:py-3 shadow-lg">
+              <p className=" w-full gap-3 text-center flex justify-center items-center text-white  sm:text-3xl font-bold">Just <span className="text-amber-500">Geek</span> IT!</p>
             </div>
           </div>
 
