@@ -117,7 +117,7 @@ const Navbar = () => {
 
   const isLoggedIn = isAuthenticated || isGeekAuthenticated;
   const displayName = user?.fullName?.first || geek?.fullName?.first || '';
-  const supportUrl = `${process.env.NEXT_PUBLIC_SUPPORT_URL || 'http://localhost:3002'}/tickets?role=${
+  const supportUrl = `${process.env.NEXT_PUBLIC_SUPPORT_URL || 'https://god-support-hnhahmadccdvgtcz.southindia-01.azurewebsites.net'}/tickets?role=${
     isGeekAuthenticated ? 'geek' : 'seeker'
   }`;
   const ctaLabel = isGeekAuthenticated ? 'Become a Seeker' : isAuthenticated ? 'Earn as a Geek' : 'Book a Geek';
