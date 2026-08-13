@@ -25,8 +25,13 @@ jobs:
           npm install
           npm run build
 
+      - name: Prepare standalone output
+        run: |
+          cp -r public .next/standalone/public
+          cp -r .next/static .next/standalone/.next/static
+
       - name: Zip artifact for deployment
-        run: zip -r release.zip . -x "node_modules/.cache/*" ".git/*" ".github/*"
+        run: cd .next/standalone && zip -r -1 ../../release.zip .
 
       - name: Login to Azure
         uses: azure/login@v2
