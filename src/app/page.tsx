@@ -19,6 +19,7 @@ import GlobalSkeleton from './components/Sekeletn.tsx';
 import CtaBannerRow from './components/CtaBannerRow.tsx';
 import InnerBannerAd from './components/InnerBannerAd.tsx';
 import FAQSection from './components/FAQSection.tsx';
+import IndependenceDayPopup from './components/IndependenceDayPopup.tsx';
 
 
 
@@ -47,6 +48,8 @@ export default function Home() {
 
   return (
     <>
+      <IndependenceDayPopup />
+
       <div>
 
         {/* Hero */}
