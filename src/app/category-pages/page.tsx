@@ -25,7 +25,9 @@ const CategoryPagesListing = () => {
     document.title = "Category Pages | GeekOnDemand";
   }, []);
 
-  const publishedPages = pages?.filter((page) => page.isPublished) ?? [];
+  const publishedPages = (pages?.filter((page) => page.isPublished) ?? []).sort(
+    (a, b) => (a.category?.priority ?? 0) - (b.category?.priority ?? 0)
+  );
 
   return (
     <section className="w-full flex flex-col justify-center items-center bg-gray-50">

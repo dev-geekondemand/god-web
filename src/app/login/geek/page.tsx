@@ -150,10 +150,10 @@ const LoginGeek = () => {
 
             <button
               type="submit"
-              disabled={isResending}
+              disabled={isResending || geekState?.isLoading}
               className="bg-teal-500 cursor-pointer hover:bg-teal-600 text-white py-2 rounded  w-full disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <span>{isResending ? 'Please wait…' : 'Sign In'}</span>
+              <span>{isResending || geekState?.isLoading ? 'Please wait…' : 'Sign In'}</span>
             </button>
 
             {isOTPSent && (

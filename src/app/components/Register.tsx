@@ -350,8 +350,8 @@ const Register = () => {
               </>
             )}
 
-            <button type='submit' disabled={formik.isSubmitting} className='text-white cursor-pointer bg-teal-500 hover:bg-teal-700 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-6 py-2 w-full'>
-              <span>Sign Up</span>
+            <button type='submit' disabled={formik.isSubmitting || seekerState?.isPending || geekState?.isLoading} className='text-white cursor-pointer bg-teal-500 hover:bg-teal-700 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-6 py-2 w-full disabled:opacity-60 disabled:cursor-not-allowed'>
+              <span>{seekerState?.isPending || geekState?.isLoading ? 'Sending OTP…' : 'Sign Up'}</span>
             </button>
           </form>
         </div>

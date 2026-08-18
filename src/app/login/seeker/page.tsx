@@ -42,7 +42,7 @@ const Login = () => {
            
             setLoading(true);
             try{
-                dispatch(getLoginOTP(formik.values.phone)).unwrap();                
+                await dispatch(getLoginOTP(formik.values.phone)).unwrap();
             }catch(error){
                 console.log(error);
             }finally{
@@ -176,11 +176,17 @@ const Login = () => {
 
                        
                       
-                            <button type="submit" className="w-full cursor-pointer text-white bg-teal-500 hover:bg-teal-500  font-medium rounded-sm text-sm px-5 py-2.5 text-center inline-flex justify-center items-center">
-                               {loading ? (
-                                
+                            <button
+                                type="submit"
+                                disabled={loading || seekerState?.isPending || seekerState?.isLoginOTP}
+                                className="w-full cursor-pointer text-white bg-teal-500 hover:bg-teal-500  font-medium rounded-sm text-sm px-5 py-2.5 text-center inline-flex justify-center items-center disabled:opacity-60 disabled:cursor-not-allowed"
+                            >
+                               {loading || seekerState?.isPending ? (
+
                                     <LoaderCircle className="w-5 h-5 mr-2 animate-spin" />
-                                
+
+                            ) : seekerState?.isLoginOTP ? (
+                                <span>OTP Sent</span>
                             ) : (
                                 <span>Get OTP</span>
                             )}

@@ -20,8 +20,8 @@ const OtherCategoryPagesSection = ({ currentSlug, limit = 5,  }: Props) => {
     categoryPageService.getCategoryPages().then((allPages: CategoryPageData[]) => {
       if (cancelled) return;
       const others = (allPages || []).filter((p) => p.isPublished && p.slug !== currentSlug);
-      const shuffled = [...others].sort(() => Math.random() - 0.5);
-      setPages(shuffled.slice(0, limit));
+      const sorted = [...others].sort((a, b) => (a.category?.priority ?? 0) - (b.category?.priority ?? 0));
+      setPages(sorted.slice(0, limit));
     }).catch(() => {
       if (!cancelled) setPages([]);
     });
