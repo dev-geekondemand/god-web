@@ -59,6 +59,17 @@ export const getMySubscription = createAsyncThunk(
   }
 );
 
+export const requestRefund = createAsyncThunk(
+  'subscription/requestRefund',
+  async (reason: string, thunkAPI) => {
+    try {
+      return await subscriptionService.requestRefund(reason);
+    } catch (err) {
+      return thunkAPI.rejectWithValue((err as { response: { data: unknown } }).response?.data);
+    }
+  }
+);
+
 // ─── Slice ────────────────────────────────────────────────────────────────────
 
 interface SubscriptionState {
@@ -150,6 +161,18 @@ const subscriptionSlice = createSlice({
       .addCase(cancelMySubscription.rejected, (state, action) => {
         state.isLoading = false;
         toast.error((action.payload as { message: string })?.message || 'Failed to cancel');
+      })
+
+      // requestRefund
+      .addCase(requestRefund.pending, (state) => { state.isLoading = true; })
+      .addCase(requestRefund.fulfilled, (state, action) => {
+        state.isLoading = false;
+        if (state.subscription) state.subscription.refundRequest = action.payload;
+        toast.success('Refund requested. We will review it shortly.');
+      })
+      .addCase(requestRefund.rejected, (state, action) => {
+        state.isLoading = false;
+        toast.error((action.payload as { message: string })?.message || 'Failed to request refund');
       })
 
       // switchPlan

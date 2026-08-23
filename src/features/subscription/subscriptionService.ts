@@ -1,5 +1,15 @@
 import api from "@/utils/api";
 
+export interface RefundRequestData {
+  _id: string;
+  status: 'requested' | 'processing' | 'processed' | 'rejected' | 'failed';
+  amount: number;
+  reason: string;
+  adminNote?: string;
+  createdAt: string;
+  processedAt?: string;
+}
+
 export interface SubscriptionData {
   _id: string;
   plan: 'Startup' | 'Advance' | 'Professional';
@@ -8,6 +18,8 @@ export interface SubscriptionData {
   cancelAtPeriodEnd?: boolean;
   pendingPlan?: string;
   failedPaymentCount?: number;
+  refundEligible?: boolean;
+  refundRequest?: RefundRequestData | null;
 }
 
 export interface CheckoutData {
@@ -46,12 +58,18 @@ const getMySubscription = async (): Promise<SubscriptionData> => {
   return res.data;
 };
 
+const requestRefund = async (reason: string) => {
+  const res = await api.post('subscription/refund/request', { reason }, { withCredentials: true });
+  return res.data;
+};
+
 const subscriptionService = {
   createSubscription,
   verifyPayment,
   cancelSubscription,
   changePlan,
   getMySubscription,
+  requestRefund,
 };
 
 export default subscriptionService;

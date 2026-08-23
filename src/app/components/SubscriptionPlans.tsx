@@ -9,6 +9,7 @@ import {
   cancelMySubscription,
   switchPlan,
   getMySubscription,
+  requestRefund,
   clearPendingCheckout,
   resetSuccess,
 } from "@/features/subscription/subscriptionSlice";
@@ -122,6 +123,8 @@ export default function SubscriptionPlans() {
 
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [showRefundConfirm, setShowRefundConfirm] = useState(false);
+  const [refundReason, setRefundReason] = useState("");
 
   const currentPlan = (geek?.subscriptionPlan as string) || "Startup";
 
@@ -215,6 +218,21 @@ export default function SubscriptionPlans() {
     try {
       await dispatch(cancelMySubscription()).unwrap();
       dispatch(loadGeek());
+      dispatch(getMySubscription());
+    } catch {
+      // error handled by slice
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  async function handleRequestRefund() {
+    if (!refundReason.trim()) return;
+    setShowRefundConfirm(false);
+    setActionLoading("refund");
+    try {
+      await dispatch(requestRefund(refundReason.trim())).unwrap();
+      setRefundReason("");
       dispatch(getMySubscription());
     } catch {
       // error handled by slice
@@ -439,6 +457,40 @@ export default function SubscriptionPlans() {
         })}
       </div>
 
+      {/* Refund status / request */}
+      {subscription?.refundRequest ? (
+        <div className="max-w-md mx-auto mt-10 bg-teal-50 border border-teal-100 rounded-xl p-4 text-left space-y-2">
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-500">Refund request</span>
+            <span className="font-semibold text-gray-800 capitalize">{subscription.refundRequest.status}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-500">Amount</span>
+            <span className="font-semibold text-gray-800">₹{(subscription.refundRequest.amount / 100).toFixed(0)}</span>
+          </div>
+          {subscription.refundRequest.status === "rejected" && subscription.refundRequest.adminNote && (
+            <p className="text-xs text-gray-500 pt-1 border-t border-teal-100">
+              Reason: {subscription.refundRequest.adminNote}
+            </p>
+          )}
+          {subscription.refundRequest.status === "processed" && (
+            <p className="text-xs text-gray-500 pt-1 border-t border-teal-100">
+              Refunded — should reflect in your account within a few business days.
+            </p>
+          )}
+        </div>
+      ) : subscription?.refundEligible ? (
+        <div className="text-center mt-10">
+          <button
+            onClick={() => setShowRefundConfirm(true)}
+            disabled={!!actionLoading || isLoading}
+            className="text-sm text-gray-500 hover:text-red-600 underline underline-offset-2 transition disabled:opacity-50"
+          >
+            Need a refund on your last payment?
+          </button>
+        </div>
+      ) : null}
+
       {/* Cancel confirmation dialog */}
       {showCancelConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -459,6 +511,40 @@ export default function SubscriptionPlans() {
                 className="flex-1 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition"
               >
                 Yes, cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Refund request dialog */}
+      {showRefundConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Request a refund?</h3>
+            <p className="text-sm text-gray-500 mb-4">
+              Tell us why you&apos;re requesting a refund on your last payment. Our team will review it.
+            </p>
+            <textarea
+              value={refundReason}
+              onChange={(e) => setRefundReason(e.target.value)}
+              placeholder="Reason for refund (required)"
+              rows={4}
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-teal-400 focus:outline-none mb-6"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setShowRefundConfirm(false); setRefundReason(""); }}
+                className="flex-1 py-2 rounded-lg border border-gray-300 text-sm text-gray-700 hover:bg-gray-50 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRequestRefund}
+                disabled={!refundReason.trim() || actionLoading === "refund"}
+                className="flex-1 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition disabled:opacity-50"
+              >
+                {actionLoading === "refund" ? "Submitting…" : "Submit Request"}
               </button>
             </div>
           </div>
