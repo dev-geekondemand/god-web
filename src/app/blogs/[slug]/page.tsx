@@ -1,80 +1,74 @@
-﻿"use client"
 import BlogContent from '@/app/components/BlogContent';
-import { getAllBlogs, getBlogFromSlug, getTags, getCategories } from '@/features/blogs/blogSlice';
-import { useAppDispatch } from '@/lib/hooks';
-import { RootState } from '@/lib/store';
+import { getAllBlogsServer, getBlogBySlugServer, getTagsServer, getCategoriesServer } from '@/features/blogs/blogServerService';
+import { resolveTags, resolveCategories } from '@/utils/blogTaxonomy';
 import Blog, { BlogTag, BlogCategory } from '@/utils/Blog'
-// BlogTag and BlogCategory used in useSelector type annotations below;
 import Image from 'next/image'
 import Link from 'next/link'
-import { useParams } from 'next/navigation';
-import { useEffect } from 'react'
-import { useSelector } from 'react-redux';
+import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
 
-const BlogPage = () => {
+export const revalidate = 3600;
 
-const params = useParams();
-const slug = params.slug?.toString() || '';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.geekondemand.in";
 
-  const dispatch = useAppDispatch();
-  useEffect(() => {
-    dispatch(getBlogFromSlug(slug));
-    dispatch(getAllBlogs());
-    dispatch(getTags());
-    dispatch(getCategories());
-  },[dispatch, slug]);
+interface PageProps {
+  params: Promise<{ slug: string }>;
+}
 
-  const blog = useSelector((state: RootState) => state.blog?.blog) as unknown as Blog;
-  const allBlogs = useSelector((state: RootState) => state.blog?.blogs) as Blog[];
-  const allTags = useSelector((state: RootState) => state.blog?.tags) as BlogTag[];
-  const allCategories = useSelector((state: RootState) => state.blog?.categories) as BlogCategory[];
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const blog = await getBlogBySlugServer(slug);
+  if (!blog) notFound();
 
-  // Resolve tags — handle both populated objects and plain ID strings
-  const resolvedTags = (blog?.tags as (BlogTag | string)[] | undefined)
-    ?.map(item =>
-      typeof item === 'string'
-        ? allTags?.find(t => t._id === item)
-        : item
-    )
-    .filter((t): t is BlogTag => !!t && typeof t === 'object' && !!t.name);
+  const title = blog.seo?.metaTitle || blog.title || 'Blog | GeekOnDemand';
+  const description = blog.seo?.metaDescription || blog.summary || '';
 
-  // Resolve categories — handle both populated objects and plain ID strings
-  const resolvedCategories = (blog?.categories as (BlogCategory | string)[] | undefined)
-    ?.map(item =>
-      typeof item === 'string'
-        ? allCategories?.find(c => c._id === item)
-        : item
-    )
-    .filter((c): c is BlogCategory => !!c && typeof c === 'object' && !!c.name);
+  return {
+    title,
+    description,
+    keywords: blog.seo?.metaKeywords?.length ? blog.seo.metaKeywords.join(', ') : undefined,
+    alternates: { canonical: `${SITE_URL}/blogs/${slug}` },
+    openGraph: {
+      title,
+      description,
+      type: 'article',
+      url: `${SITE_URL}/blogs/${slug}`,
+      images: blog.coverImage?.url
+        ? [{ url: blog.coverImage.url, alt: blog.coverImage.alt || blog.title }]
+        : undefined,
+      publishedTime: blog.createdAt,
+      modifiedTime: blog.updatedAt,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: blog.coverImage?.url ? [blog.coverImage.url] : undefined,
+    },
+  };
+}
 
-  // Inject SEO meta tags
-  useEffect(() => {
-    if (!blog) return;
+const BlogPage = async ({ params }: PageProps) => {
+  const { slug } = await params;
 
-    document.title = blog.seo?.metaTitle || blog.title || 'Blog | GeekOnDemand';
+  const [blog, allBlogs, allTags, allCategories] = await Promise.all([
+    getBlogBySlugServer(slug),
+    getAllBlogsServer(),
+    getTagsServer(),
+    getCategoriesServer(),
+  ]);
 
-    const setMeta = (name: string, content: string) => {
-      let el = document.querySelector(`meta[name="${name}"]`);
-      if (!el) {
-        el = document.createElement('meta');
-        el.setAttribute('name', name);
-        document.head.appendChild(el);
-      }
-      el.setAttribute('content', content);
-    };
+  if (!blog) notFound();
 
-    setMeta('description', blog.seo?.metaDescription || blog.summary || '');
-    if (blog.seo?.metaKeywords?.length) {
-      setMeta('keywords', blog.seo.metaKeywords.join(', '));
-    }
-  }, [blog]);
+  const resolvedTags = resolveTags(blog.tags, allTags);
+  const resolvedCategories = resolveCategories(blog.categories, allCategories);
 
   // Related blogs: share a category or tag with the current blog, exclude self
-  const currentTagIds = resolvedTags?.map(t => t._id) ?? [];
-  const currentCatIds = resolvedCategories?.map(c => c._id) ?? [];
+  const currentTagIds = resolvedTags.map(t => t._id);
+  const currentCatIds = resolvedCategories.map(c => c._id);
 
   const relatedBlogs = allBlogs
-    ?.filter(b => b.slug !== blog?.slug)
+    .filter(b => b.slug !== blog.slug)
     .map(b => {
       const bTagIds = (b.tags as (BlogTag | string)[])?.map(t => typeof t === 'string' ? t : t._id) ?? [];
       const bCatIds = (b.categories as (BlogCategory | string)[])?.map(c => typeof c === 'string' ? c : c._id) ?? [];
@@ -96,7 +90,7 @@ const slug = params.slug?.toString() || '';
                     <div className='xl:max-w-6xl w-full h-full lg:max-w-5xl md:max-w-3xl sm:max-w-xl mx-auto'>
                         <div className='flex flex-wrap w-full'>
                             <div className='w-full flex flex-col gap-3 items-center justify-center'>
-                                <h2 className='text-3xl max-w-2xl font-bold text-black'>{blog?.title}</h2>
+                                <h2 className='text-3xl max-w-2xl font-bold text-black'>{blog.title}</h2>
                                 <div className='flex gap-2 items-center'>
                                <Link href="/" className='cursor-pointer'>
                         <svg className='w-4 h-4 '
@@ -124,7 +118,7 @@ const slug = params.slug?.toString() || '';
                                     <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier">
                                     <g id="next"> <g> <polygon points="6.8,23.7 5.4,22.3 15.7,12 5.4,1.7 6.8,0.3 18.5,12 "></polygon> </g> </g> </g>
                                 </svg>
-                                <p className=' text-gray-600'>{blog?.title?.slice(0,20) + '...'}</p>
+                                <p className=' text-gray-600'>{blog.title?.slice(0,20) + '...'}</p>
                                 </div>
                             </div>
                         </div>
@@ -140,10 +134,10 @@ const slug = params.slug?.toString() || '';
                                 <div className='flex md:col-span-8 col-span-12 flex-col gap-5 h-fit bg-white rounded-lg px-5 py-0'>
 
                                     <div className='w-full flex flex-col gap-6'>
-                                      <h2 className="h2">{blog?.title}</h2>
+                                      <h2 className="h2">{blog.title}</h2>
 
                                       {/* Categories */}
-                                      {resolvedCategories && resolvedCategories.length > 0 && (
+                                      {resolvedCategories.length > 0 && (
                                         <div className='flex flex-wrap gap-2'>
                                           {resolvedCategories.map((cat) => (
                                             <Link key={cat._id} href={`/blogs/category/${cat.slug || cat._id}`} className='px-3 py-1 rounded-full text-xs font-medium bg-teal-50 text-teal-700 border border-teal-200 hover:bg-teal-100 transition-colors'>
@@ -158,7 +152,7 @@ const slug = params.slug?.toString() || '';
                                           <div className='w-8 h-8 rounded-full border border-gray-300'>
                                             <Image src="/assets/logo-big.webp" alt='Author' className='object-contain w-8 h-8 rounded-full' width={40} height={40} />
                                           </div>
-                                          {blog?.author}
+                                          {blog.author}
                                         </div>
 
                                         <div className='flex gap-2 items-center text-gray-500'>
@@ -170,19 +164,19 @@ const slug = params.slug?.toString() || '';
                                           >
                                             <path d="M19,4H17V3a1,1,0,0,0-2,0V4H9V3A1,1,0,0,0,7,3V4H5A3,3,0,0,0,2,7V19a3,3,0,0,0,3,3H19a3,3,0,0,0,3-3V7A3,3,0,0,0,19,4Zm1,15a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V12H20Zm0-9H4V7A1,1,0,0,1,5,6H7V7A1,1,0,0,0,9,7V6h6V7a1,1,0,0,0,2,0V6h2a1,1,0,0,1,1,1Z" />
                                           </svg>
-                                              {new Date(blog?.createdAt).toLocaleDateString("en-US",{day: "numeric", month: "long", year: "numeric"})}
+                                              {new Date(blog.createdAt).toLocaleDateString("en-US",{day: "numeric", month: "long", year: "numeric"})}
                                         </div>
                                       </div>
                                     </div>
 
                                     <div className='w-full  relative'>
-                                        <Image src={blog?.coverImage?.url ? blog?.coverImage?.url : "/assets/images/blog.png"} width={800} height={800} className='rounded-lg' alt={blog?.coverImage?.alt || blog?.title || "Blog Image"} />
+                                        <Image src={blog.coverImage?.url ? blog.coverImage.url : "/assets/images/blog.png"} width={800} height={800} className='rounded-lg' alt={blog.coverImage?.alt || blog.title || "Blog Image"} />
                                     </div>
 
-                                   <BlogContent html={blog?.description ? blog?.description?.toString() : ""} />
+                                   <BlogContent html={blog.description ? blog.description.toString() : ""} />
 
                                    {/* Tags */}
-                                   {resolvedTags && resolvedTags.length > 0 && (
+                                   {resolvedTags.length > 0 && (
                                      <div className='flex flex-wrap gap-2 pt-4 border-t border-gray-100'>
                                        <span className='text-sm text-gray-500 font-medium'>Tags:</span>
                                        {resolvedTags.map((tag) => (
@@ -198,7 +192,7 @@ const slug = params.slug?.toString() || '';
                                 <div className='flex md:col-span-4 col-span-12 flex-col gap-5 mt-28 h-fit'>
 
                                   {/* Categories sidebar */}
-                                  {resolvedCategories && resolvedCategories.length > 0 && (
+                                  {resolvedCategories.length > 0 && (
                                     <div className='w-full bg-gray-50 px-6 py-6 rounded-md'>
                                       <h3 className='text-gray-800 font-semibold text-lg mb-4'>Categories</h3>
                                       <div className='flex flex-col gap-2'>
@@ -212,7 +206,7 @@ const slug = params.slug?.toString() || '';
                                   )}
 
                                   {/* Tags sidebar */}
-                                  {resolvedTags && resolvedTags.length > 0 && (
+                                  {resolvedTags.length > 0 && (
                                     <div className='w-full bg-gray-50 flex flex-col gap-4 px-6 py-6 rounded-md'>
                                       <h3 className='text-gray-800 font-semibold text-lg'>Tags</h3>
                                       <div className='flex flex-wrap gap-2'>
@@ -229,7 +223,7 @@ const slug = params.slug?.toString() || '';
                                   <div className='w-full px-6 py-6 rounded-md'>
                                     <h3 className="text-2xl font-semibold text-gray-800 mb-4">Related Blogs</h3>
                                     <div className="flex flex-col gap-4">
-                                      {relatedBlogs?.length > 0 ? (
+                                      {relatedBlogs.length > 0 ? (
                                         relatedBlogs.map((item: Blog, index: number) => (
                                           <Link
                                             href={`/blogs/${item.slug}`}

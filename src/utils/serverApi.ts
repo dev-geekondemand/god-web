@@ -3,8 +3,11 @@
 // where Next.js `fetch` cache directives (next.revalidate) apply and
 // there is no Redux store to dispatch thunks against.
 
-// const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL || "https://god-backend.vercel.app"}/api`;
-const API_BASE_URL = `http://localhost:4002/api`;
+import { url } from "@/utils/url";
+
+// Shares the same backend host as the client axios instance (utils/api.ts)
+// so this can never drift onto a different backend than the client targets.
+const API_BASE_URL = url.replace(/\/$/, "");
 const FETCH_TIMEOUT_MS = 15000;
 const REVALIDATE_SECONDS = 3600;
 

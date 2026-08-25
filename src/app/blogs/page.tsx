@@ -1,57 +1,61 @@
-﻿"use client"
-
-import { getAllBlogs } from '@/features/blogs/blogSlice';
-import { useAppDispatch } from '@/lib/hooks';
-import { RootState } from '@/lib/store';
-import Blog from '@/utils/Blog';
+import { getAllBlogsServer } from '@/features/blogs/blogServerService';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux';
-import GlobalSkeleton from '../components/Sekeletn';
+import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import PageBanner from '@/app/components/PageBanner';
 
+export const revalidate = 3600;
+
 const PAGE_SIZE = 9;
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.geekondemand.in";
 
-const Blogs = () => {
+interface PageProps {
+  searchParams: Promise<{ page?: string }>;
+}
 
-    const dispatch = useAppDispatch();
-    const [currentPage, setCurrentPage] = useState(1);
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const { page } = await searchParams;
+  const pageNum = Math.max(1, parseInt(page ?? '1', 10) || 1);
+  const title = pageNum > 1 ? `Blogs — Page ${pageNum} | GeekOnDemand` : 'Blogs | GeekOnDemand';
+  return {
+    title,
+    description: 'Read the latest IT support, tech tips, and how-to guides from GeekOnDemand.',
+    alternates: {
+      canonical: pageNum > 1 ? `${SITE_URL}/blogs?page=${pageNum}` : `${SITE_URL}/blogs`,
+    },
+  };
+}
 
-    const blogs = useSelector((state: RootState) => state.blog?.blogs) as Blog[];
-    const isLoading = useSelector((state: RootState) => state.blog?.isLoading);
+const getPageNumbers = (currentPage: number, totalPages: number) => {
+  if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+  if (currentPage <= 4) return [1, 2, 3, 4, 5, '...', totalPages];
+  if (currentPage >= totalPages - 3) return [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+  return [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+};
 
-    useEffect(() => {
-        if (!blogs?.length) {
-            dispatch(getAllBlogs());
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dispatch]);
+const Blogs = async ({ searchParams }: PageProps) => {
+  const { page } = await searchParams;
+  const blogs = await getAllBlogsServer();
 
-    const totalPages = Math.ceil((blogs?.length || 0) / PAGE_SIZE);
-    const paginatedBlogs = blogs?.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const getPageNumbers = () => {
-        if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
-        if (currentPage <= 4) return [1, 2, 3, 4, 5, '...', totalPages];
-        if (currentPage >= totalPages - 3) return [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
-        return [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
-    };
+  const totalPages = Math.max(1, Math.ceil(blogs.length / PAGE_SIZE));
+  const requestedPage = Math.max(1, parseInt(page ?? '1', 10) || 1);
+  if (blogs.length > 0 && requestedPage > totalPages) notFound();
+  const currentPage = Math.min(requestedPage, totalPages);
+  const paginatedBlogs = blogs.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const pageHref = (p: number) => (p <= 1 ? '/blogs' : `/blogs?page=${p}`);
 
   return (
     <section className='w-full flex flex-col justify-center items-center bg-gray-50'>
         <PageBanner title="Blogs" crumbs={[{ label: 'Blogs' }]} />
 
         <div className='w-full flex flex-col gap-6 justify-center items-center py-0 px-3'>
-           {isLoading ? <GlobalSkeleton cards={9} cols={1} lgCols={3} /> : (
+           {blogs.length === 0 ? (
+             <p className='text-gray-500 py-16'>No blog posts available right now. Please check back soon.</p>
+           ) : (
             <>
             <div className='grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-x-8 gap-y-16 max-w-7xl'>
-            {paginatedBlogs && paginatedBlogs.map((blog, index) => (
+            {paginatedBlogs.map((blog, index) => (
                 <Link href={`/blogs/${blog?.slug}`} key={index} className='bg-white border-none p-0 shadow rounded-md'>
                     <div className="flex flex-col group gap-2 items-start justify-start h-fit">
                         <div className='w-full h-[240px] relative rounded-t-md overflow-hidden'>
@@ -80,41 +84,51 @@ const Blogs = () => {
             </div>
 
             {totalPages > 1 && (
-                <div className='flex items-center gap-2 my-4'>
-                    <button
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className='px-3 py-2 rounded-md text-sm font-medium border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition'
-                    >
-                        ← Prev
-                    </button>
+                <nav className='flex items-center gap-2 my-4' aria-label='Blog pagination'>
+                    {currentPage === 1 ? (
+                        <span className='px-3 py-2 rounded-md text-sm font-medium border border-gray-300 bg-white text-gray-600 opacity-40 cursor-not-allowed'>
+                            ← Prev
+                        </span>
+                    ) : (
+                        <Link
+                            href={pageHref(currentPage - 1)}
+                            className='px-3 py-2 rounded-md text-sm font-medium border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition'
+                        >
+                            ← Prev
+                        </Link>
+                    )}
 
-                    {getPageNumbers().map((page, i) =>
-                        page === '...' ? (
+                    {getPageNumbers(currentPage, totalPages).map((p, i) =>
+                        p === '...' ? (
                             <span key={`ellipsis-${i}`} className='px-2 text-gray-400 select-none'>…</span>
                         ) : (
-                            <button
-                                key={page}
-                                onClick={() => handlePageChange(page as number)}
-                                className={`w-9 h-9 rounded-md text-sm font-medium transition ${
-                                    currentPage === page
+                            <Link
+                                key={p}
+                                href={pageHref(p as number)}
+                                className={`w-9 h-9 flex items-center justify-center rounded-md text-sm font-medium transition ${
+                                    currentPage === p
                                         ? 'bg-teal-600 text-white border border-teal-600'
                                         : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
                                 }`}
                             >
-                                {page}
-                            </button>
+                                {p}
+                            </Link>
                         )
                     )}
 
-                    <button
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        className='px-3 py-2 rounded-md text-sm font-medium border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition'
-                    >
-                        Next →
-                    </button>
-                </div>
+                    {currentPage === totalPages ? (
+                        <span className='px-3 py-2 rounded-md text-sm font-medium border border-gray-300 bg-white text-gray-600 opacity-40 cursor-not-allowed'>
+                            Next →
+                        </span>
+                    ) : (
+                        <Link
+                            href={pageHref(currentPage + 1)}
+                            className='px-3 py-2 rounded-md text-sm font-medium border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition'
+                        >
+                            Next →
+                        </Link>
+                    )}
+                </nav>
             )}
             </>
            )}
