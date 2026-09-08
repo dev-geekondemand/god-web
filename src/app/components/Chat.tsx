@@ -397,8 +397,11 @@ const dispatch = useAppDispatch();
 			try {
 				const { data } = await axios.post(
 					`${process.env.NEXT_PUBLIC_BASE_SERVER_URL}/geek_query/get_geeks_from_user_issue?page=${page}`,
-					{ user_issue: userIssue }
+					userIssue
 				);
+				if (data?.error) {
+					throw new Error(data.error);
+				}
 				setGeeks(data?.geeks ?? []);
 				if (data?.pages) {
 					setTotalPages(data.pages);
