@@ -3,6 +3,7 @@
 
 import { ChatMessageInterface } from '@/interfaces/Chat';
 import Image from 'next/image';
+import { Play, Pause, XCircle } from 'lucide-react';
 
 function TimeDisplay({ timestamp }: { timestamp: number }) {
 	const date = new Date(timestamp);
@@ -18,10 +19,27 @@ interface ChatMessageProps {
 	key: number;
 	profileImage:string
 	isExpanded: boolean;
+	playingMessageId: string | null;
+	isPlaying: boolean;
+	isPaused: boolean;
+	speak: (text: string, messageId: string, voice?: string) => void;
+	togglePauseResume: () => void;
+	cancel: () => void;
 }
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ message,profileImage, isExpanded }) => {
+const ChatMessage: React.FC<ChatMessageProps> = ({
+	message,
+	profileImage,
+	isExpanded,
+	playingMessageId,
+	isPlaying,
+	isPaused,
+	speak,
+	togglePauseResume,
+	cancel,
+}) => {
 	const isUser = message.role === 'user';
+	const isActive = playingMessageId === message.id;
 
 	const bgColor = isUser
 		? 'bg-teal-500'
@@ -31,6 +49,15 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message,profileImage, isExpan
 	const timeColor = isUser ? 'text-white' : 'text-gray-800';
 	const corner = isUser ? 'rounded-tr-none' : 'rounded-tl-none';
 
+	const iconSize = isExpanded ? 16 : 14;
+
+	const handlePlayPause = () => {
+		if (isActive) {
+			togglePauseResume();
+		} else {
+			speak(message.content, message.id);
+		}
+	};
 
 	return (
 		<div className={` flex ${alignment} items-start`}>
@@ -48,6 +75,21 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message,profileImage, isExpan
 					<TimeDisplay timestamp={message.timestamp} />
 				</div>
 			</div>
+			{!isUser && (
+				<div className='flex flex-row gap-1 text-teal-500 items-center my-auto'>
+					<button
+						onClick={handlePlayPause}
+						className='p-1 rounded-full hover:bg-teal-50'
+						aria-label={isActive && isPlaying ? 'Pause' : isActive && isPaused ? 'Resume' : 'Play'}>
+						{isActive && isPlaying ? <Pause size={iconSize} /> : <Play size={iconSize} />}
+					</button>
+					{isActive && (
+						<button onClick={cancel} className='p-1 rounded-full hover:bg-teal-50' aria-label='Stop'>
+							<XCircle size={iconSize} />
+						</button>
+					)}
+				</div>
+			)}
 			{isUser && (
 				<div
 					className={`${isExpanded ? 'w-10 h-10' : 'w-7 h-7'} my-2 rounded-full ${bgColor} flex items-center justify-center font-bold ${textColor}`}>

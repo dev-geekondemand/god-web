@@ -1,14 +1,25 @@
 'use client';
 import { useRef, useState } from 'react';
+import { Mic, Square } from 'lucide-react';
+import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 
 interface ChatInputProps {
 	onSendMessage: (message: string) => Promise<void>;
 	isLoading: boolean;
+	onStartRecording?: () => void;
 }
 
-const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
+const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, onStartRecording }) => {
 	const [inputValue, setInputValue] = useState<string>('');
 	const textareaRef = useRef<HTMLInputElement | null>(null);
+
+	const handleVoiceTranscript = async (transcript: string) => {
+		if (transcript.trim()) {
+			await onSendMessage(transcript.trim());
+		}
+	};
+
+	const { isRecording, startRecording, stopRecording } = useAudioRecorder(handleVoiceTranscript);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -47,6 +58,24 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
 					onKeyDown={handleKeyDown}
 					onChange={handleInputChange}
 				/>
+				<button
+					type='button'
+					onPointerDown={(e) => {
+						e.preventDefault();
+						onStartRecording?.();
+						startRecording();
+					}}
+					onPointerUp={stopRecording}
+					onPointerLeave={() => isRecording && stopRecording()}
+					onPointerCancel={() => isRecording && stopRecording()}
+					disabled={isLoading}
+					aria-label={isRecording ? 'Stop recording' : 'Record voice message'}
+					style={{ touchAction: 'none' }}
+					className={`shrink-0 w-9 h-9 flex items-center justify-center rounded-full transition-colors select-none ${
+						isRecording ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+					}`}>
+					{isRecording ? <Square size={16} /> : <Mic size={16} />}
+				</button>
 				<button
 					type='submit'
 					disabled={isLoading || !inputValue.trim()}

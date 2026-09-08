@@ -26,6 +26,7 @@ import { UserIssue } from '@/interfaces/UserIssue';
 import { createRequest, getSeekerRequests, ServiceState } from '@/features/request/requestSlice';
 import { ServiceRequest } from '@/interfaces/ServiceRequest';
 import { Maximize2, Minus } from 'lucide-react';
+import { useTTS } from '@/hooks/useTTS';
 
 function Chat({setOpenChat, isExpanded, setIsExpanded}:{setOpenChat: (value: boolean)=>void, isExpanded: boolean, setIsExpanded: (value: boolean)=>void}): JSX.Element {
 	const router = useRouter();
@@ -44,6 +45,8 @@ function Chat({setOpenChat, isExpanded, setIsExpanded}:{setOpenChat: (value: boo
 	const [error, setError] = useState<string | null>(null);
 	const [sentRequest, setSentRequest] = useState(false);
 
+	const tts = useTTS();
+	const skipPageFetchRef = useRef(true);
 
 	const ws = useRef<WebSocket | null>(null);
 
@@ -153,9 +156,11 @@ const dispatch = useAppDispatch();
 					// setCurrentBotMessage(null);
 					// currentBotMessageRef.current = null;
 					// textBufferRef.current = '';
+					tts.speak(response, botMessage.id);
 					if (response === 'Please select a Geek to proceed') {
 						const geekOptions = JSON.parse(options[0]);
 						console.log(geekOptions);
+						skipPageFetchRef.current = true;
 						setPage(geekOptions?.page);
 						setTotalPages(geekOptions?.pages);
 						setUserIssue(geekOptions?.user_issue);
@@ -168,7 +173,6 @@ const dispatch = useAppDispatch();
 						setOptions([]);
 					} else {
 						setGeeks([]);
-						setPage(page)
 						setIsGeekOption(false);
 						setOptions(options || []);
 					}
@@ -210,7 +214,7 @@ const dispatch = useAppDispatch();
 		if (userId) {
 			sendMessage();
 		}
-	}, [conversationId, page, userId]);
+	}, [conversationId, tts.speak, userId]);
 
 
 
@@ -380,20 +384,33 @@ const dispatch = useAppDispatch();
 		setFetchedChatHistory(false);
 	};
 
-	// useEffect(()=>{
-	// 	const handlePageChange = async () => {
-	// 		const response = await axios.post(
-	// 			`${process.env.NEXT_PUBLIC_BASE_SERVER_URL}/geek_query/get_geeks_from_user_issue?page=${page}`,{
-	// 				user_issue: userIssue
-	// 			})
-	// 			console.log(response);
-				
-	// 	}
+	useEffect(() => {
+		if (!isGeekOption || !userIssue) {
+			return;
+		}
+		if (skipPageFetchRef.current) {
+			skipPageFetchRef.current = false;
+			return;
+		}
 
-	// 	handlePageChange();
-		
-		
-	// },[page, userIssue])
+		const fetchGeeksForPage = async () => {
+			try {
+				const { data } = await axios.post(
+					`${process.env.NEXT_PUBLIC_BASE_SERVER_URL}/geek_query/get_geeks_from_user_issue?page=${page}`,
+					{ user_issue: userIssue }
+				);
+				setGeeks(data?.geeks ?? []);
+				if (data?.pages) {
+					setTotalPages(data.pages);
+				}
+			} catch (error) {
+				console.error('Error fetching geeks for page:', error);
+				toast.error('Failed to load Geeks for this page. Please try again.');
+			}
+		};
+
+		fetchGeeksForPage();
+	}, [page, isGeekOption, userIssue]);
 
 
 	return (
@@ -483,7 +500,18 @@ const dispatch = useAppDispatch();
 					) : (
 						<div className='flex flex-col w-full  mt-28 py-5'>
 							{messages.map((message: ChatMessageInterface, index) => (
-								<ChatMessage isExpanded={isExpanded}  key={index} message={message} profileImage={user?.profileImage  ? user.profileImage  : "/assets/images/placeholder_user.jpg"} />
+								<ChatMessage
+									isExpanded={isExpanded}
+									key={index}
+									message={message}
+									profileImage={user?.profileImage  ? user.profileImage  : "/assets/images/placeholder_user.jpg"}
+									playingMessageId={tts.playingMessageId}
+									isPlaying={tts.isPlaying}
+									isPaused={tts.isPaused}
+									speak={tts.speak}
+									togglePauseResume={tts.togglePauseResume}
+									cancel={tts.cancel}
+								/>
 							))}
 
 							{/* Loader */}
@@ -534,7 +562,7 @@ const dispatch = useAppDispatch();
 									<Pagination
 									currentPage={page}
 									totalPages={totalPages}
-									onPageChange={()=>{setPage(page)}}
+									onPageChange={(newPage: number)=>{setPage(newPage)}}
 									/>
 
 								</div>
@@ -560,7 +588,7 @@ const dispatch = useAppDispatch();
 				</main>
 				{!error && userId && userId !== '' && (
 					<div className='w-full static  bottom-0'>
-						<ChatInput onSendMessage={handleMessageSend} isLoading={isLoading} />
+						<ChatInput onSendMessage={handleMessageSend} isLoading={isLoading} onStartRecording={tts.cancel} />
 					</div>
 				)}
 			</div>
