@@ -25,6 +25,11 @@ jobs:
           NEXT_PUBLIC_BASE_SERVER_URL: ${{ vars.NEXT_PUBLIC_BASE_SERVER_URL }}
           NEXT_PUBLIC_WEBSOCKET_URL: ${{ vars.NEXT_PUBLIC_WEBSOCKET_URL }}
           NEXT_PUBLIC_SERVER_URL: ${{ vars.NEXT_PUBLIC_SERVER_URL }}
+          # NEXT_PUBLIC_* is inlined into the client bundle at build time, so these
+          # must be present here - setting them in Azure App Service does nothing.
+          NEXT_PUBLIC_BASE_SERVER_URL_TEST: ${{ vars.NEXT_PUBLIC_BASE_SERVER_URL_TEST }}
+          NEXT_PUBLIC_WEBSOCKET_URL_TEST: ${{ vars.NEXT_PUBLIC_WEBSOCKET_URL_TEST }}
+          NEXT_PUBLIC_SERVER_URL_TEST: ${{ vars.NEXT_PUBLIC_SERVER_URL_TEST }}
           NEXT_PUBLIC_MAPBOX_TOKEN: ${{ vars.NEXT_PUBLIC_MAPBOX_TOKEN }}
           NEXT_PUBLIC_IPINFO_TOKEN: ${{ vars.NEXT_PUBLIC_IPINFO_TOKEN }}
           NEXT_PUBLIC_BACKEND_URL: ${{ vars.NEXT_PUBLIC_BACKEND_URL }}
