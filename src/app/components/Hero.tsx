@@ -27,38 +27,38 @@ const HeroSectionTen = () => {
       id: slicedCategories[0]?.slug || slicedCategories[0]?._id,
       title:"Laptop & Desktop",
       subtitle:"Repair",
-      image:"/assets/new-cat-icons/Laptops%20-%20Desktop%20Service%20and%20Repair.jpg"
+      image:"/assets/new-cat-icons/laptops.jpg"
     },
     {
       id: slicedCategories[1]?.slug || slicedCategories[1]?._id,
       title:"Printer",
       subtitle:"Service & Repair",
-      image:"/assets/new-cat-icons/Printer%20-%20Service%20%26%20Repair.jpg",
+      image:"/assets/new-cat-icons/printer.jpg",
     },
     {
       id: slicedCategories[2]?.slug || slicedCategories[3]?._id,
       title:"Router",
       subtitle:"Service & Repair",
-      image:"/assets/new-cat-icons/Router%20-%20Service%20%26%20Repair.jpg",
+      image:"/assets/new-cat-icons/router.jpg",
     },
      {
       id: slicedCategories[3]?.slug || slicedCategories[4]?._id,
       title:"Software",
       subtitle:"Installation & Support",
-      image:"/assets/new-cat-icons/Software%20-%20Install%20%26%20Update.jpg",
+      image:"/assets/new-cat-icons/software.jpg",
     },
     {
       id: slicedCategories[4]?.slug || slicedCategories[2]?._id,
       title:"Email",
       subtitle:"Service & Repair",
-      image:"/assets/new-cat-icons/Email%20-%20Service%20%26%20Repair.jpg",
+      image:"/assets/new-cat-icons/email.jpg",
     },
 
     {
       id: slicedCategories[5]?.slug || slicedCategories[5]?._id,
       title:"Antivirus",
       subtitle:"Setup & Protection",
-      image:"/assets/new-cat-icons/Antivirus%20-%20Install%20%26%20Update.jpg",
+      image:"/assets/new-cat-icons/antivirus.jpg",
     },
 
   ]
