@@ -156,7 +156,7 @@ export default function SubscriptionPlans() {
       subscription_id: checkout.subscriptionId,
       name: "Geek on Demand",
       description: `${checkout.plan} Plan — Monthly Subscription`,
-      image: `${window.location.origin}/assets/logo-big.webp`,
+      image: `${window.location.origin}\assets\icons\god-new-logo.jpg`,
       handler: async (response: RazorpayPaymentResponse) => {
         try {
           await dispatch(verifySubscriptionPayment(response)).unwrap();

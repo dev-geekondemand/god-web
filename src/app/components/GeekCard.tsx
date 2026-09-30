@@ -8,18 +8,22 @@ const PLAN_CONFIG: Record<string, { label: string; color: string }> = {
 interface GeekCardProps {
 	geekData: GeekData;
 	handleGeekCardClick: () => void;
+	isSubmitting?: boolean;
 }
 
-const GeekCard: React.FC<GeekCardProps> = ({ geekData, handleGeekCardClick }) => {
+const GeekCard: React.FC<GeekCardProps> = ({ geekData, handleGeekCardClick, isSubmitting = false }) => {
 	const plan = PLAN_CONFIG[geekData.subscriptionPlan] ?? null;
 	const isCorporate = !!(geekData.__t === 'Corporate' || geekData.companyName);
 
 	return (
-		<div className='max-w-2xs min-w-[220px] h-fit shadow-lg border border-teal-500 p-4 m-2 text-wrap rounded-2xl'>
+		// Width is owned by the grid that lays these out. The old fixed
+		// `min-w-[220px]` forced two 220px columns into a ~360px phone panel,
+		// which is what made the cards overlap and the row scroll sideways.
+		<div className='w-full h-full min-w-0 flex flex-col justify-between shadow-lg border border-teal-500 p-3 sm:p-4 rounded-2xl'>
 
-			<div className='flex flex-col gap-1'>
-				<div className='mb-2 flex flex-col items-center gap-1.5'>
-					<div className='font-semibold md:text-xl text-base text-center'>
+			<div className='flex flex-col gap-1 min-w-0'>
+				<div className='mb-2 flex flex-col items-center gap-1.5 min-w-0'>
+					<div className='font-semibold text-sm sm:text-base md:text-lg text-center break-words w-full'>
 						{geekData.fullName.first} {geekData.fullName.last}
 						{geekData?.address?.city && `, ${geekData?.address?.state}`}
 					</div>
@@ -41,11 +45,11 @@ const GeekCard: React.FC<GeekCardProps> = ({ geekData, handleGeekCardClick }) =>
 						</div>
 					)}
 				</div>
-				<div className='md:text-sm text-xs text-gray-600'>
+				<div className='md:text-sm text-xs text-gray-600 break-words'>
 					<span className='font-bold md:text-sm text-xs'>Primary Skill:</span> {geekData.primarySkillName}
 				</div>
-				{geekData.secondarySkillsNames.length > 0 && (
-					<div className='md:text-sm text-xs flex flex-wrap  text-gray-600'>
+				{geekData?.secondarySkillsNames && geekData.secondarySkillsNames.length > 0 && (
+					<div className='md:text-sm text-xs flex flex-wrap gap-x-1 text-gray-600 break-words'>
 						<span className='font-bold'>Secondary Skills:</span>{' '}
 						{geekData?.secondarySkillsNames?.map((skill,i:number) => (
 							i<2 &&<div key={i}>{skill}</div>
@@ -56,11 +60,12 @@ const GeekCard: React.FC<GeekCardProps> = ({ geekData, handleGeekCardClick }) =>
 					<span className='font-bold'>Experience:</span> {geekData.yoe} years
 				</div>
 			</div>
-			<div className='py-2 bottom-0 flex flex-wrap gap-4'>
+			<div className='pt-3 flex flex-wrap gap-4'>
 				<button
 					onClick={handleGeekCardClick}
-					className='bg-teal-500 text-white py-1.5 text-xs px-4 rounded-md'>
-					Book Now
+					disabled={isSubmitting}
+					className='bg-teal-500 text-white py-1.5 text-xs px-4 rounded-md w-full sm:w-auto hover:bg-teal-600 disabled:opacity-60 disabled:cursor-not-allowed'>
+					{isSubmitting ? 'Sending…' : 'Book Now'}
 				</button>
 			</div>
 		</div>

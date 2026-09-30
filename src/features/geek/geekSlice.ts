@@ -208,6 +208,18 @@ export const logoutGeek = createAsyncThunk('geek/logout', async (_, thunkAPI) =>
   }
 })
 
+export const getSsoHandoffToken = createAsyncThunk('geek/sso-handoff', async (_, thunkAPI) => {
+  try {
+    return await geekService.getSsoHandoffToken();
+  } catch (error) {
+    if (error) {
+      return thunkAPI.rejectWithValue((error as { response: { data: unknown } }).response?.data || (error as Error).message);
+      } else {
+        return thunkAPI.rejectWithValue('An unknown error occurred');
+      }
+  }
+});
+
 export const updateAddress = createAsyncThunk(
   "geek/updateAddress",
   async ({ id, address }: { id: string; address: Address }, thunkAPI) => {

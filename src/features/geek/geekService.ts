@@ -65,7 +65,12 @@ const getAuthStatus = async()=>{
     });
 
     return response.data;
-} 
+}
+
+const getSsoHandoffToken = async () => {
+  const response = await api.get(`geek/sso-handoff`, { withCredentials: true });
+  return response.data.token as string;
+}
 
 // geekService.ts
  const searchGeeks = async (filters: unknown) => {
@@ -207,6 +212,7 @@ const geekService = {
     createCorporateGeek,
     adminCreateCorporateGeek,
     updateAvailability,
+    getSsoHandoffToken,
 }
 
 export default geekService

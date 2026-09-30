@@ -65,7 +65,7 @@ const Blogs = async ({ searchParams }: PageProps) => {
 
                                 <div className='flex gap-2 text-gray-600 text-sm items-center'>
                                     <div className='w-7 relative h-7 rounded-full'>
-                                        <Image src="/assets/logo-big.webp" className='rounded-full object-contain' fill alt='Blog Author Image' sizes="28px" />
+                                        <Image src="\assets\icons\god-new-logo.jpg" className='rounded-full object-contain' fill alt='Blog Author Image' sizes="28px" />
                                     </div>
                                     <p className=" ">{blog?.author}</p>
                                     <span>{new Date(blog?.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>

@@ -170,8 +170,11 @@ const requestSlice = createSlice({
             state.isError = true;
             state.isSuccess = false;
             state.isRequestCreated = false;
-            state.message = action.error.message;
-            toast.error("Failed to create request.");
+            // The thunk rejects with the backend body, which carries the specific reason
+            // (unknown brand, missing address, ...). action.error is only the axios message.
+            const reason = (action.payload as { message?: string } | undefined)?.message;
+            state.message = reason || action.error.message;
+            toast.error(reason || "Failed to create request.");
         }).addCase(getGeekRequests.pending, (state) => {
             state.isLoading = true;
             state.isSuccess = false;

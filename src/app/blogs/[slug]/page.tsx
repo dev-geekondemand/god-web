@@ -150,7 +150,7 @@ const BlogPage = async ({ params }: PageProps) => {
                                       <div className='flex gap-4'>
                                         <div className='flex gap-3 items-center text-gray-500'>
                                           <div className='w-8 h-8 rounded-full border border-gray-300'>
-                                            <Image src="/assets/logo-big.webp" alt='Author' className='object-contain w-8 h-8 rounded-full' width={40} height={40} />
+                                            <Image src="/assets/icons/god-new-logo.jpg" alt='Author' className='object-contain w-8 h-8 rounded-full' width={40} height={40} />
                                           </div>
                                           {blog.author}
                                         </div>
@@ -239,7 +239,7 @@ const BlogPage = async ({ params }: PageProps) => {
                                               </p>
                                               <div className='flex gap-3 items-center text-gray-500'>
                                                 <div className='w-8 h-8 rounded-full border border-gray-300'>
-                                                  <Image src="/assets/logo-big.webp" alt='Author' className='object-contain w-8 h-8 rounded-full' width={40} height={40} />
+                                                  <Image src="\assets\icons\god-new-logo.jpg" alt='Author' className='object-contain w-8 h-8 rounded-full' width={40} height={40} />
                                                 </div>
                                                 {item?.author}
                                               </div>

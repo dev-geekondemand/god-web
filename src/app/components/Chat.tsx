@@ -9,7 +9,7 @@ import ChatInput from './chat/ChatInput';
 import ChatWelcome from './chat/ChatWelcome';
 import ChatSuggestionButton from './chat/ChatSuggestionButton';
 import GeekCard from './GeekCard';
-import   { GeekData } from '@/interfaces/Geek';
+import   { Address, GeekData } from '@/interfaces/Geek';
 import Image from 'next/image';
 import { ChatMessageInterface } from '@/interfaces/Chat';
 import { useSelector } from 'react-redux';
@@ -23,10 +23,50 @@ import { useAppDispatch } from '@/lib/hooks';
 import { getCategories } from '@/features/category/categorySlice';
 import { Category } from '@/interfaces/Category';
 import { UserIssue } from '@/interfaces/UserIssue';
-import { createRequest, getSeekerRequests, ServiceState } from '@/features/request/requestSlice';
+import { createRequest, getSeekerRequests } from '@/features/request/requestSlice';
 import { ServiceRequest } from '@/interfaces/ServiceRequest';
 import { Maximize2, Minus } from 'lucide-react';
 import { useTTS } from '@/hooks/useTTS';
+
+interface GeekOptionsPayload {
+	geeks: GeekData[];
+	page: number;
+	pages: number;
+	userIssue?: UserIssue;
+}
+
+// The geek list rides along inside the socket frame's `options[0]`, which is a
+// JSON string on some backend paths and an already-parsed object on others.
+// Anything unreadable comes back as null instead of throwing, so a malformed
+// frame degrades into an error panel rather than taking out the whole handler.
+const parseGeekOptions = (options: unknown): GeekOptionsPayload | null => {
+	if (!Array.isArray(options) || options.length === 0) return null;
+
+	let parsed: unknown = options[0];
+	if (typeof parsed === 'string') {
+		try {
+			parsed = JSON.parse(parsed);
+		} catch {
+			return null;
+		}
+	}
+	if (!parsed || typeof parsed !== 'object') return null;
+
+	const payload = parsed as Record<string, unknown>;
+	if (!Array.isArray(payload.geeks)) return null;
+
+	const toPositiveInt = (value: unknown, fallback: number) => {
+		const parsedNumber = Number(value);
+		return Number.isFinite(parsedNumber) && parsedNumber > 0 ? Math.floor(parsedNumber) : fallback;
+	};
+
+	return {
+		geeks: payload.geeks as GeekData[],
+		page: toPositiveInt(payload.page, 1),
+		pages: toPositiveInt(payload.pages, 1),
+		userIssue: (payload.user_issue as UserIssue) ?? undefined,
+	};
+};
 
 function Chat({setOpenChat, isExpanded, setIsExpanded}:{setOpenChat: (value: boolean)=>void, isExpanded: boolean, setIsExpanded: (value: boolean)=>void}): JSX.Element {
 	const router = useRouter();
@@ -44,11 +84,17 @@ function Chat({setOpenChat, isExpanded, setIsExpanded}:{setOpenChat: (value: boo
 	const [userIssue,setUserIssue] = useState<UserIssue>();
 	const [error, setError] = useState<string | null>(null);
 	const [sentRequest, setSentRequest] = useState(false);
+	const [isSendingRequest, setIsSendingRequest] = useState(false);
+	const [geeksError, setGeeksError] = useState<string | null>(null);
+	const [isGeeksLoading, setIsGeeksLoading] = useState(false);
+	const [geeksReloadKey, setGeeksReloadKey] = useState(0);
+	const [reconnectKey, setReconnectKey] = useState(0);
 
 	const tts = useTTS();
 	const skipPageFetchRef = useRef(true);
 
 	const ws = useRef<WebSocket | null>(null);
+	const pendingMessageRef = useRef<string | null>(null);
 
 
 	const user = useSelector((state: RootState) => state.seeker?.user) as User;
@@ -80,7 +126,7 @@ const dispatch = useAppDispatch();
 						return;
 					}
 					const { data } = await axios.get(
-						`${process.env.NEXT_PUBLIC_BASE_SERVER_URL}/chat/chat_history/${conversationId}`,
+						`${process.env.NEXT_PUBLIC_BASE_SERVER_URL_TEST}/chat/chat_history/${conversationId}`,
 						{
 							method: 'GET',
 							headers: {
@@ -105,10 +151,10 @@ const dispatch = useAppDispatch();
 						setFetchedChatHistory(true);
 					}
 				}catch (error) {
-					console.error(error);
-					setError(
-						"Unable to connect to the chat server. Please check your connection or try again later."
-					);
+					// A missing history is not fatal — the seeker can still start a new
+					// chat, so warn without blocking the whole surface behind the error panel.
+					console.error('Could not load chat history:', error);
+					toast.error('Could not load your previous chat. You can still start a new one.');
 				}
 
 		};
@@ -121,18 +167,47 @@ const dispatch = useAppDispatch();
 
 	
 
-	useEffect(() => {
-		const sendMessage = async ()=>{
+	// Never let a TTS problem abort the onmessage handler — everything after it
+	// (the geek list parsing) lives in the same try block.
+	const handleSpeak = (text: string, messageId: string) => {
+		try {
+			if (typeof text === 'string' && text.trim()) {
+				tts.speak(text, messageId);
+			}
+		} catch (error) {
+			console.error('TTS error:', error);
+		}
+	};
 
-				ws.current = new WebSocket(
-				`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}${userId}?conversation_id=${conversationId}`
-			);
+	// The socket takes a moment to connect after a fresh page load/new chat.
+	// Sending immediately would silently drop the message (readyState isn't
+	// OPEN yet) and leave the loader stuck forever with no server reply ever
+	// coming — so queue it and flush once the socket actually opens instead.
+	const sendWhenReady = (payload: string) => {
+		if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+			ws.current.send(payload);
+		} else if (ws.current && ws.current.readyState === WebSocket.CONNECTING) {
+			pendingMessageRef.current = payload;
+		} else {
+			setIsLoading(false);
+			toast.error('Connection lost. Please try sending your message again.');
+		}
+	};
 
-			ws.current.onopen = () => {
+	// Wires up every handler a chat socket needs. Used both for the initial
+	// connection and whenever handleContinueChat has to reconnect a closed
+	// socket — a socket with only `onopen` attached would silently drop every
+	// reply from the server.
+	const attachSocketHandlers = (socket: WebSocket) => {
+			socket.onopen = () => {
 				console.log('WebSocket connection opened');
+				if (pendingMessageRef.current) {
+					socket.send(pendingMessageRef.current);
+					pendingMessageRef.current = null;
+				}
 			};
 
-			ws.current.onmessage = (event) => {
+			socket.onmessage = (event) => {
 				const data = event.data;
 
 				if (!data || data === '[END]') {
@@ -144,7 +219,7 @@ const dispatch = useAppDispatch();
 				try {
 					const fullResponse = JSON.parse(data);
 					const { response, options } = fullResponse;
-					
+
 
 					const botMessage = {
 						id: Date.now().toString(),
@@ -156,72 +231,117 @@ const dispatch = useAppDispatch();
 					// setCurrentBotMessage(null);
 					// currentBotMessageRef.current = null;
 					// textBufferRef.current = '';
-					tts.speak(response, botMessage.id);
+					handleSpeak(response, botMessage.id);
 					if (response === 'Please select a Geek to proceed') {
-						const geekOptions = JSON.parse(options[0]);
-						console.log(geekOptions);
+						const geekOptions = parseGeekOptions(options);
+
+						if (!geekOptions) {
+							// The frame said "pick a Geek" but carried no readable list.
+							// Show the bot's message with an inline error instead of a
+							// dead end, and keep the composer usable.
+							console.error('Unreadable geek payload on socket frame:', options);
+							setGeeks([]);
+							setOptions([]);
+							setIsGeekOption(true);
+							setGeeksError('We could not load the list of Geeks for your issue.');
+							setIsLoading(false);
+							return;
+						}
+
 						skipPageFetchRef.current = true;
-						setPage(geekOptions?.page);
-						setTotalPages(geekOptions?.pages);
-						setUserIssue(geekOptions?.user_issue);
-						
-						const suitableGeeks = geekOptions.geeks;
-						setGeeks(suitableGeeks);
-						console.log(suitableGeeks);
-						
+						setGeeksError(
+							geekOptions.geeks.length === 0
+								? 'No Geeks are available for this issue right now.'
+								: null
+						);
+						setPage(geekOptions.page);
+						setTotalPages(geekOptions.pages);
+						setUserIssue(geekOptions.userIssue);
+						setGeeks(geekOptions.geeks);
 						setIsGeekOption(true);
-						setOptions([]);
+						setSentRequest(false);
 					} else {
 						setGeeks([]);
+						setGeeksError(null);
 						setIsGeekOption(false);
-						setOptions(options || []);
+						setOptions(Array.isArray(options) ? options : []);
 					}
 					setIsLoading(false);
-				// eslint-disable-next-line @typescript-eslint/no-unused-vars
 				} catch (error) {
+					console.error('Failed to handle socket frame:', error);
 					toast.error('Something went wrong. Please try again.');
 					setIsLoading(false);
 					setOptions([]);
 					setGeeks([]);
+					setGeeksError(null);
 					setIsGeekOption(false);
 				}
 
 
 			};
 
-			ws.current.onclose = () => {
+			socket.onclose = () => {
 				console.log('WebSocket connection closed');
 				setIsLoading(false);
 			};
 
-			ws.current.onerror = () => {
+			socket.onerror = () => {
 				setError(
 					"Chat service is currently unavailable. Please try again later."
 					);
 				setIsLoading(false);
 			};
+	};
 
-
-
-			return () => {
-				if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-					ws.current.close();
-					<p>The connection has been closed.</p>;
-				}
-			};
+	useEffect(() => {
+		if (!userId) {
+			return;
 		}
 
-		if (userId) {
-			sendMessage();
+		let socket: WebSocket;
+		try {
+			socket = new WebSocket(
+				`${process.env.NEXT_PUBLIC_WEBSOCKET_URL_TEST}${userId}?conversation_id=${conversationId}`
+			);
+		} catch (error) {
+			// A malformed/missing NEXT_PUBLIC_WEBSOCKET_URL throws right here
+			console.error('Could not open chat socket:', error);
+			setError('Chat service is currently unavailable. Please try again later.');
+			return;
 		}
-	}, [conversationId, tts.speak, userId]);
+
+		ws.current = socket;
+		attachSocketHandlers(socket);
+
+		return () => {
+			pendingMessageRef.current = null;
+			// Detach first: a socket torn down mid-connect would otherwise fire
+			// onclose/onerror and push state into an unmounted or superseded chat.
+			socket.onopen = null;
+			socket.onmessage = null;
+			socket.onclose = null;
+			socket.onerror = null;
+			if (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING) {
+				socket.close();
+			}
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [conversationId, userId, reconnectKey]);
 
 
 
 	const handleMessageSend = async (content: string) => {
 		if (!userId || userId === '') {
 			toast.error('User not found');
+			return;
 		}
+		if (!content || !content.trim()) {
+			return;
+		}
+
+		// The moment the seeker answers — typed, spoken, or by tapping a suggested
+		// reply — stop reading the previous bot message out loud.
+		tts.cancel();
 		setError(null);
 		const userMessage = {
 			id: Date.now().toString(),
@@ -235,18 +355,12 @@ const dispatch = useAppDispatch();
 		});
 
 		
-		console.log(content);
 		setIsLoading(true);
 		textBufferRef.current = '';
 		setOptions([]);
-		console.log(ws.current);
-		
+
 		try {
-			if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-				ws.current.send(content);
-			} else {
-				console.log('WebSocket is not open');
-			}
+			sendWhenReady(content);
 		}catch (error) {
 			console.error('Error sending message:', error);
 			setError("Failed to send message. Please try again.");
@@ -256,8 +370,72 @@ const dispatch = useAppDispatch();
 	};
 
 
-	const handleGeekCardClick = (geek: GeekData) => {
-		console.log(userIssue);
+	// An offline job sends a geek to a doorstep, so it needs a real street address. Prefer the
+	// seeker's saved one; otherwise ask for location permission and reverse geocode the fix.
+	// Returns null when we could not establish an address the backend will accept.
+	const resolveOfflineAddress = async (): Promise<Address | null> => {
+		if (user?.address?.line1) return user.address;
+
+		if (typeof navigator === 'undefined' || !navigator.geolocation) return null;
+
+		let position: GeolocationPosition;
+		try {
+			position = await new Promise<GeolocationPosition>((resolve, reject) => {
+				navigator.geolocation.getCurrentPosition(resolve, reject, {
+					enableHighAccuracy: true,
+					timeout: 10000,
+					maximumAge: 0,
+				});
+			});
+		} catch {
+			// permission denied, position unavailable, or timed out
+			return null;
+		}
+
+		const { latitude, longitude } = position.coords;
+
+		try {
+			const res = await fetch(
+				`https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}`
+			);
+			const data = await res.json();
+
+			const place =
+				data?.features?.find((f: { place_type?: string[] }) => f.place_type?.includes('address')) ||
+				data?.features?.[0];
+			if (!place) return null;
+
+			const contextValue = (type: string) =>
+				place.context?.find((c: { id: string; text: string }) => c.id.includes(type))?.text || '';
+
+			// line1 is the one field the backend requires; without it there is no usable address
+			const line1 =
+				[place.address, place.text].filter(Boolean).join(' ').trim() ||
+				place.place_name?.split(',')[0]?.trim() ||
+				'';
+			if (!line1) return null;
+
+			return {
+				line1,
+				line2: '',
+				line3: undefined,
+				city: contextValue('place'),
+				state: contextValue('region'),
+				country: contextValue('country'),
+				pin: contextValue('postcode'),
+				location: { type: 'Point', coordinates: [longitude, latitude] },
+			};
+		} catch {
+			return null;
+		}
+	};
+
+	const handleGeekCardClick = async (geek: GeekData) => {
+		if (isSendingRequest) return;
+
+		// Picking a Geek is an answer too — silence the bot before acting on it.
+		tts.cancel();
+
 		let selectedCategoryId = '';
 		if (userIssue !== null) {
 			const category = categories?.find((value: object): value is Category => {
@@ -268,45 +446,69 @@ const dispatch = useAppDispatch();
 				selectedCategoryId = category._id;
 			}
 		}
-				console.log(requestState?.requests, selectedCategoryId, geek?.id);
 
+		if (!selectedCategoryId) {
+			toast.error('We could not match this issue to a service category. Please try again.');
+			return;
+		}
 
-			if (requestState?.requests?.length > 0) {
-				
-				const alreadyExists = seekerRequests?.some((request: ServiceRequest) => {
-					return request?.category?._id === selectedCategoryId && request?.geek?._id === geek?.id && request?.geekResponseStatus === 'Pending';
-				})
-		
-				if (alreadyExists) {
-					toast.error('You already have a pending request for this category.');
-					setIsLoading(false);
-					return;
-				}
+		const alreadyExists = seekerRequests?.some((request: ServiceRequest) => {
+			return request?.category?._id === selectedCategoryId && request?.geek?._id === geek?._id && request?.geekResponseStatus === 'Pending';
+		});
+
+		if (alreadyExists) {
+			toast.error('You already have a pending request for this category.');
+			return;
+		}
+
+		const mode = userIssue?.modeOfService || 'Online';
+
+		// Default to the seeker's saved address; the backend falls back to it anyway
+		let requestAddress: Address | { city: string; state: string; line1: string } =
+			user?.address?.line1 ? user.address : { city: '', state: '', line1: '' };
+
+		setIsSendingRequest(true);
+
+		if (mode === 'Offline') {
+			const resolved = await resolveOfflineAddress();
+
+			if (!resolved) {
+				setIsSendingRequest(false);
+				toast.error('We need your address for an on-site visit. Please add it to your profile.');
+				if (userId) router.push(`/seeker/${userId}/add-address`);
+				return;
 			}
-		
-		dispatch(createRequest({
-			category:selectedCategoryId,
-			geek: geek?.id,
-			issue: userIssue ? userIssue?.id : '',
-			mode: userIssue?.modeOfService || "Online",
-			location: {
-				city: '',
-				state: '',
-				line1: '',
-				line2: '',
-				pin: '',
-			},
-		}));
-		setSentRequest(true);
+
+			requestAddress = resolved;
+		}
+
+		try {
+			const result = await dispatch(createRequest({
+				category: selectedCategoryId,
+				geek: geek?._id,
+				issue: userIssue?.id || '',
+				mode,
+				brand: userIssue?.device_details?.brand,
+				location: requestAddress,
+			}));
+
+			// Only show the confirmation panel once the backend has actually accepted the request
+			if (createRequest.fulfilled.match(result)) {
+				setSentRequest(true);
+				setGeeksError(null);
+				dispatch(getSeekerRequests());
+			} else {
+				toast.error('We could not send your request. Please try again.');
+			}
+		} catch (error) {
+			console.error('Error creating request:', error);
+			toast.error('We could not send your request. Please try again.');
+		} finally {
+			setIsSendingRequest(false);
+		}
 	};
 
-	const requestState = useSelector((state:RootState)=>state.request) as ServiceState;
-
-	useEffect(()=>{
-		if(requestState?.isRequestCreated && requestState?.request?._id){
-			toast.success('Request created successfully');
-		}
-	},[requestState?.isRequestCreated, requestState?.request])
+	// The success toast is raised by the request slice; toasting here too would double it up
 
 
 	useEffect(() => {
@@ -338,7 +540,7 @@ const dispatch = useAppDispatch();
 			console.log(conversationId);
 			
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_BASE_SERVER_URL}/chat/delete/${conversationId}`,
+				`${process.env.NEXT_PUBLIC_BASE_SERVER_URL_TEST}/chat/delete/${conversationId}`,
 				{
 					method: 'DELETE',
 					headers: {
@@ -348,72 +550,114 @@ const dispatch = useAppDispatch();
 			);
 
 			if (response.ok) {
+				// Reset every derived panel too, otherwise a stale geek list and its
+				// pager survive a cleared conversation.
 				setMessages([]);
 				setFetchedChatHistory(false);
+				setOptions([]);
+				setGeeks([]);
+				setIsGeekOption(false);
+				setGeeksError(null);
+				setUserIssue(undefined);
+				setSentRequest(false);
+				setPage(1);
+				setTotalPages(1);
+				skipPageFetchRef.current = true;
+				tts.cancel();
 				toast.success('Chat history deleted successfully');
 			} else {
 				console.error('Failed to delete chat history',response);
+				toast.error('Could not clear the chat. Please try again.');
 			}
 		} catch (error) {
 			console.log('Error deleting chat history:', error);
-			toast.error('Error deleting chat history:');
+			toast.error('Error deleting chat history');
 		}
 	};
 
 	const handleContinueChat = async () => {
 		setFetchedChatHistory(true);
-		if (ws.current && ws.current.readyState === WebSocket.CLOSED) {
+		if (!ws.current || ws.current.readyState === WebSocket.CLOSED) {
 			ws.current = new WebSocket(
-				`${process.env.NEXT_PUBLIC_BASE_SERVER_URL}/chat/${userId}?conversation_id=${conversationId}`
+				`${process.env.NEXT_PUBLIC_WEBSOCKET_URL_TEST}${userId}?conversation_id=${conversationId}`
 			);
+			attachSocketHandlers(ws.current);
 		}
 
-		if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-			console.log('WebSocket connection opened to continue chat with agent.');
-			setIsLoading(true);
-			ws.current.send(
-				JSON.stringify({
-					action: 'continue_conversation',
-					chat_history: messages.map((message) => ({
-						role: message.role,
-						message: message.content,
-					})),
-				})
-			);
-		}
+		setIsLoading(true);
+		sendWhenReady(
+			JSON.stringify({
+				action: 'continue_conversation',
+				chat_history: messages.map((message) => ({
+					role: message.role,
+					message: message.content,
+				})),
+			})
+		);
 		setFetchedChatHistory(false);
 	};
 
 	useEffect(() => {
-		if (!isGeekOption || !userIssue) {
+		if (!isGeekOption) {
 			return;
 		}
+
+		// Consume the skip flag before any other bail-out: the current page's Geeks
+		// already arrived inside the socket frame. Returning ahead of this (which a
+		// missing user_issue used to do) left the flag latched true forever and
+		// silently killed every later page fetch.
 		if (skipPageFetchRef.current) {
 			skipPageFetchRef.current = false;
 			return;
 		}
 
+		if (!userIssue) {
+			setGeeksError('We cannot load more Geeks because the issue details are missing.');
+			return;
+		}
+
+		let cancelled = false;
+
 		const fetchGeeksForPage = async () => {
+			setIsGeeksLoading(true);
+			setGeeksError(null);
 			try {
 				const { data } = await axios.post(
-					`${process.env.NEXT_PUBLIC_BASE_SERVER_URL}/geek_query/get_geeks_from_user_issue?page=${page}`,
+					`${process.env.NEXT_PUBLIC_BASE_SERVER_URL_TEST}/geek_query/get_geeks_from_user_issue?page=${page}`,
 					userIssue
 				);
+				if (cancelled) return;
 				if (data?.error) {
 					throw new Error(data.error);
 				}
-				setGeeks(data?.geeks ?? []);
-				if (data?.pages) {
-					setTotalPages(data.pages);
+
+				const nextGeeks = Array.isArray(data?.geeks) ? (data.geeks as GeekData[]) : [];
+				setGeeks(nextGeeks);
+
+				const nextPages = Number(data?.pages);
+				if (Number.isFinite(nextPages) && nextPages > 0) {
+					setTotalPages(Math.floor(nextPages));
+				}
+				if (nextGeeks.length === 0) {
+					setGeeksError('No Geeks found on this page.');
 				}
 			} catch (error) {
+				if (cancelled) return;
 				console.error('Error fetching geeks for page:', error);
-				toast.error('Failed to load Geeks for this page. Please try again.');
+				setGeeks([]);
+				setGeeksError('Failed to load Geeks for this page.');
+			} finally {
+				if (!cancelled) setIsGeeksLoading(false);
 			}
 		};
 
 		fetchGeeksForPage();
-	}, [page, isGeekOption, userIssue]);
+
+		// A fast click through pages must not let an earlier response overwrite a later one
+		return () => {
+			cancelled = true;
+		};
+	}, [page, isGeekOption, userIssue, geeksReloadKey]);
 
 
 	return (
@@ -461,13 +705,21 @@ const dispatch = useAppDispatch();
 					
 					
 				</div>
-				{!user?._id && error && (
+				{error && (
+						// Previously gated on `!user?._id`, so a signed-in seeker whose socket
+						// failed saw no error at all — and the composer below hides on `error`,
+						// leaving a chat with no way out. Now it always renders, and Retry
+						// actually re-opens the socket instead of just spinning the loader.
 						<div className=" flex flex-col items-center h-[80vh] justify-center text-center px-6">
 							<p className="text-red-500 font-semibold mb-2">⚠ Chat Error</p>
 							<p className="text-sm text-gray-600 mb-4">{error}</p>
 
 							<button
-							onClick={() => {setError(''); setIsLoading(true)}}
+							onClick={() => {
+								setError(null);
+								setIsLoading(false);
+								setReconnectKey((key) => key + 1);
+							}}
 							className="px-4 py-2 bg-black text-white rounded-md hover:opacity-90"
 							>
 							Retry
@@ -530,7 +782,7 @@ const dispatch = useAppDispatch();
 								)}
 
 						{fetchedChatHistory && (
-							<div className='flex flex-col items-center mx-auto my-3 justify-center border border-teal-300 p-3 w-1/2'>
+							<div className='flex flex-col items-center mx-auto my-3 justify-center border border-teal-300 p-3 w-11/12 max-w-xs sm:w-1/2'>
 								<p className='font-bold text-xs md:text-sm mb-3'>Continue chat?</p>
 								<div className='flex flex-row gap-x-6'>
 									<button
@@ -549,30 +801,65 @@ const dispatch = useAppDispatch();
 
 
 
-							{!isLoading && isGeekOption && geeks.length > 0 ? (
-								<div className='flex flex-col gap-6 mt-8'>
-									{!sentRequest ?  <div className='grid grid-cols-2 gap-3 w-full justify-center'>
-									{geeks?.map((geek, index) => (
-										<GeekCard
-											// className='m-2'
-											key={index}
-											geekData={geek}
-											handleGeekCardClick={() => handleGeekCardClick(geek)}
-										/>
-									))}
-								</div> : <p className='text-center text-green-600 font-semibold'>Your request has been sent to the selected Geek. They will get back to you soon.</p>}
+							{!isLoading && isGeekOption ? (
+								<div className='flex flex-col gap-4 mt-8 w-full min-w-0'>
+									{sentRequest ? (
+										// Once the request is accepted the list is gone, so the pager
+										// that used to page it must go with it.
+										<p className='text-center text-green-600 font-semibold text-xs md:text-sm px-3'>
+											Your request has been sent to the selected Geek. They will get back to
+											you soon.
+										</p>
+									) : (
+										<>
+											{isGeeksLoading && (
+												<p className='text-center text-xs md:text-sm text-gray-500'>
+													Loading Geeks…
+												</p>
+											)}
 
-									<Pagination
-									currentPage={page}
-									totalPages={totalPages}
-									onPageChange={(newPage: number)=>{setPage(newPage)}}
-									/>
+											{!isGeeksLoading && geeksError && (
+												<div className='mx-auto flex w-full max-w-sm flex-col items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-center'>
+													<p className='text-xs md:text-sm text-red-600'>{geeksError}</p>
+													{userIssue && (
+														<button
+															onClick={() => setGeeksReloadKey((key) => key + 1)}
+															className='rounded-md bg-teal-500 px-3 py-1 text-xs font-medium text-white hover:bg-teal-600'>
+															Try again
+														</button>
+													)}
+												</div>
+											)}
 
+											{!isGeeksLoading && geeks?.length > 0 && (
+												<div className='grid grid-cols-1 sm:grid-cols-2 gap-3 w-full min-w-0 px-1'>
+													{geeks.map((geek, index) => (
+														<GeekCard
+															key={geek?._id ?? index}
+															geekData={geek}
+															isSubmitting={isSendingRequest}
+															handleGeekCardClick={() => handleGeekCardClick(geek)}
+														/>
+													))}
+												</div>
+											)}
+
+											{!isGeeksLoading && userIssue && totalPages > 1 && (
+												<Pagination
+													currentPage={page}
+													totalPages={totalPages}
+													onPageChange={(newPage: number) => {
+														if (newPage >= 1 && newPage <= totalPages) setPage(newPage);
+													}}
+												/>
+											)}
+										</>
+									)}
 								</div>
 							) : (
 								<div>
 									{!isLoading && options.length > 0 && (
-										<div className='flex flex-wrap w-3/4'>
+										<div className='flex flex-wrap w-full px-2 sm:w-3/4'>
 											{options.map((option, index) => (
 												<ChatSuggestionButton
 													key={index}

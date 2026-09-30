@@ -11,6 +11,7 @@ export function useTTS() {
 
 	const audioRef = useRef<HTMLAudioElement | null>(null);
 	const currentUrlRef = useRef<string | null>(null);
+	const requestIdRef = useRef(0);
 
 	useEffect(() => {
 		const audio = new Audio();
@@ -37,6 +38,9 @@ export function useTTS() {
 	}, []);
 
 	const speak = useCallback(async (text: string, messageId: string, voice: string = 'verse') => {
+		// Every speak/cancel bumps this. An in-flight request whose token is no
+		// longer current has been superseded and must stay silent.
+		const requestId = ++requestIdRef.current;
 		try {
 			if (audioRef.current) {
 				audioRef.current.pause();
@@ -51,10 +55,15 @@ export function useTTS() {
 			setIsVoiceLoading(true);
 
 			const response = await axios.post(
-				`${process.env.NEXT_PUBLIC_BASE_SERVER_URL}/tts`,
+				`${process.env.NEXT_PUBLIC_BASE_SERVER_URL_TEST}/tts`,
 				{ text, voice },
 				{ responseType: 'blob' }
 			);
+
+			// The audio for a message the user has already answered must never start
+			// playing. cancel() (and any newer speak()) bumps the token while this
+			// request is in flight, which lands us here.
+			if (requestId !== requestIdRef.current) return;
 
 			if (currentUrlRef.current) URL.revokeObjectURL(currentUrlRef.current);
 
@@ -70,14 +79,23 @@ export function useTTS() {
 			audio.currentTime = 0;
 
 			await audio.play();
+
+			// play() is async too, so re-check before claiming the floor
+			if (requestId !== requestIdRef.current) {
+				audio.pause();
+				audio.currentTime = 0;
+				return;
+			}
+
 			setIsPlaying(true);
 			setIsPaused(false);
 			setPlayingMessageId(messageId);
 		} catch (err) {
+			if (requestId !== requestIdRef.current) return;
 			setVoiceError(err instanceof Error ? err.message : 'Something went wrong with TTS');
 			setPlayingMessageId(null);
 		} finally {
-			setIsVoiceLoading(false);
+			if (requestId === requestIdRef.current) setIsVoiceLoading(false);
 		}
 	}, []);
 
@@ -96,13 +114,18 @@ export function useTTS() {
 	}, []);
 
 	const cancel = useCallback(() => {
+		// Invalidate any speak() still waiting on the network so it cannot start
+		// talking over the user after they have already replied.
+		requestIdRef.current += 1;
+		setIsVoiceLoading(false);
+
 		if (audioRef.current) {
 			audioRef.current.pause();
 			audioRef.current.currentTime = 0;
-			setIsPlaying(false);
-			setIsPaused(false);
-			setPlayingMessageId(null);
 		}
+		setIsPlaying(false);
+		setIsPaused(false);
+		setPlayingMessageId(null);
 	}, []);
 
 	return {

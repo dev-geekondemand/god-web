@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     canonical: "https://geekondemand.in/",
   },
   icons: {
-    icon: "/assets/logo-big.webp",
+    icon: "/assets/icons/god-new-logo.jpg",
   },
 };
 

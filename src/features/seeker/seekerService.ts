@@ -79,6 +79,11 @@ const logout = async()=>{
   });
 }
 
+const getSsoHandoffToken = async () => {
+  const response = await api.get(`seeker/sso-handoff`, { withCredentials: true });
+  return response.data.token as string;
+}
+
 const updateAddress = async (id: string, address: Address) => {
   const response = await api.put(`seeker/${id}/address`, address, {
     withCredentials: true
@@ -136,6 +141,7 @@ export const seekerService = {
     updateUserProfile,
     sendVerificationMail,
     verifyMail,
-    updateProfileImage
+    updateProfileImage,
+    getSsoHandoffToken
 };
 

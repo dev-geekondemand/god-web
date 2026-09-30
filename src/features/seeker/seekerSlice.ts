@@ -149,6 +149,18 @@ export const loadUser = createAsyncThunk('user/load', async (_, thunkAPI) => {
   }
 });
 
+export const getSsoHandoffToken = createAsyncThunk('user/sso-handoff', async (_, thunkAPI) => {
+  try {
+    return await seekerService.getSsoHandoffToken();
+  } catch (error) {
+    if (error) {
+      return thunkAPI.rejectWithValue((error as { response: { data: unknown } }).response?.data || (error as Error).message);
+      } else {
+        return thunkAPI.rejectWithValue('An unknown error occurred');
+      }
+  }
+});
+
 export const logoutUser = createAsyncThunk('user/logout', async (_, thunkAPI) => {
   try {
     const res = await seekerService.logout();

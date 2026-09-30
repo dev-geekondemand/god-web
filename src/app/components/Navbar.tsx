@@ -6,9 +6,9 @@ import { useEffect, useRef, useState } from 'react';
 import CustomButton from './CustomButton';
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
-import { logoutUser, UserState } from '@/features/seeker/seekerSlice';
+import { getSsoHandoffToken as getSeekerSsoHandoffToken, logoutUser, UserState } from '@/features/seeker/seekerSlice';
 import CustomModel from './CustomModal';
-import { GeekInitialState, logoutGeek } from '@/features/geek/geekSlice';
+import { getSsoHandoffToken as getGeekSsoHandoffToken, GeekInitialState, logoutGeek } from '@/features/geek/geekSlice';
 import { Bell, UserRound, ChevronDown, LayoutDashboard, CreditCard, ClipboardList, LogOut, ArrowRight, LifeBuoy } from 'lucide-react';
 import {
   DropdownMenu,
@@ -121,20 +121,32 @@ const Navbar = () => {
     isGeekAuthenticated ? 'geek' : 'seeker'
   }`;
   const ctaLabel = isGeekAuthenticated ? 'Become a Seeker' : isAuthenticated ? 'Earn as a Geek' : 'Book a Geek';
+  const handleContactSupport = async () => {
+    try {
+      const token = isGeekAuthenticated
+        ? await dispatch(getGeekSsoHandoffToken()).unwrap()
+        : await dispatch(getSeekerSsoHandoffToken()).unwrap();
+      window.location.href = `${supportUrl}&ssoToken=${token}`;
+    } catch {
+      // Handoff mint failed (e.g. session expired) — fall back to a plain
+      // redirect, which just lands the user on god-support's own login.
+      window.location.href = supportUrl;
+    }
+  };
   const handleCta = () => {
     if (!isLoggedIn) {
       router.push('/register?type=seeker');
     } else if (isGeekAuthenticated) {
       toast.dismiss();
             showCustomToast(
-              { title: "Logged in as a Geek.", message: "Please logout first to register as a Seeker.", type: "warning", avatar: "/assets/logo-big.webp" },
+              { title: "Logged in as a Geek.", message: "Please logout first to register as a Seeker.", type: "warning", avatar: "\assets\icons\god-new-logo.jpg" },
               { position: "top-center" }
             )
       toast.custom('Please logout first to book a Geek.', { position: 'top-center' });
     } else if (isAuthenticated) {
       toast.dismiss();
             showCustomToast(
-              { title: "Logged in as a Seeker.", message: "Please logout first to register as a Geek.", type: "warning", avatar: "/assets/logo-big.webp" },
+              { title: "Logged in as a Seeker.", message: "Please logout first to register as a Geek.", type: "warning", avatar: "\assets\icons\god-new-logo.jpg" },
               { position: "top-center" }
             );
     } else {
@@ -149,7 +161,7 @@ const Navbar = () => {
 
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
-            <Image src="/assets/logo-big.webp" width={140} height={57} alt="Geek on Demand" priority style={{ width: '140px', height: '57px' }} />
+            <Image src="/assets/icons/god-new-logo.jpg" width={180} height={70} alt="Geek on Demand" priority style={{ width: '170px', height: '75px' }} />
           </Link>
 
           {/* Center: navlinks (desktop) */}
@@ -332,7 +344,7 @@ const Navbar = () => {
 
                    <DropdownMenuItem
                     className="cursor-pointer rounded-lg px-2.5 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 focus:bg-teal-50 focus:text-teal-700 gap-2.5 transition-colors"
-                    onClick={() => { window.location.href = supportUrl; }}
+                    onClick={handleContactSupport}
                   >
                     <LifeBuoy className="w-4 h-4" />
                     Contact &amp; Support
@@ -391,7 +403,7 @@ const Navbar = () => {
       >
         <div className="p-4 flex justify-between items-center border-b">
           <Link href="/" onClick={() => setSidebarOpen(false)}>
-            <Image src="/assets/logo-big.webp" width={110} height={45} alt="Logo" style={{ width: '110px', height: '45px' }} />
+            <Image src="\assets\icons\god-new-logo.jpg" width={130} height={55} alt="Logo" style={{ width: '150px', height: '65px' }} />
           </Link>
           <button
             onClick={() => setSidebarOpen(false)}
@@ -547,14 +559,14 @@ const Navbar = () => {
                   </Link>
                 )}
 
-                 <a
-                  href={supportUrl}
-                  onClick={() => setSidebarOpen(false)}
-                  className="px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
+                 <button
+                  type="button"
+                  onClick={() => { setSidebarOpen(false); handleContactSupport(); }}
+                  className="px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors text-left"
                 >
                   <LifeBuoy className="w-4 h-4" />
                   Contact &amp; Support
-                </a> 
+                </button>
 
                 <div className="mt-1 px-1">
                   <CustomModel

@@ -14,7 +14,7 @@ const FounderMessage = () => {
             <div className='w-full h-[30vh] founder-bg border-b relative'>
               <div className='relative w-full h-full'>
                 <Image
-                  src="/assets/logo-big.webp"
+                  src="\assets\icons\god-new-logo.jpg"
                   fill
                   sizes="100vw"
                   alt="GeekOnDemand Logo"

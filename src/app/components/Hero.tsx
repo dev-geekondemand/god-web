@@ -27,38 +27,38 @@ const HeroSectionTen = () => {
       id: slicedCategories[0]?.slug || slicedCategories[0]?._id,
       title:"Laptop & Desktop",
       subtitle:"Repair",
-      image:"/cat-icons/Laptops.png"
+      image:"/assets/new-cat-icons/Laptops%20-%20Desktop%20Service%20and%20Repair.jpg"
     },
     {
       id: slicedCategories[1]?.slug || slicedCategories[1]?._id,
       title:"Printer",
       subtitle:"Service & Repair",
-      image:"/cat-icons/Printer.png",
+      image:"/assets/new-cat-icons/Printer%20-%20Service%20%26%20Repair.jpg",
     },
     {
       id: slicedCategories[2]?.slug || slicedCategories[3]?._id,
       title:"Router",
       subtitle:"Service & Repair",
-      image:"/cat-icons/Router.png",
+      image:"/assets/new-cat-icons/Router%20-%20Service%20%26%20Repair.jpg",
     },
      {
       id: slicedCategories[3]?.slug || slicedCategories[4]?._id,
       title:"Software",
       subtitle:"Installation & Support",
-      image:"/cat-icons/Software.png",
+      image:"/assets/new-cat-icons/Software%20-%20Install%20%26%20Update.jpg",
     },
     {
       id: slicedCategories[4]?.slug || slicedCategories[2]?._id,
       title:"Email",
-      subtitle:"Service & Repair", 
-      image:"/cat-icons/email.png",
+      subtitle:"Service & Repair",
+      image:"/assets/new-cat-icons/Email%20-%20Service%20%26%20Repair.jpg",
     },
-   
+
     {
       id: slicedCategories[5]?.slug || slicedCategories[5]?._id,
       title:"Antivirus",
       subtitle:"Setup & Protection",
-      image:"/cat-icons/Antivirus.png",
+      image:"/assets/new-cat-icons/Antivirus%20-%20Install%20%26%20Update.jpg",
     },
 
   ]
@@ -154,9 +154,36 @@ const handleSearch = (category: string | null) => {
         </div>
       )}
 
+    
+        {/* Floating Gigi mascot — small screens only (the in-hero mascot takes over from mmd up) */}
+        <div className="mmd:hidden absolute bottom-4 left-4 z-20 group floating">
+          <div className="rounded-full flex items-center justify-center">
+            <Image
+              src="/assets/icons/gigi.png"
+              width={100}
+              height={100}
+              alt="Gigi mascot"
+              style={{ height: 'auto' }}
+            />
+          </div>
+
+          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 mb-2 transition flex justify-center bg-black text-white text-xs px-3 py-1 rounded-lg whitespace-nowrap">
+            Gigi
+          </div>
+        </div>
+
       <div className="h-full">
         <div className="w-full max-w-7xl mx-auto h-full">
-          <div className="grid grid-cols-2  mmd:gap-6  items-stretch h-full">
+          <div className="relative grid grid-cols-2  mmd:gap-6  items-stretch h-full">
+            <div className="hidden mmd:flex absolute left-1/2 top-80 -translate-x-1/2 -translate-y-1/2 z-10">
+              <Image
+                src="/assets/icons/gigi.png"
+                width={200}
+                height={200}
+                alt="Gigi mascot"
+                className="object-contain"
+              />
+            </div>
             <div className="h-full col-span-2 mmd:col-span-1 flex items-center">
               <div
                 className=" fadeInUp h-full w-full flex flex-col justify-center"
@@ -254,10 +281,10 @@ const handleSearch = (category: string | null) => {
                      
                    {displayCategories?.slice(0,3)?.map((cat,i)=>{
                       return  <Link key={i+10} href={`/categories/${cat.id}/brands`} className="flex flex-col w-full h-full">
-                      <div className="flex flex-col items-center bg-gray-100 xxs:p-1.5 xs:p-2 sm:p-1 rounded-lg xxs:me-1 xs:me-2 md:me-4 mb-1 cursor-pointer hover:bg-teal-700 hover:text-white">
+                      <div className="flex flex-col items-center bg-gray-50 xxs:p-1.5 xs:p-2 sm:p-1 rounded-lg xxs:me-1 xs:me-2 md:me-4 mb-1 cursor-pointer hover:bg-teal-700 hover:text-white">
                       <Image 
-                        width={40}
-                        height={40}
+                        width={50}
+                        height={50}
                         decoding="async"
                         src={cat.image}
                         alt={`${cat.title} service in Hyderabad`}
@@ -276,8 +303,8 @@ const handleSearch = (category: string | null) => {
                       return  <Link key={i+100} href={`/categories/${cat.id}/brands`} className="flex flex-col w-full">
                       <div className="flex flex-col h-full items-center bg-gray-100 xxs:p-1.5 xs:p-2 sm:p-1 rounded-lg xxs:me-1 xs:me-2 md:me-4 mb-1 cursor-pointer hover:bg-teal-700 hover:text-white">
                       <Image 
-                        width={40}
-                        height={40}
+                        width={50}
+                        height={50}
                         decoding="async"
                         src={cat.image}
                         alt={`${cat.title} service in Hyderabad`}
@@ -372,7 +399,7 @@ const handleSearch = (category: string | null) => {
                       alt="icon"
                     />
                     <div className=" xs:ms-2">
-                      <h3 className="font-bold xxs:text-xs xs:text-sm lg:text-base">380+ </h3>
+                      <h3 className="font-bold xxs:text-xs xs:text-sm lg:text-base">420+ </h3>
                       <p className="xxs:text-[9px] xs:text-xs lg:text-sm text-gray-600">Verified Geeks</p>
 
                     </div>
@@ -388,7 +415,7 @@ const handleSearch = (category: string | null) => {
                       style={{ height: 'auto' }}
                     />
                     <div className="ms-1.5 xs:ms-2">
-                      <h3 className="font-bold xxs:text-xs xs:text-sm lg:text-base">1,000+</h3>
+                      <h3 className="font-bold xxs:text-xs xs:text-sm lg:text-base">1250+</h3>
                       <p className="xxs:text-[9px] xs:text-xs lg:text-sm text-gray-600">Seekers Registered</p>
                     </div>
                   </div>

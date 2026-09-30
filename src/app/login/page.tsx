@@ -7,7 +7,7 @@ const Models = () => {
     <div className='w-full flex flex-col justify-center items-center'>
       <PageBanner title="Login" crumbs={[{ label: 'Login' }]} />
 
-      <div className='flex flex-wrap justify-center max-w-6xl items-center gap-8 p-5 h-[80vh]'>
+      <div className='flex flex-wrap justify-center max-w-6xl items-center gap-8 p-5 min-h-screen md:min-h-[80vh]'>
         <Link
           href="/login/seeker"
           className="max-w-xs px-10 py-8 rounded-lg relative bg-white hover:scale-105 transition transform duration-300 shadow-lg border cursor-pointer border-gray-400/50"
