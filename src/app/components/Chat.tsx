@@ -8,6 +8,7 @@ import ChatInput from './chat/ChatInput';
 // import loader from '/assets/gifs/loader.gif';
 import ChatWelcome from './chat/ChatWelcome';
 import ChatSuggestionButton from './chat/ChatSuggestionButton';
+import GeekListSkeleton from './chat/GeekListSkeleton';
 import GeekCard from './GeekCard';
 import   { Address, GeekData } from '@/interfaces/Geek';
 import Image from 'next/image';
@@ -34,6 +35,11 @@ interface GeekOptionsPayload {
 	pages: number;
 	userIssue?: UserIssue;
 }
+
+// The chatbot spells a geek's id `_id` over the HTTP pager but `id` on the socket
+// frame, and GeekData declares both so TypeScript cannot flag the difference. Read
+// whichever is actually present, or the request goes out with no geek at all.
+const geekIdOf = (geek?: GeekData | null): string => geek?._id || geek?.id || '';
 
 // The geek list rides along inside the socket frame's `options[0]`, which is a
 // JSON string on some backend paths and an already-parsed object on others.
@@ -88,10 +94,20 @@ function Chat({setOpenChat, isExpanded, setIsExpanded}:{setOpenChat: (value: boo
 	const [geeksError, setGeeksError] = useState<string | null>(null);
 	const [isGeeksLoading, setIsGeeksLoading] = useState(false);
 	const [geeksReloadKey, setGeeksReloadKey] = useState(0);
+	// Set by Gnie's `{"status":"searching_geeks"}` control frame, which arrives before
+	// the issue extraction + geek matching work begins. Cleared by the next frame that
+	// actually carries a response.
+	const [isSearchingGeeks, setIsSearchingGeeks] = useState(false);
 	const [reconnectKey, setReconnectKey] = useState(0);
 
 	const tts = useTTS();
 	const skipPageFetchRef = useRef(true);
+	// Remembered so the skeleton draws as many placeholders as the last real page,
+	// which keeps the panel from jumping height while the next page loads.
+	const lastGeekCountRef = useRef(4);
+	// Mirrors isSearchingGeeks so socket handlers (which close over stale state) can
+	// tell whether a close interrupted an in-progress geek search.
+	const searchingGeeksRef = useRef(false);
 
 	const ws = useRef<WebSocket | null>(null);
 	const pendingMessageRef = useRef<string | null>(null);
@@ -167,6 +183,11 @@ const dispatch = useAppDispatch();
 
 	
 
+	const markSearchingGeeks = (value: boolean) => {
+		searchingGeeksRef.current = value;
+		setIsSearchingGeeks(value);
+	};
+
 	// Never let a TTS problem abort the onmessage handler — everything after it
 	// (the geek list parsing) lives in the same try block.
 	const handleSpeak = (text: string, messageId: string) => {
@@ -218,8 +239,23 @@ const dispatch = useAppDispatch();
 				// NON-STREAMING RESPONSE
 				try {
 					const fullResponse = JSON.parse(data);
+
+					// Control frames carry a `status` and no chat text — they only move the
+					// UI into a waiting state and must not be rendered as a bot message.
+					if (fullResponse && typeof fullResponse === 'object' && !('response' in fullResponse) && fullResponse.status) {
+						if (fullResponse.status === 'searching_geeks') {
+							markSearchingGeeks(true);
+							setGeeksError(null);
+							setOptions([]);
+						}
+						setIsLoading(false);
+						return;
+					}
+
 					const { response, options } = fullResponse;
 
+					// Any frame with real content ends the geek search wait
+					markSearchingGeeks(false);
 
 					const botMessage = {
 						id: Date.now().toString(),
@@ -258,6 +294,9 @@ const dispatch = useAppDispatch();
 						setTotalPages(geekOptions.pages);
 						setUserIssue(geekOptions.userIssue);
 						setGeeks(geekOptions.geeks);
+						if (geekOptions.geeks.length > 0) {
+							lastGeekCountRef.current = geekOptions.geeks.length;
+						}
 						setIsGeekOption(true);
 						setSentRequest(false);
 					} else {
@@ -271,6 +310,7 @@ const dispatch = useAppDispatch();
 					console.error('Failed to handle socket frame:', error);
 					toast.error('Something went wrong. Please try again.');
 					setIsLoading(false);
+					markSearchingGeeks(false);
 					setOptions([]);
 					setGeeks([]);
 					setGeeksError(null);
@@ -283,6 +323,14 @@ const dispatch = useAppDispatch();
 			socket.onclose = () => {
 				console.log('WebSocket connection closed');
 				setIsLoading(false);
+				// Gnie closes the socket right after delivering the list, so a close while
+				// the search flag is still up means the list never arrived. Surface that
+				// instead of leaving the skeleton animating forever.
+				if (searchingGeeksRef.current) {
+					markSearchingGeeks(false);
+					setIsGeekOption(true);
+					setGeeksError('The connection closed before your Geeks could load. Please try again.');
+				}
 			};
 
 			socket.onerror = () => {
@@ -452,8 +500,16 @@ const dispatch = useAppDispatch();
 			return;
 		}
 
+		const geekId = geekIdOf(geek);
+
+		if (!geekId) {
+			console.error('Geek card carried no id:', geek);
+			toast.error('We could not identify that Geek. Please reload the chat and try again.');
+			return;
+		}
+
 		const alreadyExists = seekerRequests?.some((request: ServiceRequest) => {
-			return request?.category?._id === selectedCategoryId && request?.geek?._id === geek?._id && request?.geekResponseStatus === 'Pending';
+			return request?.category?._id === selectedCategoryId && request?.geek?._id === geekId && request?.geekResponseStatus === 'Pending';
 		});
 
 		if (alreadyExists) {
@@ -485,7 +541,7 @@ const dispatch = useAppDispatch();
 		try {
 			const result = await dispatch(createRequest({
 				category: selectedCategoryId,
-				geek: geek?._id,
+				geek: geekId,
 				issue: userIssue?.id || '',
 				mode,
 				brand: userIssue?.device_details?.brand,
@@ -516,7 +572,9 @@ const dispatch = useAppDispatch();
 		bottomRef?.current?.scrollIntoView({ behavior: 'smooth' });
 	}, 50); // small delay to allow rendering
 	return () => clearTimeout(timeout);
-	}, [messages]);
+	// isSearchingGeeks/geeks are here too: the skeleton and the cards are tall enough
+	// to land below the fold if we only scroll when a message is appended.
+	}, [messages, isSearchingGeeks, geeks]);
 
 
 	useEffect(()=>{
@@ -525,6 +583,17 @@ const dispatch = useAppDispatch();
 	},[dispatch])
 
 	const categories = useSelector((state: RootState) => state.category?.categories);
+
+	// True while a Geek list is on its way: either the HTTP pager is in flight, or
+	// we are already at the Geek step and waiting on the next socket frame (which
+	// is what the seeker sees at the end of the chat with Gnie). The skeleton grid
+	// stands in for the cards here, so the generic "thinking" loader steps aside.
+	const isGeekStepLoading =
+		!sentRequest && (isSearchingGeeks || (isGeekOption && (isGeeksLoading || isLoading)));
+
+	// The skeleton has to be reachable before isGeekOption is ever set — during the
+	// first search there is no list yet, only Gnie's searching_geeks signal.
+	const showGeekArea = isGeekOption || isSearchingGeeks;
 
 
 
@@ -558,6 +627,7 @@ const dispatch = useAppDispatch();
 				setGeeks([]);
 				setIsGeekOption(false);
 				setGeeksError(null);
+				markSearchingGeeks(false);
 				setUserIssue(undefined);
 				setSentRequest(false);
 				setPage(1);
@@ -633,6 +703,9 @@ const dispatch = useAppDispatch();
 
 				const nextGeeks = Array.isArray(data?.geeks) ? (data.geeks as GeekData[]) : [];
 				setGeeks(nextGeeks);
+				if (nextGeeks.length > 0) {
+					lastGeekCountRef.current = nextGeeks.length;
+				}
 
 				const nextPages = Number(data?.pages);
 				if (Number.isFinite(nextPages) && nextPages > 0) {
@@ -769,16 +842,22 @@ const dispatch = useAppDispatch();
 								/>
 							))}
 
-							{/* Loader */}
+							{/* Loader — suppressed when the Geek skeleton below is already showing */}
 							{isLoading &&
+								!isGeekStepLoading &&
 								messages.length > 0 &&
 								messages[messages.length - 1].role === 'user' && (
-									<Image
-										src={'/assets/gifs/loader.gif'}
-										alt='loading'
-										width={50}
-										height={50}
-									/>
+									<div className='flex items-center gap-2' role='status' aria-live='polite'>
+										<Image
+											src={'/assets/gifs/loader.gif'}
+											alt=''
+											width={50}
+											height={50}
+										/>
+										<span className='text-xs md:text-sm text-gray-500'>
+											Gnie is thinking…
+										</span>
+									</div>
 								)}
 
 						{fetchedChatHistory && (
@@ -801,7 +880,7 @@ const dispatch = useAppDispatch();
 
 
 
-							{!isLoading && isGeekOption ? (
+							{showGeekArea ? (
 								<div className='flex flex-col gap-4 mt-8 w-full min-w-0'>
 									{sentRequest ? (
 										// Once the request is accepted the list is gone, so the pager
@@ -810,15 +889,11 @@ const dispatch = useAppDispatch();
 											Your request has been sent to the selected Geek. They will get back to
 											you soon.
 										</p>
+									) : isGeekStepLoading ? (
+										<GeekListSkeleton count={lastGeekCountRef.current} />
 									) : (
 										<>
-											{isGeeksLoading && (
-												<p className='text-center text-xs md:text-sm text-gray-500'>
-													Loading Geeks…
-												</p>
-											)}
-
-											{!isGeeksLoading && geeksError && (
+											{geeksError && (
 												<div className='mx-auto flex w-full max-w-sm flex-col items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-center'>
 													<p className='text-xs md:text-sm text-red-600'>{geeksError}</p>
 													{userIssue && (
@@ -831,11 +906,11 @@ const dispatch = useAppDispatch();
 												</div>
 											)}
 
-											{!isGeeksLoading && geeks?.length > 0 && (
+											{geeks?.length > 0 && (
 												<div className='grid grid-cols-1 sm:grid-cols-2 gap-3 w-full min-w-0 px-1'>
 													{geeks.map((geek, index) => (
 														<GeekCard
-															key={geek?._id ?? index}
+															key={geekIdOf(geek) || index}
 															geekData={geek}
 															isSubmitting={isSendingRequest}
 															handleGeekCardClick={() => handleGeekCardClick(geek)}
@@ -844,7 +919,7 @@ const dispatch = useAppDispatch();
 												</div>
 											)}
 
-											{!isGeeksLoading && userIssue && totalPages > 1 && (
+											{userIssue && totalPages > 1 && (
 												<Pagination
 													currentPage={page}
 													totalPages={totalPages}
