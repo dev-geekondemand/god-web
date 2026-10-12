@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, JSX } from 'react';
 import { useRouter } from 'next/navigation';
 import ChatMessage from './chat/ChatMessage';
-import ChatInput from './chat/ChatInput';
+import ChatInput, { type ChatInputHandle } from './chat/ChatInput';
 
 // import loader from '/assets/gifs/loader.gif';
 import ChatWelcome from './chat/ChatWelcome';
@@ -12,7 +12,7 @@ import GeekListSkeleton from './chat/GeekListSkeleton';
 import GeekCard from './GeekCard';
 import   { Address, GeekData } from '@/interfaces/Geek';
 import Image from 'next/image';
-import { ChatMessageInterface } from '@/interfaces/Chat';
+import { ChatMessageInterface, SendMessageOptions } from '@/interfaces/Chat';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/lib/store';
 import User from '@/interfaces/Seeker';
@@ -99,6 +99,8 @@ function Chat({setOpenChat, isExpanded, setIsExpanded}:{setOpenChat: (value: boo
 	// actually carries a response.
 	const [isSearchingGeeks, setIsSearchingGeeks] = useState(false);
 	const [reconnectKey, setReconnectKey] = useState(0);
+	// Which bubble is currently being re-recorded, reported up by ChatInput.
+	const [reRecordingMessageId, setReRecordingMessageId] = useState<string | null>(null);
 
 	const tts = useTTS();
 	const skipPageFetchRef = useRef(true);
@@ -111,6 +113,9 @@ function Chat({setOpenChat, isExpanded, setIsExpanded}:{setOpenChat: (value: boo
 
 	const ws = useRef<WebSocket | null>(null);
 	const pendingMessageRef = useRef<string | null>(null);
+	// The recorder lives in ChatInput alongside the mic UI, so the bubble's
+	// re-record action reaches it through this handle.
+	const chatInputRef = useRef<ChatInputHandle | null>(null);
 
 
 	const user = useSelector((state: RootState) => state.seeker?.user) as User;
@@ -155,9 +160,12 @@ const dispatch = useAppDispatch();
 							message: string,
 							sender: string,
 							sentAt: string
-						}) => {
+						}, index: number) => {
 							return {
-								id: Date.now().toString(),
+								// Date.now() alone gave every restored message the same id, so
+								// per-message state (TTS highlight, re-record target) matched
+								// all of them at once.
+								id: `history-${index}`,
 								content: message.message,
 								role: message.sender,
 								timestamp: message.sentAt,
@@ -378,7 +386,7 @@ const dispatch = useAppDispatch();
 
 
 
-	const handleMessageSend = async (content: string) => {
+	const handleMessageSend = async (content: string, options?: SendMessageOptions) => {
 		if (!userId || userId === '') {
 			toast.error('User not found');
 			return;
@@ -391,18 +399,41 @@ const dispatch = useAppDispatch();
 		// reply — stop reading the previous bot message out loud.
 		tts.cancel();
 		setError(null);
+
+		const replaceMessageId = options?.replaceMessageId;
 		const userMessage = {
 			id: Date.now().toString(),
 			content: content.toString(),
 			role: 'user',
 			timestamp: Date.now(),
+			source: options?.source ?? 'text',
 		};
+
 		setMessages((prev) => {
-			const updated = [...prev, userMessage];
-			return updated;
+			if (replaceMessageId) {
+				const targetIndex = prev.findIndex((message) => message.id === replaceMessageId);
+				if (targetIndex !== -1) {
+					// Swap the bad transcript for the new one and drop whatever followed it
+					// (the bot's reply to the text the seeker never meant to send), so the
+					// thread reads as if they had said this the first time.
+					return [
+						...prev.slice(0, targetIndex),
+						{ ...prev[targetIndex], content: userMessage.content, source: 'voice' as const },
+					];
+				}
+			}
+			return [...prev, userMessage];
 		});
 
-		
+		if (replaceMessageId) {
+			// Anything the dropped reply produced has to go with it.
+			setGeeks([]);
+			setGeeksError(null);
+			setIsGeekOption(false);
+			setSentRequest(false);
+			markSearchingGeeks(false);
+		}
+
 		setIsLoading(true);
 		textBufferRef.current = '';
 		setOptions([]);
@@ -594,6 +625,14 @@ const dispatch = useAppDispatch();
 	// The skeleton has to be reachable before isGeekOption is ever set — during the
 	// first search there is no list yet, only Gnie's searching_geeks signal.
 	const showGeekArea = isGeekOption || isSearchingGeeks;
+
+	// Only the seeker's latest turn can be re-recorded. Offering it on an older
+	// message would mean silently discarding every exchange that came after it.
+	const lastUserMessage = [...messages].reverse().find((message) => message.role === 'user');
+	const retryableVoiceMessageId =
+		lastUserMessage?.source === 'voice' && !isLoading && !isSearchingGeeks && !isSendingRequest
+			? lastUserMessage.id
+			: null;
 
 
 
@@ -839,6 +878,12 @@ const dispatch = useAppDispatch();
 									speak={tts.speak}
 									togglePauseResume={tts.togglePauseResume}
 									cancel={tts.cancel}
+									onReRecord={
+										message.id === retryableVoiceMessageId
+											? () => chatInputRef.current?.startVoiceRetry(message.id)
+											: undefined
+									}
+									isReRecording={message.id === reRecordingMessageId}
 								/>
 							))}
 
@@ -953,7 +998,13 @@ const dispatch = useAppDispatch();
 				</main>
 				{!error && userId && userId !== '' && (
 					<div className='w-full static  bottom-0'>
-						<ChatInput onSendMessage={handleMessageSend} isLoading={isLoading} onStartRecording={tts.cancel} />
+						<ChatInput
+							ref={chatInputRef}
+							onSendMessage={handleMessageSend}
+							isLoading={isLoading}
+							onStartRecording={tts.cancel}
+							onVoiceRetryChange={setReRecordingMessageId}
+						/>
 					</div>
 				)}
 			</div>

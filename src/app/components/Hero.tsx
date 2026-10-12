@@ -412,7 +412,7 @@ const handleSearch = (category: string | null) => {
                       decoding="async"
                       src="/assets/icons/success-02.svg"
                       alt="icon"
-                      style={{ height: 'auto' }}
+                      style={{ height: 'auto', width:'auto' }}
                     />
                     <div className="ms-1.5 xs:ms-2">
                       <h3 className="font-bold xxs:text-xs xs:text-sm lg:text-base">1250+</h3>
@@ -427,7 +427,7 @@ const handleSearch = (category: string | null) => {
                       decoding="async"
                       src="/assets/icons/success-03.svg"
                       alt="icon"
-                      style={{ height: 'auto' }}
+                      style={{ height: 'auto', width:'auto' }}
                     />
                     <div className="ms-1.5 xs:ms-2">
                       <h3 className="font-bold xxs:text-xs xs:text-sm lg:text-base">Live in Hyderabad</h3>

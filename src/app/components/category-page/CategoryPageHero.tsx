@@ -52,7 +52,7 @@ const CategoryPageHero = ({ hero, categorySlug }: Props) => {
               </div>
               
               <div className="flex flex-col items-start gap-1">
-                <span className="text-xl text-yellow-500 font-bold">430+</span>
+                <span className="text-xl text-yellow-500 font-bold">420+</span>
                 <span className="text-xs font-semibold text-gray-800">Verified Geeks</span>
               </div>
                 

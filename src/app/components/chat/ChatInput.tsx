@@ -1,32 +1,84 @@
 'use client';
-import { useCallback, useRef, useState } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
 import { Mic, Square, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
+import type { SendMessageOptions } from '@/interfaces/Chat';
 
 interface ChatInputProps {
-	onSendMessage: (message: string) => Promise<void>;
+	onSendMessage: (message: string, options?: SendMessageOptions) => Promise<void>;
 	isLoading: boolean;
 	onStartRecording?: () => void;
+	/** Fires with the message being re-recorded, or null once that attempt ends. */
+	onVoiceRetryChange?: (messageId: string | null) => void;
 }
 
-const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, onStartRecording }) => {
+export interface ChatInputHandle {
+	/** Record again and send the result as a replacement for `messageId`. */
+	startVoiceRetry: (messageId: string) => void;
+}
+
+const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(function ChatInput(
+	{ onSendMessage, isLoading, onStartRecording, onVoiceRetryChange },
+	ref
+) {
 	const [inputValue, setInputValue] = useState<string>('');
 	const textareaRef = useRef<HTMLInputElement | null>(null);
+	// A ref, not state: useAudioRecorder's onstop closes over the onTranscript it
+	// had when startRecording ran, so a state write in the same tick would not be
+	// visible to it. The mirrored state only drives the status text.
+	const retryTargetRef = useRef<string | null>(null);
+	const [retryTargetId, setRetryTargetId] = useState<string | null>(null);
+
+	const updateRetryTarget = useCallback(
+		(messageId: string | null) => {
+			retryTargetRef.current = messageId;
+			setRetryTargetId(messageId);
+			onVoiceRetryChange?.(messageId);
+		},
+		[onVoiceRetryChange]
+	);
 
 	const handleVoiceTranscript = useCallback(
 		async (transcript: string) => {
-			await onSendMessage(transcript);
+			const replaceMessageId = retryTargetRef.current ?? undefined;
+			updateRetryTarget(null);
+			await onSendMessage(transcript, { source: 'voice', replaceMessageId });
 		},
-		[onSendMessage]
+		[onSendMessage, updateRetryTarget]
 	);
 
-	const handleVoiceError = useCallback((message: string) => toast.error(message), []);
+	const handleVoiceError = useCallback(
+		(message: string) => {
+			updateRetryTarget(null);
+			toast.error(message);
+		},
+		[updateRetryTarget]
+	);
 
 	const { isRecording, isTranscribing, startRecording, stopRecording } = useAudioRecorder({
 		onTranscript: handleVoiceTranscript,
 		onError: handleVoiceError,
 	});
+
+	useImperativeHandle(
+		ref,
+		() => ({
+			startVoiceRetry: (messageId: string) => {
+				if (isTranscribing) return;
+				// Tapping the bubble action again stops the take, so the seeker never has
+				// to hunt for the composer mic to finish a re-record they started here.
+				if (isRecording) {
+					if (retryTargetRef.current === messageId) stopRecording();
+					return;
+				}
+				updateRetryTarget(messageId);
+				onStartRecording?.();
+				startRecording();
+			},
+		}),
+		[isRecording, isTranscribing, onStartRecording, startRecording, stopRecording, updateRetryTarget]
+	);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -58,13 +110,19 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, onStart
 			stopRecording();
 			return;
 		}
+		// A fresh tap on the composer mic is a new message, never a replacement.
+		updateRetryTarget(null);
 		// Stop any bot audio still playing so it isn't picked up by the mic.
 		onStartRecording?.();
 		startRecording();
 	};
 
+	const isRetrying = retryTargetId !== null;
+
 	const statusText = isRecording
-		? 'Listening… tap the mic to stop'
+		? isRetrying
+			? 'Listening… say it again, then tap the mic to stop'
+			: 'Listening… tap the mic to stop'
 		: isTranscribing
 		? 'Transcribing your voice…'
 		: 'Please note that you are interacting with an AI-powered assistant.';
@@ -124,6 +182,6 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, onStart
 			<div className='mt-2 mb-0 text-gray-400 text-xs md:text-sm text-center'>{statusText}</div>
 		</form>
 	);
-};
+});
 
 export default ChatInput;

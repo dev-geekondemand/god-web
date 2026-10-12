@@ -3,7 +3,7 @@
 
 import { ChatMessageInterface } from '@/interfaces/Chat';
 import Image from 'next/image';
-import { Play, Pause, XCircle } from 'lucide-react';
+import { Play, Pause, XCircle, Mic, RotateCcw } from 'lucide-react';
 
 function TimeDisplay({ timestamp }: { timestamp: number }) {
 	const date = new Date(timestamp);
@@ -25,6 +25,9 @@ interface ChatMessageProps {
 	speak: (text: string, messageId: string, voice?: string) => void;
 	togglePauseResume: () => void;
 	cancel: () => void;
+	/** Supplied only for the latest voice message, which is the only one safe to rewind to. */
+	onReRecord?: () => void;
+	isReRecording?: boolean;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({
@@ -37,9 +40,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 	speak,
 	togglePauseResume,
 	cancel,
+	onReRecord,
+	isReRecording = false,
 }) => {
 	const isUser = message.role === 'user';
 	const isActive = playingMessageId === message.id;
+	const isVoice = isUser && message.source === 'voice';
 
 	const bgColor = isUser
 		? 'bg-teal-500'
@@ -70,8 +76,37 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 			<div
 				className={`${bgColor} ${textColor} ${corner}
 				text-xs font-medium ${isExpanded ? "sm:text-sm px-6 py-2" :"text-xs px-3 py-1"} rounded-2xl    m-2 flex ${isExpanded ? "max-w-xs sm:max-w-fit md:max-w-1/2":"max-w-2/3"} shadow-md flex-col`}>
+				{isVoice && (
+					<div className='mt-1 flex items-center gap-1 self-start rounded-full bg-white/20 px-1.5 py-0.5'>
+						<Mic size={10} />
+						<span className='text-[10px] font-semibold leading-none'>Voice</span>
+					</div>
+				)}
 				<div style={{ whiteSpace: 'pre-wrap' }}>{message.content}</div>
-				<div className={`${timeColor} text-xs  my-1 flex justify-end`}>
+				<div className={`${timeColor} text-xs  my-1 flex items-center justify-between gap-3`}>
+					{onReRecord ? (
+						// A wrong transcript is far easier to re-speak than to retype, so the
+						// fix lives on the bubble itself rather than behind the composer.
+						<button
+							type='button'
+							onClick={onReRecord}
+							title={isReRecording ? 'Tap to stop recording' : 'Re-record this message'}
+							className='flex items-center gap-1 text-[10px] font-semibold underline decoration-white/50 underline-offset-2 opacity-90 hover:opacity-100'>
+							{isReRecording ? (
+								<>
+									<span className='h-1.5 w-1.5 rounded-full bg-red-300 animate-pulse' />
+									Listening… tap to stop
+								</>
+							) : (
+								<>
+									<RotateCcw size={10} />
+									Wrong? Re-record
+								</>
+							)}
+						</button>
+					) : (
+						<span />
+					)}
 					<TimeDisplay timestamp={message.timestamp} />
 				</div>
 			</div>
