@@ -18,7 +18,7 @@ const ChatWelcome: React.FC<ChatWelcomeProps> = ({ onSuggestionClick, isLoadingA
 
 		try {
 			 await fetch(
-				`${process.env.NEXT_PUBLIC_SERVER_URL}`,
+				`${process.env.NEXT_PUBLIC_SERVER_URL_TEST}`,
 				{
 					method: 'GET',
 					headers: {

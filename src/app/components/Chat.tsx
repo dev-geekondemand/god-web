@@ -147,7 +147,7 @@ const dispatch = useAppDispatch();
 						return;
 					}
 					const { data } = await axios.get(
-						`${process.env.NEXT_PUBLIC_BASE_SERVER_URL}/chat/chat_history/${conversationId}`,
+						`${process.env.NEXT_PUBLIC_BASE_SERVER_URL_TEST}/chat/chat_history/${conversationId}`,
 						{
 							method: 'GET',
 							headers: {
@@ -357,7 +357,7 @@ const dispatch = useAppDispatch();
 		let socket: WebSocket;
 		try {
 			socket = new WebSocket(
-				`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}${userId}?conversation_id=${conversationId}`
+				`${process.env.NEXT_PUBLIC_WEBSOCKET_URL_TEST}${userId}?conversation_id=${conversationId}`
 			);
 		} catch (error) {
 			// A malformed/missing NEXT_PUBLIC_WEBSOCKET_URL throws right here
@@ -648,7 +648,7 @@ const dispatch = useAppDispatch();
 			console.log(conversationId);
 			
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_BASE_SERVER_URL}/chat/delete/${conversationId}`,
+				`${process.env.NEXT_PUBLIC_BASE_SERVER_URL_TEST}/chat/delete/${conversationId}`,
 				{
 					method: 'DELETE',
 					headers: {
@@ -688,7 +688,7 @@ const dispatch = useAppDispatch();
 		setFetchedChatHistory(true);
 		if (!ws.current || ws.current.readyState === WebSocket.CLOSED) {
 			ws.current = new WebSocket(
-				`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}${userId}?conversation_id=${conversationId}`
+				`${process.env.NEXT_PUBLIC_WEBSOCKET_URL_TEST}${userId}?conversation_id=${conversationId}`
 			);
 			attachSocketHandlers(ws.current);
 		}
@@ -732,7 +732,7 @@ const dispatch = useAppDispatch();
 			setGeeksError(null);
 			try {
 				const { data } = await axios.post(
-					`${process.env.NEXT_PUBLIC_BASE_SERVER_URL}/geek_query/get_geeks_from_user_issue?page=${page}`,
+					`${process.env.NEXT_PUBLIC_BASE_SERVER_URL_TEST}/geek_query/get_geeks_from_user_issue?page=${page}`,
 					userIssue
 				);
 				if (cancelled) return;

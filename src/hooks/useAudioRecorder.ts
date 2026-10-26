@@ -105,7 +105,7 @@ export function useAudioRecorder({ onTranscript, onError }: UseAudioRecorderOpti
 
 				try {
 					const response = await axios.post(
-						`${process.env.NEXT_PUBLIC_BASE_SERVER_URL}/stt`,
+						`${process.env.NEXT_PUBLIC_BASE_SERVER_URL_TEST}/stt`,
 						formData,
 						{ headers: { 'Content-Type': 'multipart/form-data' } }
 					);
