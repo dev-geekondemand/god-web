@@ -55,7 +55,7 @@ export function useTTS() {
 			setIsVoiceLoading(true);
 
 			const response = await axios.post(
-				`${process.env.NEXT_PUBLIC_BASE_SERVER_URL_TEST}/tts`,
+				`${process.env.NEXT_PUBLIC_BASE_SERVER_URL}/tts`,
 				{ text, voice },
 				{ responseType: 'blob' }
 			);
