@@ -900,7 +900,7 @@ const dispatch = useAppDispatch();
 											height={50}
 										/>
 										<span className='text-xs md:text-sm text-gray-500'>
-											Gnie is thinking…
+											Genie is thinking…
 										</span>
 									</div>
 								)}

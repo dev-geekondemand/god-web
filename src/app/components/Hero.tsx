@@ -156,7 +156,7 @@ const handleSearch = (category: string | null) => {
 
     
         {/* Floating Gigi mascot — small screens only (the in-hero mascot takes over from mmd up) */}
-        <div className="mmd:hidden absolute bottom-4 left-4 z-20 group floating">
+        <div className="mmd:hidden absolute bottom-20 -left-5 z-20 group floating">
           <div className="rounded-full flex items-center justify-center">
             <Image
               src="/assets/icons/gigi.png"

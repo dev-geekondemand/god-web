@@ -31,7 +31,7 @@ const Genie = () => {
             className="rounded-full flex items-center justify-center"
           >
             <Image
-              src="/assets/icons/genie-logo.png"
+              src="/assets/icons/genie-new.png"
               width={100}
               height={100}
               alt="AI Genie"
