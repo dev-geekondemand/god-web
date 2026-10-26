@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import axios from 'axios';
+import { CHAT_SERVER_URL } from '@/utils/chatEnv';
 
 export function useTTS() {
 	const [isVoiceLoading, setIsVoiceLoading] = useState(false);
@@ -55,7 +56,7 @@ export function useTTS() {
 			setIsVoiceLoading(true);
 
 			const response = await axios.post(
-				`${process.env.NEXT_PUBLIC_BASE_SERVER_URL_TEST}/tts`,
+				`${CHAT_SERVER_URL}/tts`,
 				{ text, voice },
 				{ responseType: 'blob' }
 			);

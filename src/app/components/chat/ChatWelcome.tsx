@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Skeleton from './Skeleton';
 import ChatSuggestionButton from './ChatSuggestionButton';
+import { CHAT_CATEGORIES_URL } from '@/utils/chatEnv';
 
 interface ChatWelcomeProps {
 	onSuggestionClick: (prompt: string) => void;
@@ -18,7 +19,7 @@ const ChatWelcome: React.FC<ChatWelcomeProps> = ({ onSuggestionClick, isLoadingA
 
 		try {
 			 await fetch(
-				`${process.env.NEXT_PUBLIC_SERVER_URL_TEST}`,
+				CHAT_CATEGORIES_URL,
 				{
 					method: 'GET',
 					headers: {

@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import axios from 'axios';
+import { CHAT_SERVER_URL } from '@/utils/chatEnv';
 
 interface UseAudioRecorderOptions {
 	onTranscript: (text: string) => void;
@@ -105,7 +106,7 @@ export function useAudioRecorder({ onTranscript, onError }: UseAudioRecorderOpti
 
 				try {
 					const response = await axios.post(
-						`${process.env.NEXT_PUBLIC_BASE_SERVER_URL_TEST}/stt`,
+						`${CHAT_SERVER_URL}/stt`,
 						formData,
 						{ headers: { 'Content-Type': 'multipart/form-data' } }
 					);
