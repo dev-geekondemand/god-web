@@ -191,12 +191,9 @@ const Request: React.FC<RequestProps> = ({ requests, onAccept, onReject }) => {
                         linkText={"From: " + req.seeker?.fullName?.first + " " + (req.seeker?.fullName?.last ?? "")}
                         avatarImg={req.seeker?.profileImage || "/assets/images/placeholder_user.jpg"}
                         title={"Name: " + req?.seeker?.fullName?.first + " " + (req?.seeker?.fullName?.last ?? "")}
-                        line1={
-                          req.seeker?.authProvider === "google" || req.seeker?.authProvider === "microsoft"
-                            ? "Email: " + req?.seeker?.email
-                            : "Phone: " + req?.seeker?.phone
-                        }
-                        line2={"Joined on: " + new Date(req?.seeker?.createdAt).toLocaleString("en-US", { day: "numeric", month: "long", year: "numeric" })}
+                        // The backend sends a geek only contact fields (email only when there's no phone).
+                        line1={req?.seeker?.phone ? "Phone: " + req.seeker.phone : "Email: " + (req?.seeker?.email ?? "N/A")}
+                        line2=""
                         mutedLine={
                           req?.seeker?.address?.line1
                             ? "Address: " + (req?.seeker?.address?.line1 + ", " || "") + (req?.seeker?.address?.line2 + ", " || "") + (req?.seeker?.address?.line3 || "")

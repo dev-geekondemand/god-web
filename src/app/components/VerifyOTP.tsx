@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { createGeek, createCorporateGeek } from '@/features/geek/geekSlice';
+import { createGeek, createCorporateGeek, sendGeekOTP } from '@/features/geek/geekSlice';
 import { getLoginOTP, loadUser, loginWithOTP, registerUser } from '@/features/seeker/seekerSlice';
 import { useAppDispatch } from '@/lib/hooks';
 import { useSelector } from 'react-redux';
@@ -104,7 +104,15 @@ const VerifyOTP = () => {
           dispatch(loadUser());
         }
       } catch (error) {
-        toast.error('An error occurred. Please try again.');
+        // Every thunk's rejected reducer already toasts the backend's message.
+        const isGeek = selected === 'Geek' || selected === 'CorporateGeek';
+        const message = (error as { message?: string })?.message ?? '';
+        if (/already exists/i.test(message)) {
+          // Already registered: send them to login (geek login takes ?phone=).
+          router.push(isGeek ? `/login/geek?phone=${encodeURIComponent(mobile ?? '')}` : '/login/seeker');
+        } else if (step === 'login' && /not registered/i.test(message)) {
+          router.push('/register?type=seeker');
+        }
         console.log(error);
       } finally {
         setLoading(false);
@@ -136,7 +144,8 @@ const VerifyOTP = () => {
 
     try {
       setTimer(30);
-      dispatch(getLoginOTP(mobile ?? ''));
+      if (selected === 'Geek' || selected === 'CorporateGeek') dispatch(sendGeekOTP(mobile ?? ''));
+      else dispatch(getLoginOTP(mobile ?? ''));
       toast.success("OTP resent!");
     } catch {
       toast.error("Error resending OTP");
@@ -218,6 +227,7 @@ const VerifyOTP = () => {
                                 </div>
                                  <div className=" items-center">
                           <button
+                            type="button"
                             disabled={timer > 0}
                             onClick={handleResendOTP}
                           >

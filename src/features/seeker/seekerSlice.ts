@@ -141,6 +141,14 @@ export const loadUser = createAsyncThunk('user/load', async (_, thunkAPI) => {
     const res = await seekerService.getAuthStatus();
     return res.data;
   } catch (error) {
+    // Session cookie is gone/invalid: drop the stale hint so AuthInitializer
+    // stops probing /seeker/me (and logging a 403) on every page load.
+    // The API-key gate also answers 403, so don't treat that as a logout.
+    const response = (error as { response?: { status?: number; data?: { message?: string } } }).response;
+    const isApiKeyError = /api key/i.test(response?.data?.message ?? "");
+    if ((response?.status === 401 || response?.status === 403) && !isApiKeyError) {
+      localStorage.removeItem("userType");
+    }
     if (error) {
       return thunkAPI.rejectWithValue((error as { response: { data: unknown } }).response?.data || (error as Error).message);
       } else {

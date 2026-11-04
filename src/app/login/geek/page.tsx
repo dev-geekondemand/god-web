@@ -52,6 +52,15 @@ const LoginGeek = () => {
     },
   })
 
+  // Prefill from ?phone= (VerifyOTP redirects here when the number is already
+  // registered). Read via window rather than useSearchParams to avoid needing a
+  // Suspense boundary around this page.
+  useEffect(() => {
+    const phone = new URLSearchParams(window.location.search).get('phone')
+    if (phone) formik.setFieldValue('phone', phone.replace(/\D/g, '').slice(-10))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const geekState = useSelector((state: RootState) => state.geek)
 
   useEffect(() => {

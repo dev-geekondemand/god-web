@@ -361,9 +361,14 @@ const SingleRequestPage = () => {
                   </p>
                 </div>
                 <div className="flex flex-col gap-3">
+                  {/* Contact details arrive only after the geek accepts the request. */}
+                  {request.geekResponseStatus !== 'Accepted' && (
+                    <p className="text-xs text-gray-500">Contact details are shared once you accept this request.</p>
+                  )}
                   {[
-                    { label: 'Email', value: request.seeker.email || 'N/A' },
-                    { label: 'Phone', value: request.seeker.phone || 'N/A' },
+                    ...(request.seeker.email && !request.seeker.phone
+                      ? [{ label: 'Email', value: request.seeker.email }]
+                      : [{ label: 'Phone', value: request.seeker.phone || 'N/A' }]),
                     {
                       label: 'Location',
                       value: request.seeker.address?.city && request.seeker.address?.state

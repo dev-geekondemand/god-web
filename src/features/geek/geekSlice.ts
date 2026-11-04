@@ -101,9 +101,17 @@ export const loginGeek = createAsyncThunk('geek/login', async (geek:{phone: stri
 
 export const loadGeek = createAsyncThunk('geek/load', async (_, thunkAPI) => {
   try {
-    const res = await geekService.getAuthStatus(); 
+    const res = await geekService.getAuthStatus();
     return res;
   } catch (error) {
+    // Session cookie is gone/invalid: drop the stale hint so AuthInitializer
+    // stops probing the auth endpoint (and logging a 403) on every page load.
+    // The API-key gate also answers 403, so don't treat that as a logout.
+    const response = (error as { response?: { status?: number; data?: { message?: string } } }).response;
+    const isApiKeyError = /api key/i.test(response?.data?.message ?? "");
+    if ((response?.status === 401 || response?.status === 403) && !isApiKeyError) {
+      localStorage.removeItem("userType");
+    }
     if (error) {
       return thunkAPI.rejectWithValue((error as { response: { data: unknown } }).response?.data || (error as Error).message);
       } else {

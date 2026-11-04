@@ -20,7 +20,9 @@ export const getApiKey = async () => {
   if (cachedApiKey !== null) {
     // Decode expiration from JWT to know when it expires
   const payload = JSON.parse(atob(cachedApiKey.split(".")[1]));
-  expiresAt = payload.exp * 1000; // JWT exp is in seconds, convert to ms
+  // JWT exp is in seconds; refresh 10s early so a key never expires in flight
+  // or under client/server clock skew.
+  expiresAt = payload.exp * 1000 - 10_000;
 }
 
 
