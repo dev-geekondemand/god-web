@@ -44,7 +44,6 @@ const PLANS = [
     highlight: false,
     features: [
       { label: "Basic public listing", yes: true },
-      { label: "Social media & website links", yes: false },
       { label: "Featured on homepage", yes: false },
       { label: "Top placement in categories", yes: false },
       { label: "Job alert notifications", yes: false },
@@ -64,11 +63,10 @@ const PLANS = [
     badge: "Popular",
     features: [
       { label: "Basic public listing", yes: true },
-      { label: "Social media & website links", yes: true },
       { label: "Featured on homepage", yes: true },
       { label: "Top placement in categories", yes: true },
       { label: "Job alert notifications", yes: true },
-      { label: "Verified badge", yes: false },
+      { label: "Verified badge", yes: true },
       { label: "Profile suggestion to buyers", yes: false },
       { label: "Direct email marketing", yes: false },
       { label: "24-hour priority support", yes: false },
@@ -84,7 +82,6 @@ const PLANS = [
     badge: "Best Value",
     features: [
       { label: "Basic public listing", yes: true },
-      { label: "Social media & website links", yes: true },
       { label: "Featured on homepage", yes: true },
       { label: "Top placement in categories", yes: true },
       { label: "Job alert notifications", yes: true },
