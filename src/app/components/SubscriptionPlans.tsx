@@ -95,6 +95,16 @@ const PLANS = [
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+// Plan prices are exclusive of GST; GST is added at checkout (refunds exclude it).
+const GST_RATE = 0.18;
+
+function gstBreakdown(price: number) {
+  const gst = Math.round(price * GST_RATE * 100) / 100;
+  return { base: price, gst, total: Math.round((price + gst) * 100) / 100 };
+}
+
+const formatINR = (n: number) => n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 function loadRazorpayScript(): Promise<boolean> {
   if (typeof window !== "undefined" && window.Razorpay) return Promise.resolve(true);
   return new Promise((resolve) => {
@@ -122,6 +132,7 @@ export default function SubscriptionPlans() {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [showRefundConfirm, setShowRefundConfirm] = useState(false);
   const [refundReason, setRefundReason] = useState("");
+  const [checkoutPlan, setCheckoutPlan] = useState<typeof PLANS[number] | null>(null);
 
   const currentPlan = (geek?.subscriptionPlan as string) || "Startup";
 
@@ -152,7 +163,7 @@ export default function SubscriptionPlans() {
       key: checkout.razorpayKeyId,
       subscription_id: checkout.subscriptionId,
       name: "Geek on Demand",
-      description: `${checkout.plan} Plan — Monthly Subscription`,
+      description: `${checkout.plan} Plan — ₹${PLANS.find((p) => p.name === checkout.plan)?.price ?? ""} + 18% GST / month`,
       image: `${window.location.origin}\assets\icons\god-new-logo.jpg`,
       handler: async (response: RazorpayPaymentResponse) => {
         try {
@@ -207,6 +218,14 @@ export default function SubscriptionPlans() {
     } finally {
       setActionLoading(null);
     }
+  }
+
+  function handleProceedToPay() {
+    if (!checkoutPlan) return;
+    const plan = checkoutPlan;
+    setCheckoutPlan(null);
+    if (currentPlan === "Startup") handleSubscribe(plan.name as "Advance" | "Professional");
+    else handleChangePlan(plan.name);
   }
 
   async function handleCancel() {
@@ -272,7 +291,7 @@ export default function SubscriptionPlans() {
     if (isUpgrade) {
       return (
         <button
-          onClick={() => currentPlan === "Startup" ? handleSubscribe(plan.name as "Advance" | "Professional") : handleChangePlan(plan.name)}
+          onClick={() => setCheckoutPlan(plan)}
           disabled={!!actionLoading || isLoading}
           className="w-full py-2 px-4 text-sm rounded-lg bg-teal-600 text-white font-medium hover:bg-teal-700 transition disabled:opacity-50"
         >
@@ -302,7 +321,8 @@ export default function SubscriptionPlans() {
     const periodEnd = subscription?.currentPeriodEnd
       ? new Date(subscription.currentPeriodEnd).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
       : null;
-    const AMOUNTS: Record<string, number> = { Advance: 499, Professional: 999 };
+    const paidPlan = PLANS.find((p) => p.name === planName && p.price > 0);
+    const charged = paidPlan ? gstBreakdown(paidPlan.price) : null;
 
     return (
       <div className="w-full flex flex-col items-center bg-gray-50 min-h-screen">
@@ -328,11 +348,21 @@ export default function SubscriptionPlans() {
                 <span className="text-gray-500">Plan</span>
                 <span className="font-semibold text-gray-800">{planName}</span>
               </div>
-              {AMOUNTS[planName] && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Amount charged</span>
-                  <span className="font-semibold text-gray-800">₹{AMOUNTS[planName]} / month</span>
-                </div>
+              {charged && (
+                <>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Plan price</span>
+                    <span className="text-gray-800">₹{formatINR(charged.base)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">GST @ 18%</span>
+                    <span className="text-gray-800">₹{formatINR(charged.gst)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Amount charged</span>
+                    <span className="font-semibold text-gray-800">₹{formatINR(charged.total)} / month</span>
+                  </div>
+                </>
               )}
               {periodEnd && (
                 <div className="flex justify-between text-sm">
@@ -423,6 +453,7 @@ export default function SubscriptionPlans() {
               <div className="mb-1">
                 <span className="text-3xl font-bold text-gray-900">{plan.price === 0 ? "Free" : `₹${plan.price}`}</span>
                 {plan.price > 0 && <span className="text-sm text-gray-400 ml-1">/ month</span>}
+                {plan.price > 0 && <p className="text-xs text-gray-400 mt-0.5">+ 18% GST</p>}
               </div>
               <p className="text-sm text-gray-500 mb-6">{plan.description}</p>
 
@@ -454,6 +485,10 @@ export default function SubscriptionPlans() {
         })}
       </div>
 
+      <p className="text-center text-xs text-gray-400 mt-6">
+        All prices are exclusive of 18% GST, which is added at checkout.
+      </p>
+
       {/* Refund status / request */}
       {subscription?.refundRequest ? (
         <div className="max-w-md mx-auto mt-10 bg-teal-50 border border-teal-100 rounded-xl p-4 text-left space-y-2">
@@ -463,7 +498,7 @@ export default function SubscriptionPlans() {
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-500">Amount</span>
-            <span className="font-semibold text-gray-800">₹{(subscription.refundRequest.amount / 100).toFixed(0)}</span>
+            <span className="font-semibold text-gray-800">₹{formatINR(subscription.refundRequest.amount / 100)} <span className="font-normal text-gray-400">(excl. GST)</span></span>
           </div>
           {subscription.refundRequest.status === "rejected" && subscription.refundRequest.adminNote && (
             <p className="text-xs text-gray-500 pt-1 border-t border-teal-100">
@@ -487,6 +522,46 @@ export default function SubscriptionPlans() {
           </button>
         </div>
       ) : null}
+
+      {/* Checkout summary (GST breakdown) */}
+      {checkoutPlan && (() => {
+        const { base, gst, total } = gstBreakdown(checkoutPlan.price);
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Order summary</h3>
+              <div className="space-y-2 mb-6">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">{checkoutPlan.name} Plan (monthly)</span>
+                  <span className="text-gray-800">₹{formatINR(base)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">GST @ 18%</span>
+                  <span className="text-gray-800">₹{formatINR(gst)}</span>
+                </div>
+                <div className="flex justify-between text-sm pt-2 border-t border-gray-100">
+                  <span className="font-semibold text-gray-900">Total payable</span>
+                  <span className="font-semibold text-gray-900">₹{formatINR(total)} / month</span>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setCheckoutPlan(null)}
+                  className="flex-1 py-2 rounded-lg border border-gray-300 text-sm text-gray-700 hover:bg-gray-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleProceedToPay}
+                  className="flex-1 py-2 rounded-lg bg-teal-600 text-white text-sm font-medium hover:bg-teal-700 transition"
+                >
+                  Proceed to pay
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Cancel confirmation dialog */}
       {showCancelConfirm && (
@@ -521,6 +596,9 @@ export default function SubscriptionPlans() {
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Request a refund?</h3>
             <p className="text-sm text-gray-500 mb-4">
               Tell us why you&apos;re requesting a refund on your last payment. Our team will review it.
+            </p>
+            <p className="text-xs text-gray-400 mb-4">
+              Refunds cover the plan amount only; the 18% GST is non-refundable.
             </p>
             <textarea
               value={refundReason}
