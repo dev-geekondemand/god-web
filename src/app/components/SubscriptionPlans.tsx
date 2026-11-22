@@ -17,6 +17,7 @@ import { loadGeek } from "@/features/geek/geekSlice";
 import { useRouter } from "next/navigation";
 import PageBanner from "@/app/components/PageBanner";
 import toast from "react-hot-toast";
+import { planDisplayName } from "@/utils/planLabels";
 
 // ─── Razorpay types ───────────────────────────────────────────────────────────
 declare global {
@@ -163,7 +164,7 @@ export default function SubscriptionPlans() {
       key: checkout.razorpayKeyId,
       subscription_id: checkout.subscriptionId,
       name: "Geek on Demand",
-      description: `${checkout.plan} Plan — ₹${PLANS.find((p) => p.name === checkout.plan)?.price ?? ""} + 18% GST / month`,
+      description: `${planDisplayName(checkout.plan)} Plan — ₹${PLANS.find((p) => p.name === checkout.plan)?.price ?? ""} + 18% GST / month`,
       image: `${window.location.origin}\assets\icons\god-new-logo.jpg`,
       handler: async (response: RazorpayPaymentResponse) => {
         try {
@@ -295,7 +296,7 @@ export default function SubscriptionPlans() {
           disabled={!!actionLoading || isLoading}
           className="w-full py-2 px-4 text-sm rounded-lg bg-teal-600 text-white font-medium hover:bg-teal-700 transition disabled:opacity-50"
         >
-          {loading ? "Processing…" : `Upgrade to ${plan.name}`}
+          {loading ? "Processing…" : `Upgrade to ${planDisplayName(plan.name)}`}
         </button>
       );
     }
@@ -307,7 +308,7 @@ export default function SubscriptionPlans() {
           disabled={!!actionLoading || isLoading}
           className="w-full py-2 px-4 text-sm rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition disabled:opacity-50"
         >
-          {loading ? "Processing…" : `Downgrade to ${plan.name}`}
+          {loading ? "Processing…" : `Downgrade to ${planDisplayName(plan.name)}`}
         </button>
       );
     }
@@ -318,6 +319,7 @@ export default function SubscriptionPlans() {
   // ─── Success screen ───────────────────────────────────────────────────────────
   if (isSuccess) {
     const planName = subscription?.plan ?? '';
+    const planLabel = planDisplayName(planName);
     const periodEnd = subscription?.currentPeriodEnd
       ? new Date(subscription.currentPeriodEnd).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
       : null;
@@ -338,7 +340,7 @@ export default function SubscriptionPlans() {
 
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Subscription Activated!</h2>
             <p className="text-gray-500 text-sm mb-6">
-              Welcome to the <span className="font-semibold text-teal-600">{planName}</span> plan.
+              Welcome to the <span className="font-semibold text-teal-600">{planLabel}</span> plan.
               Your profile now gets priority placement in search results.
             </p>
 
@@ -346,7 +348,7 @@ export default function SubscriptionPlans() {
             <div className="bg-teal-50 border border-teal-100 rounded-xl p-4 mb-6 text-left space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Plan</span>
-                <span className="font-semibold text-gray-800">{planName}</span>
+                <span className="font-semibold text-gray-800">{planLabel}</span>
               </div>
               {charged && (
                 <>
@@ -433,7 +435,7 @@ export default function SubscriptionPlans() {
                 <span className={`text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${
                   plan.highlight ? "bg-teal-100 text-teal-700" : "bg-gray-100 text-gray-500"
                 }`}>
-                  {plan.name}
+                  {planDisplayName(plan.name)}
                 </span>
                 <div className="flex gap-1">
                   {"badge" in plan && (
@@ -532,7 +534,7 @@ export default function SubscriptionPlans() {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Order summary</h3>
               <div className="space-y-2 mb-6">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">{checkoutPlan.name} Plan (monthly)</span>
+                  <span className="text-gray-500">{planDisplayName(checkoutPlan.name)} Plan (monthly)</span>
                   <span className="text-gray-800">₹{formatINR(base)}</span>
                 </div>
                 <div className="flex justify-between text-sm">

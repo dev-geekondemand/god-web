@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import subscriptionService, { CheckoutData, SubscriptionData } from "./subscriptionService";
 import toast from "react-hot-toast";
+import { withPlanDisplayNames } from "@/utils/planLabels";
 
 // ─── Thunks ───────────────────────────────────────────────────────────────────
 
@@ -156,7 +157,7 @@ const subscriptionSlice = createSlice({
       .addCase(cancelMySubscription.fulfilled, (state, action) => {
         state.isLoading = false;
         if (state.subscription) state.subscription.cancelAtPeriodEnd = true;
-        toast.success(action.payload?.message || 'Subscription cancelled.');
+        toast.success(withPlanDisplayNames(action.payload?.message || 'Subscription cancelled.'));
       })
       .addCase(cancelMySubscription.rejected, (state, action) => {
         state.isLoading = false;
@@ -183,7 +184,7 @@ const subscriptionSlice = createSlice({
         if (action.payload?.subscriptionId) {
           state.pendingCheckout = action.payload;
         } else {
-          toast.success(action.payload?.message || 'Plan change scheduled.');
+          toast.success(withPlanDisplayNames(action.payload?.message || 'Plan change scheduled.'));
         }
       })
       .addCase(switchPlan.rejected, (state, action) => {

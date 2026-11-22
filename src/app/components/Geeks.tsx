@@ -29,7 +29,7 @@ const LIMIT = 12; // items per page
 
 const PLAN_CONFIG: Record<string, { label: string; color: string }> = {
   Professional: { label: 'Professional', color: 'text-amber-700 border-amber-200 bg-amber-50' },
-  Advance:      { label: 'Advance',      color: 'text-teal-700 border-teal-200 bg-teal-50' },
+  Advance:      { label: 'Pro Geek', color: 'text-teal-700 border-teal-200 bg-teal-50' },
 };
 
 const TIME_SLOTS = [

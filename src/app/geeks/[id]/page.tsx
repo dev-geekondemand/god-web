@@ -19,6 +19,7 @@ import Brand from '@/interfaces/Brand'
 import { getBrands } from '@/features/brands/brandsSlice'
 import GlobalSkeleton from '@/app/components/Sekeletn'
 import PageBanner from '@/app/components/PageBanner'
+import { planDisplayName } from '@/utils/planLabels'
 
 interface SkillWithBrands {
   category: Category
@@ -267,7 +268,7 @@ const GeekById = () => {
                 )}
                 {planLabel !== 'Startup' && (
                   <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${planColorClass}`}>
-                    {planLabel}
+                    {planDisplayName(planLabel)}
                   </span>
                 )}
                 {isVerified && (

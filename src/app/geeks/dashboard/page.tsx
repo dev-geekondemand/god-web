@@ -66,6 +66,7 @@ import ProfileImage from "@/app/components/ProfileImage";
 import RateCardSection from "@/app/components/RateCard";
 import Brand from "@/interfaces/Brand";
 import GlobalSkeleton from "@/app/components/Sekeletn";
+import { planDisplayName } from "@/utils/planLabels";
 
 interface SkillWithBrands {
   categoryId: string;
@@ -780,7 +781,7 @@ const Dashboard = () => {
                   return (
                     <div className="flex flex-col gap-3">
                       <div className={`flex items-center justify-between px-3 py-2 rounded-lg border text-sm font-medium ${colorClass}`}>
-                        <span>{plan}</span>
+                        <span>{planDisplayName(plan)}</span>
                         <span className="text-xs font-normal">{plan === "Startup" ? "Free" : "Active"}</span>
                       </div>
                       <Link

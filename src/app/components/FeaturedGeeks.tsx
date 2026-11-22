@@ -19,7 +19,7 @@ interface GeeksHere {
 
 const planConfig: Record<string, { label: string; color: string }> = {
     Professional: { label: 'Professional', color: 'text-amber-700 border-amber-200 bg-amber-50' },
-    Advance:      { label: 'Advance',      color: 'text-teal-700 border-teal-200 bg-teal-50' },
+    Advance:      { label: 'Pro Geek', color: 'text-teal-700 border-teal-200 bg-teal-50' },
 };
 
 const ArrowButton = ({ direction, onClick }: { direction: 'left' | 'right'; onClick: () => void }) => (
